@@ -12,6 +12,16 @@ let activeSessionId = null;
 // INIT
 // ============================================================
 async function init() {
+  // Tampilkan splash singkat dulu
+  const splash = document.getElementById('splashScreen');
+  const shell  = document.getElementById('appShell');
+  splash.style.display = 'flex';
+  shell.style.display  = 'none';
+  setTimeout(() => {
+    splash.classList.add('hiding');
+    setTimeout(() => { splash.style.display = 'none'; shell.style.display = 'block'; }, 500);
+  }, 800);
+
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = 'index.html'; return; }
 
@@ -24,25 +34,17 @@ async function init() {
   document.getElementById('headerAvatar').textContent = p.nama?.charAt(0)?.toUpperCase() || 'P';
 
   const now = new Date();
-  document.getElementById('headerDate').textContent = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  document.getElementById('headerDate').textContent = now.toLocaleDateString('id-ID', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
 
-  await loadSiteConfigUser();
-  await loadBlokPicker();
-
-  // Set today dates
   const today = now.toISOString().split('T')[0];
   document.getElementById('myRiwayatDari').value = today;
   document.getElementById('myRiwayatSampai').value = today;
 
-  // Nav routing handled via onclick in HTML
-
-  setTimeout(() => {
-    document.getElementById('splashScreen').classList.add('hiding');
-    setTimeout(() => {
-      document.getElementById('splashScreen').style.display = 'none';
-      document.getElementById('appShell').style.display = 'block';
-    }, 600);
-  }, 1800);
+  // Load data non-blocking
+  loadSiteConfigUser().catch(() => {});
+  loadBlokPicker().catch(() => {});
 }
 
 async function loadSiteConfigUser() {
@@ -68,9 +70,13 @@ async function loadSiteConfigUser() {
 
 function goPage(page) {
   document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + page)?.classList.add('active');
-  document.querySelector(`.nav-item[data-page="${page}"]`)?.classList.add('active');
+  const section = document.getElementById('page-' + page);
+  if (section) section.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.remove('active');
+    const oc = n.getAttribute('onclick') || '';
+    if (oc.includes("'" + page + "'")) n.classList.add('active');
+  });
 
   const titles = { absen: 'Kelola Absensi', riwayat: 'Riwayat Saya', profil: 'Profil Saya' };
   document.getElementById('headerTitle').textContent = titles[page] || page;

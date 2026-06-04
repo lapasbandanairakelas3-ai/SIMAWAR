@@ -6,6 +6,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 // Google Apps Script URL untuk data absensi
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwsbtc6-2WzTLgKnCkeWssmH_DxoSVRME5Ka5Wb9upobETp4DHrQL6gOZqIyB3S_7AHUA/exec';
+
 // Instagram & TikTok pembuat
 const CREATOR_IG = 'https://instagram.com/wa_miranti';
 const CREATOR_TT = 'https://tiktok.com/@wa_miranti';
