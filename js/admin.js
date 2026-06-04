@@ -19,7 +19,7 @@ async function init() {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = 'index.html'; return; }
 
-  const { data: p } = await sb.from('pegawai').select('*').eq('user_id', session.user.id).single();
+  const { data: p } = await sb.from('pegawai').select('*').eq('user_id', session.user.id).maybeSingle();
   if (!p || p.role !== 'admin') { window.location.href = 'index.html'; return; }
   currentAdmin = p;
 
@@ -34,10 +34,7 @@ async function init() {
   await loadSiteConfig();
   await loadDashboard();
 
-  // Nav routing
-  document.querySelectorAll('.nav-item[data-page]').forEach(el => {
-    el.addEventListener('click', () => goPage(el.dataset.page));
-  });
+  // Nav routing handled via onclick in HTML
 
   // Hide splash
   setTimeout(() => {
@@ -72,7 +69,15 @@ function goPage(page) {
   if (page === 'blok') loadBlok();
   if (page === 'riwayat') { loadRiwayatFilters(); loadRiwayat(); }
   if (page === 'akun') loadAkun();
-  if (page === 'siteconfig') loadSiteConfigForm();
+  if (page === 'siteconfig') {
+    loadSiteConfigForm();
+    setTimeout(() => {
+      ['cfgName','cfgDesc'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', updateConfigPreview);
+      });
+    }, 100);
+  }
 
   closeSidebar();
 }
@@ -109,12 +114,12 @@ async function doLogout() {
 // ============================================================
 async function loadSiteConfig() {
   try {
-    const { data } = await sb.from('site_config').select('*').single();
+    const { data } = await sb.from('site_config').select('*').maybeSingle();
     if (!data) return;
     siteConfigId = data.id;
     if (data.site_name) {
       document.title = `Admin — ${data.site_name}`;
-      document.getElementById('sidebarName').textContent = data.site_name;
+      document.getElementById('sidebarName').textContent = data.site_name || 'SIMAWAR';
       document.getElementById('splashTitle').textContent = data.site_name;
     }
     if (data.site_desc) document.getElementById('splashSub').textContent = data.site_desc;
@@ -133,22 +138,102 @@ async function loadSiteConfig() {
 
 async function loadSiteConfigForm() {
   try {
-    const { data } = await sb.from('site_config').select('*').single();
+    const { data } = await sb.from('site_config').select('*').maybeSingle();
     if (!data) return;
     document.getElementById('cfgName').value = data.site_name || '';
     document.getElementById('cfgDesc').value = data.site_desc || '';
     document.getElementById('cfgGas').value = data.gas_url || '';
+    if (document.getElementById('cfgInstansi')) document.getElementById('cfgInstansi').value = data.instansi || '';
+    if (document.getElementById('cfgAlamat')) document.getElementById('cfgAlamat').value = data.alamat || '';
     if (data.logo_url) {
       const img = document.getElementById('logoPreview');
       img.src = data.logo_url; img.style.display = 'block';
       document.getElementById('logoPlaceholder').style.display = 'none';
+      const rb = document.getElementById('removeLogoBtn');
+      if (rb) rb.style.display = 'inline-flex';
+      updatePreviewLogo(data.logo_url);
     }
     if (data.favicon_url) {
       const img = document.getElementById('favPreview');
       img.src = data.favicon_url; img.style.display = 'block';
       document.getElementById('favPlaceholder').style.display = 'none';
     }
+    // Update preview panel
+    updateConfigPreview();
   } catch(e) {}
+}
+
+function updateConfigPreview() {
+  const name = document.getElementById('cfgName')?.value || 'SIMAWAR';
+  const desc = document.getElementById('cfgDesc')?.value || '';
+  const pn = document.getElementById('previewName');
+  const pd = document.getElementById('previewDesc');
+  if (pn) pn.textContent = name;
+  if (pd) pd.textContent = desc.split('\n')[0];
+}
+
+function updatePreviewLogo(url) {
+  const box = document.getElementById('previewLogoBox');
+  const emoji = document.getElementById('previewLogoEmoji');
+  if (!box) return;
+  if (url) {
+    emoji.style.display = 'none';
+    let img = box.querySelector('img');
+    if (!img) { img = document.createElement('img'); box.appendChild(img); }
+    img.src = url;
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:10px';
+  } else {
+    emoji.style.display = 'block';
+    const img = box.querySelector('img');
+    if (img) img.remove();
+  }
+}
+
+function removeLogo() {
+  showConfirm('Hapus Logo', 'Yakin ingin menghapus logo? Logo akan direset ke default.', async () => {
+    const { error } = await sb.from('site_config').update({ logo_url: null }).eq('id', siteConfigId);
+    if (error) { showAlert('error', 'Gagal', error.message); return; }
+    document.getElementById('logoPreview').style.display = 'none';
+    document.getElementById('logoPlaceholder').style.display = 'flex';
+    document.getElementById('removeLogoBtn').style.display = 'none';
+    logoFile = null;
+    updatePreviewLogo(null);
+    showAlert('success', 'Dihapus!', 'Logo berhasil dihapus');
+    await loadSiteConfig();
+  }, 'danger');
+}
+
+async function testGasConnection() {
+  const url = document.getElementById('cfgGas').value.trim();
+  const resultEl = document.getElementById('gasTestResult');
+  if (!url) { showAlert('warning', 'Perhatian', 'Isi URL GAS terlebih dahulu!'); return; }
+  resultEl.style.display = 'block';
+  resultEl.className = 'p-3 rounded-xl text-xs mt-2 bg-blue-50 text-blue-700';
+  resultEl.textContent = '⏳ Menguji koneksi...';
+  try {
+    const r = await fetch(`${url}?action=ping`, { method: 'GET' });
+    if (r.ok) {
+      resultEl.className = 'p-3 rounded-xl text-xs mt-2 bg-green-50 text-green-700';
+      resultEl.textContent = '✅ Koneksi berhasil! GAS dapat dijangkau.';
+    } else {
+      throw new Error('HTTP ' + r.status);
+    }
+  } catch(e) {
+    resultEl.className = 'p-3 rounded-xl text-xs mt-2 bg-red-50 text-red-700';
+    resultEl.textContent = '❌ Koneksi gagal. Pastikan URL benar dan GAS sudah di-deploy sebagai Anyone.';
+  }
+}
+
+async function resetSiteConfig() {
+  showConfirm('Reset Konfigurasi', 'Yakin reset semua konfigurasi ke default? Logo akan dihapus.', async () => {
+    await sb.from('site_config').update({
+      site_name: 'SIMAWAR', site_desc: 'Sistem Informasi Monitoring Warga Binaan\nLapas Bandanaira',
+      logo_url: null, favicon_url: null, gas_url: null, instansi: null, alamat: null
+    }).eq('id', siteConfigId);
+    showAlert('success', 'Reset!', 'Konfigurasi berhasil direset');
+    await loadSiteConfig();
+    loadSiteConfigForm();
+  }, 'danger');
 }
 
 function previewLogo(event) {
@@ -159,6 +244,9 @@ function previewLogo(event) {
     const img = document.getElementById('logoPreview');
     img.src = e.target.result; img.style.display = 'block';
     document.getElementById('logoPlaceholder').style.display = 'none';
+    const rb = document.getElementById('removeLogoBtn');
+    if (rb) rb.style.display = 'inline-flex';
+    updatePreviewLogo(e.target.result);
   };
   reader.readAsDataURL(logoFile);
 }
@@ -424,7 +512,7 @@ async function openWbpModal(id = null) {
 
 async function editWbp(id) {
   await openWbpModal();
-  const { data: w } = await sb.from('wbp').select('*').eq('id', id).single();
+  const { data: w } = await sb.from('wbp').select('*').eq('id', id).maybeSingle();
   if (!w) return;
   document.getElementById('wbpModalTitle').textContent = 'Edit Data WBP';
   document.getElementById('wbpId').value = w.id;
@@ -586,7 +674,7 @@ function openPegawaiModal() {
 
 async function editPegawai(id) {
   openPegawaiModal();
-  const { data: p } = await sb.from('pegawai').select('*').eq('id', id).single();
+  const { data: p } = await sb.from('pegawai').select('*').eq('id', id).maybeSingle();
   if (!p) return;
   document.getElementById('pegawaiModalTitle').textContent = 'Edit Data Pegawai';
   document.getElementById('pegawaiId').value = p.id;
@@ -734,7 +822,7 @@ function openBlokModal() {
 }
 
 async function editBlok(id) {
-  const { data: b } = await sb.from('blok').select('*').eq('id', id).single();
+  const { data: b } = await sb.from('blok').select('*').eq('id', id).maybeSingle();
   if (!b) return;
   document.getElementById('blokModalTitle').textContent = 'Edit Blok/Kamar';
   document.getElementById('blokId').value = b.id;

@@ -15,7 +15,7 @@ async function init() {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = 'index.html'; return; }
 
-  const { data: p } = await sb.from('pegawai').select('*').eq('user_id', session.user.id).single();
+  const { data: p } = await sb.from('pegawai').select('*').eq('user_id', session.user.id).maybeSingle();
   if (!p) { await sb.auth.signOut(); window.location.href = 'index.html'; return; }
   currentUser = p;
 
@@ -34,10 +34,7 @@ async function init() {
   document.getElementById('myRiwayatDari').value = today;
   document.getElementById('myRiwayatSampai').value = today;
 
-  // Nav routing
-  document.querySelectorAll('.nav-item[data-page]').forEach(el => {
-    el.addEventListener('click', () => goPage(el.dataset.page));
-  });
+  // Nav routing handled via onclick in HTML
 
   setTimeout(() => {
     document.getElementById('splashScreen').classList.add('hiding');
@@ -50,7 +47,7 @@ async function init() {
 
 async function loadSiteConfigUser() {
   try {
-    const { data } = await sb.from('site_config').select('*').single();
+    const { data } = await sb.from('site_config').select('*').maybeSingle();
     if (!data) return;
     if (data.site_name) {
       document.title = `Petugas — ${data.site_name}`;

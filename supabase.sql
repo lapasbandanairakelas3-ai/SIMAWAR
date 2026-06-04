@@ -6,19 +6,26 @@
 -- ---- SITE CONFIG ----
 create table if not exists site_config (
   id uuid default gen_random_uuid() primary key,
-  site_name text default 'SiHadir',
-  site_desc text default 'Sistem Kehadiran Warga Binaan',
+  site_name text default 'SIMAWAR',
+  site_desc text default 'Sistem Informasi Monitoring Warga Binaan',
   logo_url text,
   favicon_url text,
   gas_url text,
+  instansi text default 'Lapas Kelas III Bandanaira',
+  alamat text,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
 
 -- Insert default config
-insert into site_config (site_name, site_desc)
-values ('SiHadir Lapas Bandanaira', 'Sistem Kehadiran Warga Binaan')
+insert into site_config (site_name, site_desc, instansi)
+values ('SIMAWAR', 'Sistem Informasi Monitoring Warga Binaan
+Lapas Bandanaira', 'Lapas Kelas III Bandanaira')
 on conflict do nothing;
+
+-- Jika tabel sudah ada, tambah kolom baru:
+-- alter table site_config add column if not exists instansi text;
+-- alter table site_config add column if not exists alamat text;
 
 -- ---- BLOK / KAMAR ----
 create table if not exists blok (

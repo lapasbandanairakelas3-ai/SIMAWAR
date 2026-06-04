@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Masuk — SiHadir Lapas</title>
-  <link rel="icon" id="faviconEl" href="data:," />
+  <title>Masuk — SIMAWAR</title>
+  <link rel="icon" id="faviconEl" href="data:,"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="css/style.css"/>
@@ -18,24 +18,23 @@
       <span id="splashEmoji">🏛️</span>
     </div>
   </div>
-  <div class="splash-title" id="splashTitle">Memuat...</div>
-  <div class="splash-subtitle" id="splashSub">Sistem Hadir WBP</div>
+  <div class="splash-title" id="splashTitle">SIMAWAR</div>
+  <div class="splash-subtitle" id="splashSub">Sistem Informasi Monitoring Warga Binaan</div>
   <div class="splash-loader"><div class="splash-loader-bar"></div></div>
 </div>
 
 <div id="loginPage" class="login-page" style="display:none">
   <div class="login-card fade-in">
-    <!-- Logo -->
     <div class="login-logo" id="loginLogo">
       <span class="login-logo-placeholder" id="loginLogoEmoji">🏛️</span>
     </div>
-    <h1 class="text-center font-extrabold text-gray-900 text-xl mb-1" id="loginSiteName">SiHadir</h1>
-    <p class="text-center text-sm text-gray-400 mb-8" id="loginSiteDesc">Sistem Kehadiran Warga Binaan</p>
+    <h1 class="text-center font-extrabold text-gray-900 text-xl mb-1" id="loginSiteName">SIMAWAR</h1>
+    <p class="text-center text-sm text-gray-400 mb-8" id="loginSiteDesc">Sistem Informasi Monitoring Warga Binaan<br>Lapas Bandanaira</p>
 
     <div class="form-group">
-      <label class="form-label">Username</label>
+      <label class="form-label">Username atau Email</label>
       <div class="relative">
-        <input type="text" id="loginUsername" class="form-control" placeholder="Masukkan username" autocomplete="username"/>
+        <input type="text" id="loginUsername" class="form-control" placeholder="Username atau email" autocomplete="username"/>
         <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
         </svg>
@@ -45,7 +44,7 @@
       <label class="form-label">Password</label>
       <div class="relative">
         <input type="password" id="loginPassword" class="form-control" placeholder="Masukkan password" autocomplete="current-password"/>
-        <button type="button" id="togglePwd" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" style="background:none;border:none;cursor:pointer;padding:0">
+        <button type="button" id="togglePwd" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;color:#94a3b8">
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/>
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -64,7 +63,6 @@
     <p class="text-center text-xs text-gray-400 mt-6">Hubungi admin jika lupa password</p>
   </div>
 
-  <!-- Footer -->
   <div class="app-footer" style="position:fixed;bottom:0;left:0;right:0;background:transparent;border:none;padding:16px">
     <span style="color:rgba(255,255,255,0.6)">Dibuat dengan ❤️ Oleh</span>
     <span style="color:white;font-weight:700">WA MIRANTI</span>
@@ -83,7 +81,7 @@
 <script>
 async function loadSiteConfig() {
   try {
-    const { data } = await sb.from('site_config').select('*').single();
+    const { data } = await sb.from('site_config').select('*').maybeSingle();
     if (!data) return;
     if (data.site_name) {
       document.title = `Masuk — ${data.site_name}`;
@@ -91,8 +89,8 @@ async function loadSiteConfig() {
       document.getElementById('splashTitle').textContent = data.site_name;
     }
     if (data.site_desc) {
-      document.getElementById('loginSiteDesc').textContent = data.site_desc;
-      document.getElementById('splashSub').textContent = data.site_desc;
+      document.getElementById('loginSiteDesc').innerHTML = data.site_desc.replace('\n','<br>');
+      document.getElementById('splashSub').textContent = data.site_desc.split('\n')[0];
     }
     if (data.logo_url) {
       const loginLogo = document.getElementById('loginLogo');
@@ -103,12 +101,11 @@ async function loadSiteConfig() {
       const splashInner = document.getElementById('splashLogoInner');
       document.getElementById('splashEmoji').style.display = 'none';
       const si = document.createElement('img');
-      si.src = data.logo_url; si.alt = 'Logo'; si.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%';
+      si.src = data.logo_url; si.alt = 'Logo';
+      si.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%';
       splashInner.appendChild(si);
     }
-    if (data.favicon_url) {
-      document.getElementById('faviconEl').href = data.favicon_url;
-    }
+    if (data.favicon_url) document.getElementById('faviconEl').href = data.favicon_url;
   } catch(e) {}
 }
 
@@ -122,11 +119,10 @@ async function init() {
     }, 600);
   }, 1800);
 
-  // Check if already logged in
   const { data: { session } } = await sb.auth.getSession();
   if (session) {
-    const { data: p } = await sb.from('pegawai').select('role').eq('user_id', session.user.id).single();
-    window.location.href = p?.role === 'admin' ? 'admin.html' : 'user.html';
+    const { data: p } = await sb.from('pegawai').select('role').eq('user_id', session.user.id).maybeSingle();
+    if (p) window.location.href = p.role === 'admin' ? 'admin.html' : 'user.html';
   }
 }
 
@@ -136,28 +132,45 @@ document.getElementById('togglePwd').addEventListener('click', () => {
 });
 
 document.getElementById('loginBtn').addEventListener('click', async () => {
-  const username = document.getElementById('loginUsername').value.trim();
+  const input = document.getElementById('loginUsername').value.trim();
   const password = document.getElementById('loginPassword').value;
   const btn = document.getElementById('loginBtn');
   const btnText = document.getElementById('loginBtnText');
 
-  if (!username || !password) {
-    showAlert('warning', 'Perhatian', 'Username dan password harus diisi!'); return;
+  if (!input || !password) {
+    showAlert('warning', 'Perhatian', 'Username/email dan password harus diisi!'); return;
   }
 
   btn.disabled = true;
   btnText.textContent = 'Memverifikasi...';
 
   try {
-    // Look up email by username
-    const { data: pegawai, error: pe } = await sb.from('pegawai')
-      .select('email, role, status')
-      .eq('username', username)
-      .single();
+    // Deteksi apakah input adalah email atau username
+    const isEmail = input.includes('@');
+    let pegawai;
 
-    if (pe || !pegawai) {
-      showAlert('error', 'Login Gagal', 'Username tidak ditemukan!');
-      btn.disabled = false; btnText.textContent = 'Masuk'; return;
+    if (isEmail) {
+      // Login pakai email langsung
+      const { data, error } = await sb.from('pegawai')
+        .select('email, role, status, nama')
+        .eq('email', input)
+        .maybeSingle();
+      if (error || !data) {
+        showAlert('error', 'Login Gagal', 'Email tidak ditemukan!');
+        btn.disabled = false; btnText.textContent = 'Masuk'; return;
+      }
+      pegawai = data;
+    } else {
+      // Login pakai username
+      const { data, error } = await sb.from('pegawai')
+        .select('email, role, status, nama')
+        .eq('username', input)
+        .maybeSingle();
+      if (error || !data) {
+        showAlert('error', 'Login Gagal', 'Username tidak ditemukan!');
+        btn.disabled = false; btnText.textContent = 'Masuk'; return;
+      }
+      pegawai = data;
     }
 
     if (pegawai.status === 'nonaktif') {
@@ -174,7 +187,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
       btn.disabled = false; btnText.textContent = 'Masuk'; return;
     }
 
-    showAlert('success', 'Berhasil!', `Selamat datang, ${username}!`);
+    showAlert('success', 'Berhasil!', `Selamat datang, ${pegawai.nama}!`);
     setTimeout(() => {
       window.location.href = pegawai.role === 'admin' ? 'admin.html' : 'user.html';
     }, 1000);
