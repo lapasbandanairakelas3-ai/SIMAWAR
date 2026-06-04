@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — SiHadir Lapas</title>
+  <link rel="icon" id="faviconEl" href="data:,"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.6.0/jspdf.plugin.autotable.min.js"></script>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splashScreen">
+  <div class="splash-logo-ring"><div class="splash-logo-inner" id="splashLogoInner"><span id="splashEmoji">🏛️</span></div></div>
+  <div class="splash-title" id="splashTitle">Memuat...</div>
+  <div class="splash-subtitle" id="splashSub">Panel Admin</div>
+  <div class="splash-loader"><div class="splash-loader-bar"></div></div>
+</div>
+
+<div id="appShell" style="display:none">
+
+<!-- Mobile overlay -->
+<div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-logo" id="sidebarLogo">
+      <span id="sidebarLogoEmoji">🏛️</span>
+    </div>
+    <div class="sidebar-brand-text">
+      <div class="sidebar-brand-name" id="sidebarName">SiHadir</div>
+      <div class="sidebar-brand-sub">Panel Admin</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Utama</div>
+      <a class="nav-item active" data-page="dashboard">
+        <div class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+        </div>
+        Dashboard
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Data Master</div>
+      <a class="nav-item" data-page="wbp">
+        <div class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+        </div>
+        Data WBP
+      </a>
+      <a class="nav-item" data-page="pegawai">
+        <div class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0M12 12.75h.008v.008H12v-.008z"/></svg>
+        </div>
+        Data Pegawai
+      </a>
+      <a class="nav-item" data-page="blok">
+        <div class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+        </div>
+        Blok / Kamar
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Laporan</div>
+      <a class="nav-item" data-page="riwayat">
+        <div class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/></svg>
+        </div>
+        Riwayat Absensi
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Pengaturan</div>
+      <a class="nav-item" data-page="siteconfig">
+        <div class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </div>
+        Konfigurasi Website
+      </a>
+      <a class="nav-item" data-page="akun">
+        <div class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </div>
+        Akun Saya
+      </a>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button onclick="doLogout()" class="nav-item w-full" style="background:rgba(239,68,68,0.1);color:#fca5a5">
+      <div class="nav-icon" style="background:rgba(239,68,68,0.15)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+      </div>
+      Keluar
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN WRAPPER -->
+<div class="main-wrapper">
+  <!-- Header -->
+  <header class="top-header">
+    <div class="flex items-center gap-3">
+      <button onclick="toggleSidebar()" class="btn btn-ghost btn-icon md:hidden">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
+      </button>
+      <div>
+        <div class="header-title" id="headerTitle">Dashboard</div>
+        <div class="header-subtitle" id="headerDate"></div>
+      </div>
+    </div>
+    <div class="header-user" onclick="goPage('akun')">
+      <div class="header-avatar" id="headerAvatar">A</div>
+      <div>
+        <div class="header-uname" id="headerUname">Admin</div>
+        <div class="header-role">Administrator</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <div class="content-area">
+
+    <!-- ===== DASHBOARD ===== -->
+    <div id="page-dashboard" class="page-section active">
+      <div class="stat-grid" id="dashStats">
+        <!-- Loaded dynamically -->
+        <div class="stat-card animate-pulse"><div class="stat-icon bg-blue-50"></div><div class="h-8 bg-gray-200 rounded w-16 mb-2"></div><div class="h-3 bg-gray-200 rounded w-24"></div></div>
+        <div class="stat-card animate-pulse"><div class="stat-icon bg-green-50"></div><div class="h-8 bg-gray-200 rounded w-16 mb-2"></div><div class="h-3 bg-gray-200 rounded w-24"></div></div>
+        <div class="stat-card animate-pulse"><div class="stat-icon bg-amber-50"></div><div class="h-8 bg-gray-200 rounded w-16 mb-2"></div><div class="h-3 bg-gray-200 rounded w-24"></div></div>
+        <div class="stat-card animate-pulse"><div class="stat-icon bg-purple-50"></div><div class="h-8 bg-gray-200 rounded w-16 mb-2"></div><div class="h-3 bg-gray-200 rounded w-24"></div></div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <!-- Absensi hari ini -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Absensi Hari Ini</div>
+              <div class="text-xs text-gray-400 mt-0.5" id="dashTodayDate">—</div>
+            </div>
+            <span class="badge badge-blue" id="dashTodayCount">0 sesi</span>
+          </div>
+          <div class="p-0">
+            <div id="dashTodayList" class="divide-y divide-gray-50 max-h-72 overflow-y-auto">
+              <div class="empty-state py-8">
+                <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-8 h-8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z"/></svg></div>
+                <div class="empty-title">Belum Ada Absensi</div>
+                <div class="empty-desc">Belum ada sesi absen yang dilakukan hari ini</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Blok aktif -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Status Blok Saat Ini</div>
+            <button class="btn btn-primary btn-sm" onclick="loadDashboard()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
+              Refresh
+            </button>
+          </div>
+          <div class="p-4" id="dashBlokStatus">
+            <div class="blok-grid" id="dashBlokGrid">
+              <!-- skeleton -->
+              ${[1,2,3,4].map(() => `<div class="animate-pulse bg-gray-100 rounded-2xl h-24"></div>`).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== WBP ===== -->
+    <div id="page-wbp" class="page-section">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Data Warga Binaan (WBP)</div>
+          <button class="btn btn-primary btn-sm" onclick="openWbpModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            Tambah WBP
+          </button>
+        </div>
+        <div class="filter-bar">
+          <div class="search-input">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+            <input type="text" id="wbpSearch" placeholder="Cari nama / no. registrasi..." oninput="loadWbp()"/>
+          </div>
+          <select class="form-control" style="width:auto;min-width:150px" id="wbpBlokFilter" onchange="loadWbp()">
+            <option value="">Semua Blok</option>
+          </select>
+          <select class="form-control" style="width:auto" id="wbpJkFilter" onchange="loadWbp()">
+            <option value="">Semua JK</option>
+            <option value="L">Laki-laki</option>
+            <option value="P">Perempuan</option>
+          </select>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>No</th><th>WBP</th><th>No. Registrasi</th><th>JK</th><th>Blok/Kamar</th><th>Masa Pidana</th><th>Status</th><th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="wbpTableBody">
+              <tr><td colspan="8"><div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-8 h-8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg></div><div class="empty-title">Belum Ada Data WBP</div><div class="empty-desc">Tambahkan data warga binaan melalui tombol Tambah WBP</div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="flex items-center justify-between px-4 py-3 border-t border-gray-50">
+          <span class="text-xs text-gray-400" id="wbpCount">0 data</span>
+          <div class="flex gap-2" id="wbpPagination"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PEGAWAI ===== -->
+    <div id="page-pegawai" class="page-section">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Data Pegawai / Regu Pengamanan</div>
+          <button class="btn btn-primary btn-sm" onclick="openPegawaiModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            Tambah Pegawai
+          </button>
+        </div>
+        <div class="filter-bar">
+          <div class="search-input">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+            <input type="text" id="pegawaiSearch" placeholder="Cari nama / username..." oninput="loadPegawai()"/>
+          </div>
+          <select class="form-control" style="width:auto" id="pegawaiRoleFilter" onchange="loadPegawai()">
+            <option value="">Semua Role</option>
+            <option value="admin">Admin</option>
+            <option value="user">Petugas</option>
+          </select>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr><th>No</th><th>Pegawai</th><th>Jabatan</th><th>Pangkat/Gol</th><th>Username</th><th>Role</th><th>Status</th><th>Aksi</th></tr>
+            </thead>
+            <tbody id="pegawaiTableBody">
+              <tr><td colspan="8"><div class="empty-state"><div class="empty-title">Belum Ada Data Pegawai</div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="px-4 py-3 border-t border-gray-50"><span class="text-xs text-gray-400" id="pegawaiCount">0 data</span></div>
+      </div>
+    </div>
+
+    <!-- ===== BLOK ===== -->
+    <div id="page-blok" class="page-section">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Kelola Blok / Kamar Hunian</div>
+          <button class="btn btn-primary btn-sm" onclick="openBlokModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            Tambah Blok
+          </button>
+        </div>
+        <div class="filter-bar">
+          <div class="search-input">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+            <input type="text" id="blokSearch" placeholder="Cari blok..." oninput="loadBlok()"/>
+          </div>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr><th>No</th><th>Nama Blok/Kamar</th><th>Kapasitas</th><th>JK</th><th>Keterangan</th><th>Jml WBP</th><th>Aksi</th></tr>
+            </thead>
+            <tbody id="blokTableBody">
+              <tr><td colspan="7"><div class="empty-state"><div class="empty-title">Belum Ada Data Blok</div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="px-4 py-3 border-t border-gray-50"><span class="text-xs text-gray-400" id="blokCount">0 data</span></div>
+      </div>
+    </div>
+
+    <!-- ===== RIWAYAT ===== -->
+    <div id="page-riwayat" class="page-section">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Riwayat Absensi (Semua Petugas)</div>
+          <button class="btn btn-success btn-sm" onclick="exportRiwayat()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+            Ekspor PDF
+          </button>
+        </div>
+        <div class="filter-bar">
+          <div class="search-input">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+            <input type="text" id="riwayatSearch" placeholder="Cari nama WBP / petugas..." oninput="loadRiwayat()"/>
+          </div>
+          <input type="date" class="form-control" style="width:auto" id="riwayatDari" onchange="loadRiwayat()"/>
+          <input type="date" class="form-control" style="width:auto" id="riwayatSampai" onchange="loadRiwayat()"/>
+          <select class="form-control" style="width:auto;min-width:140px" id="riwayatBlokFilter" onchange="loadRiwayat()">
+            <option value="">Semua Blok</option>
+          </select>
+          <select class="form-control" style="width:auto;min-width:140px" id="riwayatPegawaiFilter" onchange="loadRiwayat()">
+            <option value="">Semua Petugas</option>
+          </select>
+          <button class="btn btn-ghost btn-sm" onclick="resetRiwayatFilter()">Reset</button>
+        </div>
+        <div class="table-container" id="riwayatTableWrap">
+          <table id="riwayatTable">
+            <thead>
+              <tr><th>No</th><th>Tanggal & Waktu</th><th>Petugas</th><th>Blok/Kamar</th><th>WBP</th><th>Status</th><th>Keterangan</th></tr>
+            </thead>
+            <tbody id="riwayatTableBody">
+              <tr><td colspan="7"><div class="empty-state"><div class="empty-title">Belum Ada Data Absensi</div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="flex items-center justify-between px-4 py-3 border-t border-gray-50">
+          <span class="text-xs text-gray-400" id="riwayatCount">0 data</span>
+          <div class="flex gap-2" id="riwayatPagination"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SITE CONFIG ===== -->
+    <div id="page-siteconfig" class="page-section">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Konfigurasi Website</div></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Nama Website / Instansi</label>
+              <input type="text" class="form-control" id="cfgName" placeholder="Contoh: SiHadir Lapas Bandanaira"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Deskripsi / Tagline</label>
+              <input type="text" class="form-control" id="cfgDesc" placeholder="Sistem Kehadiran Warga Binaan"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Logo Website</label>
+              <div style="display:flex;align-items:center;gap:12px">
+                <div class="photo-upload" style="width:80px;height:80px;flex-shrink:0" id="logoUploadBox" onclick="document.getElementById('logoFileInput').click()">
+                  <img id="logoPreview" src="" style="display:none"/>
+                  <div class="photo-upload-overlay"><svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg></div>
+                  <div id="logoPlaceholder" class="flex flex-col items-center justify-center gap-1">
+                    <svg class="w-6 h-6 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
+                    <span style="font-size:9px;color:#94a3b8">Upload</span>
+                  </div>
+                </div>
+                <input type="file" id="logoFileInput" accept="image/*" style="display:none" onchange="previewLogo(event)"/>
+                <div class="text-xs text-gray-400 leading-relaxed">Format: JPG, PNG, SVG<br/>Maks. 2MB<br/>Rekomendasi: 200x200px</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Favicon (ikon tab browser)</label>
+              <div style="display:flex;align-items:center;gap:12px">
+                <div class="photo-upload" style="width:48px;height:48px;flex-shrink:0;border-radius:10px" onclick="document.getElementById('favFileInput').click()">
+                  <img id="favPreview" src="" style="display:none"/>
+                  <div id="favPlaceholder"><svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg></div>
+                </div>
+                <input type="file" id="favFileInput" accept="image/*" style="display:none" onchange="previewFav(event)"/>
+                <span class="text-xs text-gray-400">Format ICO, PNG<br/>16x16 atau 32x32px</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">URL Google Apps Script (Absensi)</label>
+              <input type="text" class="form-control" id="cfgGas" placeholder="https://script.google.com/macros/s/.../exec"/>
+              <p class="text-xs text-gray-400 mt-1">URL GAS untuk menyimpan data absensi ke Google Sheets</p>
+            </div>
+            <button class="btn btn-primary w-full justify-center" onclick="saveSiteConfig()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+              Simpan Konfigurasi
+            </button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Panduan Setup</div></div>
+          <div class="card-body">
+            <div class="space-y-4">
+              <div class="p-4 bg-blue-50 rounded-xl border border-blue-100">
+                <div class="font-bold text-sm text-blue-800 mb-2">📊 Google Apps Script</div>
+                <ol class="text-xs text-blue-700 space-y-1.5 pl-4" style="list-style:decimal">
+                  <li>Buat Google Sheets baru</li>
+                  <li>Buka Extensions → Apps Script</li>
+                  <li>Paste kode GAS dari dokumentasi</li>
+                  <li>Deploy sebagai Web App (Anyone)</li>
+                  <li>Salin URL dan paste di atas</li>
+                </ol>
+              </div>
+              <div class="p-4 bg-green-50 rounded-xl border border-green-100">
+                <div class="font-bold text-sm text-green-800 mb-2">🗄️ Supabase Tables Needed</div>
+                <ul class="text-xs text-green-700 space-y-1 pl-4" style="list-style:disc">
+                  <li>site_config (id, site_name, site_desc, logo_url, favicon_url, gas_url)</li>
+                  <li>pegawai (id, user_id, nama, jabatan, pangkat, username, email, role, status)</li>
+                  <li>wbp (id, nama, foto_url, jk, no_registrasi, blok_id, tgl_masuk, masa_pidana, kasus, status)</li>
+                  <li>blok (id, nama, kapasitas, jk, keterangan)</li>
+                  <li>absen_session (id, pegawai_id, blok_id, tgl, waktu_mulai, waktu_selesai, status)</li>
+                </ul>
+              </div>
+              <div class="p-4 bg-amber-50 rounded-xl border border-amber-100">
+                <div class="font-bold text-sm text-amber-800 mb-2">⚠️ Penting</div>
+                <p class="text-xs text-amber-700">Pastikan RLS (Row Level Security) Supabase dikonfigurasi dengan benar. Lihat file <code class="bg-amber-100 px-1 rounded">supabase.sql</code> untuk schema lengkap.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== AKUN ===== -->
+    <div id="page-akun" class="page-section">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div class="card lg:col-span-1">
+          <div class="card-body text-center py-8">
+            <div class="profile-avatar mx-auto mb-4" style="width:80px;height:80px;font-size:32px" id="akunAvatarBig">A</div>
+            <div class="font-bold text-lg text-gray-900" id="akunNamaDisplay">—</div>
+            <div class="text-sm text-gray-400 mt-1" id="akunJabatanDisplay">—</div>
+            <div class="mt-3"><span class="badge badge-blue" id="akunRoleDisplay">—</span></div>
+            <div class="mt-4 pt-4 border-t border-gray-50">
+              <div class="flex justify-between text-sm py-2">
+                <span class="text-gray-500">Pangkat/Gol</span>
+                <span class="font-semibold" id="akunPangkatDisplay">—</span>
+              </div>
+              <div class="flex justify-between text-sm py-2">
+                <span class="text-gray-500">Username</span>
+                <span class="font-semibold" id="akunUsernameDisplay">—</span>
+              </div>
+              <div class="flex justify-between text-sm py-2">
+                <span class="text-gray-500">Email</span>
+                <span class="font-semibold text-xs" id="akunEmailDisplay">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card lg:col-span-2">
+          <div class="card-header"><div class="card-title">Ubah Data Akun</div></div>
+          <div class="card-body">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="form-group">
+                <label class="form-label">Nama Lengkap</label>
+                <input type="text" class="form-control" id="akunNama" placeholder="Nama lengkap"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" id="akunEmail" placeholder="email@example.com"/>
+              </div>
+              <div class="form-group sm:col-span-2">
+                <label class="form-label">Jabatan</label>
+                <input type="text" class="form-control" id="akunJabatan" placeholder="Jabatan"/>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="saveAkun()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+              Simpan Perubahan
+            </button>
+
+            <hr class="my-6 border-gray-100"/>
+            <div class="card-title mb-4 text-sm">Ubah Password</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="form-group">
+                <label class="form-label">Password Baru</label>
+                <input type="password" class="form-control" id="akunPwdBaru" placeholder="Min. 8 karakter"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Konfirmasi Password</label>
+                <input type="password" class="form-control" id="akunPwdKonfirm" placeholder="Ulangi password baru"/>
+              </div>
+            </div>
+            <button class="btn btn-warning" onclick="savePassword()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+              Ganti Password
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content-area -->
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <span>Dibuat dengan ❤️ Oleh</span>
+    <strong>WA MIRANTI</strong>
+    <a href="https://instagram.com/wa_miranti" target="_blank" class="social-link ig-link">
+      <svg viewBox="0 0 24 24" class="w-3 h-3" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      @wa_miranti
+    </a>
+    <a href="https://tiktok.com/@wa_miranti" target="_blank" class="social-link tt-link">
+      <svg viewBox="0 0 24 24" class="w-3 h-3" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V9.15a8.16 8.16 0 004.77 1.52V7.22a4.85 4.85 0 01-1-.53z"/></svg>
+      @wa_miranti
+    </a>
+  </footer>
+</div><!-- /main-wrapper -->
+
+</div><!-- /appShell -->
+
+<!-- ===== MODALS ===== -->
+
+<!-- Modal WBP -->
+<div class="modal-overlay" id="wbpModal">
+  <div class="modal" style="max-width:620px">
+    <div class="modal-header">
+      <div class="modal-title" id="wbpModalTitle">Tambah WBP</div>
+      <button class="modal-close" onclick="closeModal('wbpModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="wbpId"/>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="sm:col-span-1">
+          <label class="form-label">Foto WBP</label>
+          <div class="photo-upload" style="max-width:140px;aspect-ratio:3/4" id="wbpFotoBox" onclick="document.getElementById('wbpFotoInput').click()">
+            <img id="wbpFotoPreview" src="" style="display:none"/>
+            <div class="photo-upload-overlay"><svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z"/></svg></div>
+            <div id="wbpFotoPlaceholder" class="flex flex-col items-center gap-1 text-center px-2">
+              <svg class="w-8 h-8 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+              <span class="text-xs text-gray-400">Upload Foto</span>
+            </div>
+          </div>
+          <input type="file" id="wbpFotoInput" accept="image/*" style="display:none" onchange="previewWbpFoto(event)"/>
+        </div>
+        <div class="sm:col-span-2 space-y-3">
+          <div class="form-group">
+            <label class="form-label">Nama Lengkap <span class="text-red-500">*</span></label>
+            <input type="text" class="form-control" id="wbpNama" placeholder="Nama lengkap WBP"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">No. Registrasi <span class="text-red-500">*</span></label>
+            <input type="text" class="form-control" id="wbpNoreg" placeholder="Cth: B.01.2024.001"/>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="form-group">
+              <label class="form-label">Jenis Kelamin</label>
+              <select class="form-control" id="wbpJk">
+                <option value="L">Laki-laki</option>
+                <option value="P">Perempuan</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Blok / Kamar</label>
+              <select class="form-control" id="wbpBlok">
+                <option value="">— Pilih Blok —</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+        <div class="form-group">
+          <label class="form-label">Tanggal Masuk</label>
+          <input type="date" class="form-control" id="wbpTglMasuk"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tanggal Bebas</label>
+          <input type="date" class="form-control" id="wbpTglBebas"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Masa Pidana</label>
+          <input type="text" class="form-control" id="wbpMasa" placeholder="Cth: 5 Tahun 6 Bulan"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Jenis Kasus</label>
+          <input type="text" class="form-control" id="wbpKasus" placeholder="Cth: Narkotika, Korupsi"/>
+        </div>
+        <div class="form-group sm:col-span-2">
+          <label class="form-label">Asal Daerah</label>
+          <input type="text" class="form-control" id="wbpAsal" placeholder="Kota/Kabupaten asal"/>
+        </div>
+        <div class="form-group sm:col-span-2">
+          <label class="form-label">Catatan</label>
+          <textarea class="form-control" id="wbpCatatan" rows="2" placeholder="Catatan tambahan..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('wbpModal')">Batal</button>
+      <button class="btn btn-primary" onclick="saveWbp()" id="wbpSaveBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+        Simpan
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Pegawai -->
+<div class="modal-overlay" id="pegawaiModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="pegawaiModalTitle">Tambah Pegawai</div>
+      <button class="modal-close" onclick="closeModal('pegawaiModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="pegawaiId"/>
+      <input type="hidden" id="pegawaiUserId"/>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="form-group sm:col-span-2">
+          <label class="form-label">Nama Lengkap <span class="text-red-500">*</span></label>
+          <input type="text" class="form-control" id="pegawaiNama" placeholder="Nama lengkap pegawai"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Jabatan</label>
+          <input type="text" class="form-control" id="pegawaiJabatan" placeholder="Cth: Ka. Regu Pengamanan"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Pangkat / Golongan</label>
+          <input type="text" class="form-control" id="pegawaiPangkat" placeholder="Cth: Penata Muda / III-a"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Username <span class="text-red-500">*</span></label>
+          <input type="text" class="form-control" id="pegawaiUsername" placeholder="Username login"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email <span class="text-red-500">*</span></label>
+          <input type="email" class="form-control" id="pegawaiEmail" placeholder="email@lapas.go.id"/>
+        </div>
+        <div class="form-group" id="pegawaiPwdGroup">
+          <label class="form-label">Password <span class="text-red-500">*</span></label>
+          <input type="password" class="form-control" id="pegawaiPassword" placeholder="Min. 8 karakter"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Role</label>
+          <select class="form-control" id="pegawaiRole">
+            <option value="user">Petugas</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-control" id="pegawaiStatus">
+            <option value="aktif">Aktif</option>
+            <option value="nonaktif">Non-aktif</option>
+          </select>
+        </div>
+        <div class="form-group sm:col-span-2">
+          <label class="form-label">NIP</label>
+          <input type="text" class="form-control" id="pegawaiNip" placeholder="Nomor Induk Pegawai"/>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('pegawaiModal')">Batal</button>
+      <button class="btn btn-primary" onclick="savePegawai()" id="pegawaiSaveBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+        Simpan
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Blok -->
+<div class="modal-overlay" id="blokModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="blokModalTitle">Tambah Blok/Kamar</div>
+      <button class="modal-close" onclick="closeModal('blokModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="blokId"/>
+      <div class="form-group">
+        <label class="form-label">Nama Blok / Kamar <span class="text-red-500">*</span></label>
+        <input type="text" class="form-control" id="blokNama" placeholder="Cth: Blok A, Kamar 1"/>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="form-group">
+          <label class="form-label">Kapasitas (Orang)</label>
+          <input type="number" class="form-control" id="blokKapasitas" placeholder="Cth: 20" min="1"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Untuk JK</label>
+          <select class="form-control" id="blokJk">
+            <option value="L">Laki-laki</option>
+            <option value="P">Perempuan</option>
+            <option value="Campur">Campur</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Keterangan</label>
+        <textarea class="form-control" id="blokKet" rows="2" placeholder="Keterangan blok/kamar..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('blokModal')">Batal</button>
+      <button class="btn btn-primary" onclick="saveBlok()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

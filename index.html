@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Masuk — SiHadir Lapas</title>
+  <link rel="icon" id="faviconEl" href="data:," />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<!-- SPLASH SCREEN -->
+<div id="splashScreen">
+  <div class="splash-logo-ring">
+    <div class="splash-logo-inner" id="splashLogoInner">
+      <span id="splashEmoji">🏛️</span>
+    </div>
+  </div>
+  <div class="splash-title" id="splashTitle">Memuat...</div>
+  <div class="splash-subtitle" id="splashSub">Sistem Hadir WBP</div>
+  <div class="splash-loader"><div class="splash-loader-bar"></div></div>
+</div>
+
+<div id="loginPage" class="login-page" style="display:none">
+  <div class="login-card fade-in">
+    <!-- Logo -->
+    <div class="login-logo" id="loginLogo">
+      <span class="login-logo-placeholder" id="loginLogoEmoji">🏛️</span>
+    </div>
+    <h1 class="text-center font-extrabold text-gray-900 text-xl mb-1" id="loginSiteName">SiHadir</h1>
+    <p class="text-center text-sm text-gray-400 mb-8" id="loginSiteDesc">Sistem Kehadiran Warga Binaan</p>
+
+    <div class="form-group">
+      <label class="form-label">Username</label>
+      <div class="relative">
+        <input type="text" id="loginUsername" class="form-control" placeholder="Masukkan username" autocomplete="username"/>
+        <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+        </svg>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <div class="relative">
+        <input type="password" id="loginPassword" class="form-control" placeholder="Masukkan password" autocomplete="current-password"/>
+        <button type="button" id="togglePwd" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" style="background:none;border:none;cursor:pointer;padding:0">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <button id="loginBtn" class="btn btn-primary w-full justify-center mt-2 py-3 text-sm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/>
+      </svg>
+      <span id="loginBtnText">Masuk</span>
+    </button>
+
+    <p class="text-center text-xs text-gray-400 mt-6">Hubungi admin jika lupa password</p>
+  </div>
+
+  <!-- Footer -->
+  <div class="app-footer" style="position:fixed;bottom:0;left:0;right:0;background:transparent;border:none;padding:16px">
+    <span style="color:rgba(255,255,255,0.6)">Dibuat dengan ❤️ Oleh</span>
+    <span style="color:white;font-weight:700">WA MIRANTI</span>
+    <a href="https://instagram.com/wa_miranti" target="_blank" class="social-link ig-link">
+      <svg viewBox="0 0 24 24" class="w-3 h-3" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      @wa_miranti
+    </a>
+    <a href="https://tiktok.com/@wa_miranti" target="_blank" class="social-link tt-link">
+      <svg viewBox="0 0 24 24" class="w-3 h-3" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V9.15a8.16 8.16 0 004.77 1.52V7.22a4.85 4.85 0 01-1-.53z"/></svg>
+      @wa_miranti
+    </a>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script>
+async function loadSiteConfig() {
+  try {
+    const { data } = await sb.from('site_config').select('*').single();
+    if (!data) return;
+    if (data.site_name) {
+      document.title = `Masuk — ${data.site_name}`;
+      document.getElementById('loginSiteName').textContent = data.site_name;
+      document.getElementById('splashTitle').textContent = data.site_name;
+    }
+    if (data.site_desc) {
+      document.getElementById('loginSiteDesc').textContent = data.site_desc;
+      document.getElementById('splashSub').textContent = data.site_desc;
+    }
+    if (data.logo_url) {
+      const loginLogo = document.getElementById('loginLogo');
+      document.getElementById('loginLogoEmoji').style.display = 'none';
+      const img = document.createElement('img');
+      img.src = data.logo_url; img.alt = 'Logo';
+      loginLogo.appendChild(img);
+      const splashInner = document.getElementById('splashLogoInner');
+      document.getElementById('splashEmoji').style.display = 'none';
+      const si = document.createElement('img');
+      si.src = data.logo_url; si.alt = 'Logo'; si.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%';
+      splashInner.appendChild(si);
+    }
+    if (data.favicon_url) {
+      document.getElementById('faviconEl').href = data.favicon_url;
+    }
+  } catch(e) {}
+}
+
+async function init() {
+  await loadSiteConfig();
+  setTimeout(() => {
+    document.getElementById('splashScreen').classList.add('hiding');
+    setTimeout(() => {
+      document.getElementById('splashScreen').style.display = 'none';
+      document.getElementById('loginPage').style.display = 'flex';
+    }, 600);
+  }, 1800);
+
+  // Check if already logged in
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    const { data: p } = await sb.from('pegawai').select('role').eq('user_id', session.user.id).single();
+    window.location.href = p?.role === 'admin' ? 'admin.html' : 'user.html';
+  }
+}
+
+document.getElementById('togglePwd').addEventListener('click', () => {
+  const inp = document.getElementById('loginPassword');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+});
+
+document.getElementById('loginBtn').addEventListener('click', async () => {
+  const username = document.getElementById('loginUsername').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const btn = document.getElementById('loginBtn');
+  const btnText = document.getElementById('loginBtnText');
+
+  if (!username || !password) {
+    showAlert('warning', 'Perhatian', 'Username dan password harus diisi!'); return;
+  }
+
+  btn.disabled = true;
+  btnText.textContent = 'Memverifikasi...';
+
+  try {
+    // Look up email by username
+    const { data: pegawai, error: pe } = await sb.from('pegawai')
+      .select('email, role, status')
+      .eq('username', username)
+      .single();
+
+    if (pe || !pegawai) {
+      showAlert('error', 'Login Gagal', 'Username tidak ditemukan!');
+      btn.disabled = false; btnText.textContent = 'Masuk'; return;
+    }
+
+    if (pegawai.status === 'nonaktif') {
+      showAlert('error', 'Akun Dinonaktifkan', 'Akun Anda telah dinonaktifkan. Hubungi admin.');
+      btn.disabled = false; btnText.textContent = 'Masuk'; return;
+    }
+
+    const { data: auth, error: ae } = await sb.auth.signInWithPassword({
+      email: pegawai.email, password
+    });
+
+    if (ae) {
+      showAlert('error', 'Login Gagal', 'Password salah!');
+      btn.disabled = false; btnText.textContent = 'Masuk'; return;
+    }
+
+    showAlert('success', 'Berhasil!', `Selamat datang, ${username}!`);
+    setTimeout(() => {
+      window.location.href = pegawai.role === 'admin' ? 'admin.html' : 'user.html';
+    }, 1000);
+  } catch(e) {
+    showAlert('error', 'Error', 'Terjadi kesalahan. Coba lagi!');
+    btn.disabled = false; btnText.textContent = 'Masuk';
+  }
+});
+
+document.getElementById('loginPassword').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('loginBtn').click();
+});
+
+init();
+</script>
+</body>
+</html>

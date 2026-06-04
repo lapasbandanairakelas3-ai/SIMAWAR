@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Petugas — SiHadir Lapas</title>
+  <link rel="icon" id="faviconEl" href="data:,"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.6.0/jspdf.plugin.autotable.min.js"></script>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splashScreen">
+  <div class="splash-logo-ring"><div class="splash-logo-inner" id="splashLogoInner"><span id="splashEmoji">🏛️</span></div></div>
+  <div class="splash-title" id="splashTitle">Memuat...</div>
+  <div class="splash-subtitle" id="splashSub">Portal Petugas</div>
+  <div class="splash-loader"><div class="splash-loader-bar"></div></div>
+</div>
+
+<div id="appShell" style="display:none">
+<div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-logo" id="sidebarLogo"><span id="sidebarLogoEmoji">🏛️</span></div>
+    <div class="sidebar-brand-text">
+      <div class="sidebar-brand-name" id="sidebarName">SiHadir</div>
+      <div class="sidebar-brand-sub">Portal Petugas</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Menu</div>
+      <a class="nav-item active" data-page="absen">
+        <div class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        Kelola Absensi
+      </a>
+      <a class="nav-item" data-page="riwayat">
+        <div class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z"/></svg>
+        </div>
+        Riwayat Saya
+      </a>
+      <a class="nav-item" data-page="profil">
+        <div class="nav-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </div>
+        Profil Saya
+      </a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <button onclick="doLogout()" class="nav-item w-full" style="background:rgba(239,68,68,0.1);color:#fca5a5">
+      <div class="nav-icon" style="background:rgba(239,68,68,0.15)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+      </div>
+      Keluar
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main-wrapper">
+  <header class="top-header">
+    <div class="flex items-center gap-3">
+      <button onclick="toggleSidebar()" class="btn btn-ghost btn-icon md:hidden">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
+      </button>
+      <div>
+        <div class="header-title" id="headerTitle">Kelola Absensi</div>
+        <div class="header-subtitle" id="headerDate"></div>
+      </div>
+    </div>
+    <div class="header-user" onclick="goPage('profil')">
+      <div class="header-avatar" id="headerAvatar">P</div>
+      <div>
+        <div class="header-uname" id="headerUname">Petugas</div>
+        <div class="header-role" id="headerRole">Regu Pengamanan</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="content-area">
+
+    <!-- ===== ABSENSI ===== -->
+    <div id="page-absen" class="page-section active">
+
+      <!-- Step 1: Pilih Blok -->
+      <div id="step1" class="fade-in">
+        <div class="card mb-5">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Langkah 1 — Pilih Blok / Kamar</div>
+              <div class="text-xs text-gray-400 mt-1">Pilih blok yang akan Anda periksa. Blok yang sudah dipilih petugas lain tidak bisa dipilih.</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="loadBlokPicker()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
+              Refresh
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="blok-grid" id="blokPickerGrid">
+              ${[1,2,3,4,5,6].map(() => `<div class="animate-pulse bg-gray-100 rounded-2xl h-28"></div>`).join('')}
+            </div>
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="flex flex-wrap gap-3 mb-4">
+          <div class="flex items-center gap-2 text-xs text-gray-500">
+            <div class="w-4 h-4 rounded border-2 border-blue-400 bg-blue-50"></div> Tersedia
+          </div>
+          <div class="flex items-center gap-2 text-xs text-gray-500">
+            <div class="w-4 h-4 rounded border-2 border-amber-400 bg-amber-50"></div> Sedang dipakai petugas lain
+          </div>
+          <div class="flex items-center gap-2 text-xs text-gray-500">
+            <div class="w-4 h-4 rounded border-2 border-gray-300 bg-gray-50 opacity-50"></div> Tidak tersedia
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Absen WBP -->
+      <div id="step2" style="display:none" class="fade-in">
+        <!-- Header Blok Terpilih -->
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <button onclick="backToStep1()" class="btn btn-ghost btn-sm">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+              Kembali
+            </button>
+            <div>
+              <div class="font-bold text-gray-900" id="selectedBlokName">Blok A</div>
+              <div class="text-xs text-gray-400">Pilih status kehadiran setiap WBP</div>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <span class="badge badge-green" id="hadirCount">0 Hadir</span>
+            <span class="badge badge-red" id="tidakHadirCount">0 Tidak</span>
+          </div>
+        </div>
+
+        <!-- Progress -->
+        <div class="card mb-5">
+          <div class="card-body py-3 px-4">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold text-gray-500">Progress Absensi</span>
+              <span class="text-xs font-bold text-blue-600" id="progressText">0 / 0</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-2.5">
+              <div class="bg-gradient-to-r from-blue-500 to-indigo-500 h-2.5 rounded-full transition-all duration-300" id="progressBar" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WBP Cards -->
+        <div class="wbp-grid" id="wbpAbsenGrid">
+          <!-- Loaded dynamically -->
+        </div>
+
+        <!-- Keterangan tidak hadir modal trigger -->
+        <div class="fixed bottom-6 right-6 left-6 md:left-auto md:right-6 md:max-w-sm z-40" id="absenActionBar" style="display:none">
+          <div class="bg-white rounded-2xl shadow-2xl border border-gray-100 p-4">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-sm font-bold text-gray-900">Sesi Absensi</span>
+              <span class="text-xs text-gray-400" id="absenSummary">Belum ada yang diabsen</span>
+            </div>
+            <button class="btn btn-success w-full justify-center" onclick="submitAbsen()" id="submitAbsenBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+              Selesai & Simpan Absensi
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== RIWAYAT SAYA ===== -->
+    <div id="page-riwayat" class="page-section">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Riwayat Absensi Saya</div>
+          <button class="btn btn-success btn-sm" onclick="exportRiwayatUser()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+            Ekspor PDF
+          </button>
+        </div>
+        <div class="filter-bar">
+          <div class="search-input">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+            <input type="text" id="myRiwayatSearch" placeholder="Cari nama WBP..." oninput="loadMyRiwayat()"/>
+          </div>
+          <input type="date" class="form-control" style="width:auto" id="myRiwayatDari" onchange="loadMyRiwayat()"/>
+          <input type="date" class="form-control" style="width:auto" id="myRiwayatSampai" onchange="loadMyRiwayat()"/>
+          <select class="form-control" style="width:auto" id="myRiwayatBlok" onchange="loadMyRiwayat()">
+            <option value="">Semua Blok</option>
+          </select>
+          <button class="btn btn-ghost btn-sm" onclick="resetMyRiwayat()">Reset</button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr><th>No</th><th>Waktu</th><th>Blok/Kamar</th><th>WBP</th><th>No. Reg</th><th>Status</th><th>Keterangan</th></tr>
+            </thead>
+            <tbody id="myRiwayatBody">
+              <tr><td colspan="7"><div class="empty-state"><div class="empty-title">Belum Ada Data</div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="flex items-center justify-between px-4 py-3 border-t border-gray-50">
+          <span class="text-xs text-gray-400" id="myRiwayatCount">0 data</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PROFIL ===== -->
+    <div id="page-profil" class="page-section">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <!-- Profil Card -->
+        <div class="card">
+          <div class="card-body text-center py-8">
+            <div class="profile-avatar mx-auto mb-4" style="width:80px;height:80px;font-size:28px;background:linear-gradient(135deg,#3b82f6,#1e40af)" id="profilAvatar">P</div>
+            <div class="font-bold text-xl text-gray-900" id="profilNama">—</div>
+            <div class="text-sm text-gray-400 mt-1" id="profilJabatan">—</div>
+            <div class="mt-3"><span class="badge badge-blue">Petugas</span></div>
+            <div class="mt-4 pt-4 border-t border-gray-50 text-left space-y-2">
+              <div class="flex justify-between text-sm py-1.5">
+                <span class="text-gray-500">NIP</span>
+                <span class="font-semibold text-xs" id="profilNip">—</span>
+              </div>
+              <div class="flex justify-between text-sm py-1.5">
+                <span class="text-gray-500">Pangkat/Gol</span>
+                <span class="font-semibold text-xs" id="profilPangkat">—</span>
+              </div>
+              <div class="flex justify-between text-sm py-1.5">
+                <span class="text-gray-500">Username</span>
+                <code class="text-xs bg-gray-100 px-2 py-0.5 rounded" id="profilUsername">—</code>
+              </div>
+              <div class="flex justify-between text-sm py-1.5">
+                <span class="text-gray-500">Email</span>
+                <span class="font-semibold text-xs" id="profilEmail">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ubah Password -->
+        <div class="card lg:col-span-2">
+          <div class="card-header"><div class="card-title">Ubah Password</div></div>
+          <div class="card-body">
+            <div class="p-4 bg-amber-50 rounded-xl border border-amber-100 mb-5">
+              <div class="flex gap-2">
+                <svg class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                <p class="text-sm text-amber-700">Gunakan password yang kuat dan jangan bagikan kepada siapapun. Minimal 8 karakter.</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="form-group">
+                <label class="form-label">Password Baru</label>
+                <input type="password" class="form-control" id="userPwdBaru" placeholder="Min. 8 karakter"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Konfirmasi Password</label>
+                <input type="password" class="form-control" id="userPwdKonfirm" placeholder="Ulangi password baru"/>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="userSavePassword()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+              Ganti Password
+            </button>
+
+            <!-- Statistik singkat -->
+            <hr class="my-6 border-gray-100"/>
+            <div class="card-title text-sm mb-4">Statistik Absensi Saya</div>
+            <div class="grid grid-cols-3 gap-3" id="userStats">
+              <div class="animate-pulse bg-gray-100 rounded-xl h-16"></div>
+              <div class="animate-pulse bg-gray-100 rounded-xl h-16"></div>
+              <div class="animate-pulse bg-gray-100 rounded-xl h-16"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content-area -->
+
+  <footer class="app-footer">
+    <span>Dibuat dengan ❤️ Oleh</span>
+    <strong>WA MIRANTI</strong>
+    <a href="https://instagram.com/wa_miranti" target="_blank" class="social-link ig-link">
+      <svg viewBox="0 0 24 24" class="w-3 h-3" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      @wa_miranti
+    </a>
+    <a href="https://tiktok.com/@wa_miranti" target="_blank" class="social-link tt-link">
+      <svg viewBox="0 0 24 24" class="w-3 h-3" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V9.15a8.16 8.16 0 004.77 1.52V7.22a4.85 4.85 0 01-1-.53z"/></svg>
+      @wa_miranti
+    </a>
+  </footer>
+</div>
+</div>
+
+<!-- Modal Keterangan Tidak Hadir -->
+<div class="modal-overlay" id="ketModal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Keterangan Tidak Hadir</div>
+        <div class="text-xs text-gray-400 mt-0.5" id="ketWbpName">—</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('ketModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ketWbpId"/>
+      <div class="form-group">
+        <label class="form-label">Pilih Alasan</label>
+        <select class="form-control" id="ketAlasan">
+          <option value="">— Pilih alasan —</option>
+          <option value="Sakit / Di Poliklinik">Sakit / Di Poliklinik</option>
+          <option value="Sidang / Pemeriksaan">Sidang / Pemeriksaan</option>
+          <option value="Cuti Bersyarat">Cuti Bersyarat</option>
+          <option value="Asimilasi">Asimilasi</option>
+          <option value="Pembebasan Bersyarat">Pembebasan Bersyarat</option>
+          <option value="Dipindahkan">Dipindahkan ke Lapas Lain</option>
+          <option value="Kabur">Kabur (Melarikan Diri)</option>
+          <option value="Lainnya">Lainnya</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Keterangan Tambahan</label>
+        <textarea class="form-control" id="ketDetail" rows="3" placeholder="Keterangan lebih lanjut (opsional)..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('ketModal')">Batal</button>
+      <button class="btn btn-danger" onclick="saveKeterangan()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+        Simpan Keterangan
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/user.js"></script>
+</body>
+</html>
