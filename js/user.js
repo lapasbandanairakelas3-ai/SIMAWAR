@@ -12,25 +12,16 @@ async function init() {
     if (s) { s.style.opacity = '0'; setTimeout(() => s.remove(), 500); }
   }, 800);
 
-  // Cek Supabase Auth session
-  const { data: { session } } = await sb.auth.getSession();
-  let p = null;
+  // Cek sessionStorage — diset saat login
+  const swId = sessionStorage.getItem('sw_id');
+  if (!swId) { location.href = 'index.html'; return; }
 
-  if (session) {
-    const { data } = await sb.from('pegawai').select('*').eq('user_id', session.user.id).maybeSingle();
-    p = data;
+  const { data: p } = await sb.from('pegawai').select('*').eq('id', swId).maybeSingle();
+  if (!p || p.status === 'nonaktif') {
+    sessionStorage.clear();
+    location.href = 'index.html';
+    return;
   }
-
-  // Fallback: sessionStorage (login via password_plain)
-  if (!p) {
-    const ssId = sessionStorage.getItem('simawar_user_id');
-    if (ssId) {
-      const { data } = await sb.from('pegawai').select('*').eq('id', ssId).maybeSingle();
-      p = data;
-    }
-  }
-
-  if (!p) { location.href = 'index.html'; return; }
   currentUser = p;
 
   document.getElementById('headerUname').textContent = p.nama;
@@ -107,7 +98,7 @@ async function doLogout() {
   if (activeSessionId) await releaseSession();
   showConfirm('Keluar', 'Yakin ingin keluar?', async () => {
     sessionStorage.clear();
-    await sb.auth.signOut();
+    try { await sb.auth.signOut(); } catch(e) {}
     location.href = 'index.html';
   });
 }

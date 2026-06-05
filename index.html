@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Masuk — SIMAWAR</title>
   <link rel="icon" id="faviconEl" href="data:,"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -10,45 +10,40 @@
   <link rel="stylesheet" href="css/style.css"/>
 </head>
 <body>
-
-<!-- SPLASH -->
-<div id="splashScreen" style="position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#1e3a8a,#1e40af,#2563eb);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.5s ease">
-  <div style="width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;margin-bottom:20px">
-    <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden" id="splashLogoBox">🏛️</div>
-  </div>
-  <div style="color:white;font-size:22px;font-weight:800;letter-spacing:-0.5px" id="splashTitle">SIMAWAR</div>
-  <div style="color:rgba(255,255,255,0.7);font-size:12px;margin-top:6px;text-align:center;padding:0 20px" id="splashSub">Sistem Informasi Monitoring Warga Binaan</div>
-  <div style="margin-top:32px;width:140px;height:3px;background:rgba(255,255,255,0.15);border-radius:100px;overflow:hidden">
-    <div style="height:100%;width:0%;background:rgba(255,255,255,0.8);border-radius:100px;animation:splashBar 0.9s ease forwards"></div>
+<div id="splashScreen" style="position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#1e3a8a,#2563eb);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.5s">
+  <div style="width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.12);border:2px solid rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;margin-bottom:18px;font-size:32px;overflow:hidden" id="splashLogoBox">🏛️</div>
+  <div style="color:white;font-size:20px;font-weight:800" id="splashTitle">SIMAWAR</div>
+  <div style="color:rgba(255,255,255,0.7);font-size:12px;margin-top:5px;text-align:center" id="splashSub">Sistem Informasi Monitoring Warga Binaan</div>
+  <div style="margin-top:28px;width:130px;height:3px;background:rgba(255,255,255,0.15);border-radius:100px;overflow:hidden">
+    <div style="height:100%;background:rgba(255,255,255,0.8);animation:sbar 0.9s ease forwards;width:0%" ></div>
   </div>
 </div>
-<style>@keyframes splashBar{to{width:100%}}</style>
+<style>
+@keyframes sbar{to{width:100%}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+</style>
 
 <div id="loginPage" class="login-page" style="display:none">
   <div class="login-card fade-in">
-    <!-- Logo -->
     <div class="login-logo" id="loginLogo">
-      <span class="login-logo-placeholder" id="loginLogoEmoji">🏛️</span>
+      <span id="loginLogoEmoji" style="font-size:32px">🏛️</span>
     </div>
     <h1 class="text-center font-extrabold text-gray-900 text-xl mb-1" id="loginSiteName">SIMAWAR</h1>
-    <p class="text-center text-sm text-gray-400 mb-8" id="loginSiteDesc">Sistem Informasi Monitoring Warga Binaan<br>Lapas Bandanaira</p>
+    <p class="text-center text-sm text-gray-400 mb-7" id="loginSiteDesc">Sistem Informasi Monitoring Warga Binaan</p>
 
     <div class="form-group">
       <label class="form-label">Username</label>
       <div style="position:relative">
-        <input type="text" id="loginUsername" class="form-control" placeholder="Masukkan username" autocomplete="username" style="padding-right:40px"/>
-        <svg style="position:absolute;right:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:#94a3b8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
-        </svg>
+        <input type="text" id="fUsername" class="form-control" placeholder="Masukkan username" style="padding-right:40px" autocomplete="username"/>
+        <svg style="position:absolute;right:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:#94a3b8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0"/></svg>
       </div>
     </div>
-
     <div class="form-group">
       <label class="form-label">Password</label>
       <div style="position:relative">
-        <input type="password" id="loginPassword" class="form-control" placeholder="Masukkan password" autocomplete="current-password" style="padding-right:40px"/>
-        <button type="button" id="togglePwd" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;color:#94a3b8">
-          <svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <input type="password" id="fPassword" class="form-control" placeholder="Masukkan password" style="padding-right:40px" autocomplete="current-password"/>
+        <button type="button" id="btnTogglePwd" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;color:#94a3b8">
+          <svg id="eyeIcon" style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/>
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
           </svg>
@@ -56,35 +51,34 @@
       </div>
     </div>
 
-    <button id="loginBtn" class="btn btn-primary w-full justify-center mt-2" style="padding:12px;font-size:14px">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/>
-      </svg>
-      <span id="loginBtnText">Masuk</span>
+    <button id="btnLogin" class="btn btn-primary w-full justify-center mt-1" style="padding:12px 20px;font-size:14px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+      <span id="btnLoginText">Masuk</span>
     </button>
-
-    <p class="text-center text-xs text-gray-400 mt-5">Hubungi admin jika lupa password</p>
+    <p style="text-align:center;font-size:11px;color:#94a3b8;margin-top:16px">Hubungi admin jika lupa password</p>
   </div>
 
-  <!-- Footer -->
-  <div class="app-footer" style="position:fixed;bottom:0;left:0;right:0;background:transparent;border:none;padding:16px">
+  <div class="app-footer" style="position:fixed;bottom:0;left:0;right:0;background:transparent;border:none;padding:14px">
     <span style="color:rgba(255,255,255,0.6)">Dibuat dengan ❤️ Oleh</span>
-    <span style="color:white;font-weight:700">WA MIRANTI</span>
-    <a href="https://instagram.com/wa_miranti" target="_blank" class="social-link ig-link">
-      <svg viewBox="0 0 24 24" class="w-3 h-3" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-      @wa_miranti
-    </a>
-    <a href="https://tiktok.com/@wa_miranti" target="_blank" class="social-link tt-link">
-      <svg viewBox="0 0 24 24" class="w-3 h-3" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V9.15a8.16 8.16 0 004.77 1.52V7.22a4.85 4.85 0 01-1-.53z"/></svg>
-      @wa_miranti
-    </a>
+    <strong style="color:white">WA MIRANTI</strong>
+    <a href="https://instagram.com/wa_miranti" target="_blank" class="social-link ig-link">@wa_miranti</a>
+    <a href="https://tiktok.com/@wa_miranti" target="_blank" class="social-link tt-link">@wa_miranti</a>
   </div>
 </div>
 
 <script src="js/config.js"></script>
 <script>
-// ── LOAD SITE CONFIG ──────────────────────────────────────────
-async function loadSiteConfig() {
+// Toggle password visibility
+document.getElementById('btnTogglePwd').onclick = () => {
+  const f = document.getElementById('fPassword');
+  f.type = f.type === 'password' ? 'text' : 'password';
+};
+
+// Enter key support
+document.getElementById('fUsername').onkeydown = e => { if(e.key==='Enter') document.getElementById('fPassword').focus(); };
+document.getElementById('fPassword').onkeydown = e => { if(e.key==='Enter') doLogin(); };
+
+async function loadSiteConfigLogin() {
   try {
     const { data } = await sb.from('site_config').select('*').maybeSingle();
     if (!data) return;
@@ -94,31 +88,31 @@ async function loadSiteConfig() {
       document.getElementById('splashTitle').textContent   = data.site_name;
     }
     if (data.site_desc) {
-      document.getElementById('loginSiteDesc').innerHTML = data.site_desc.replace(/\n/g,'<br>');
-      const sub = document.getElementById('splashSub');
-      if (sub) sub.textContent = data.site_desc.split('\n')[0];
+      document.getElementById('loginSiteDesc').textContent = data.site_desc.split('\n')[0];
+      document.getElementById('splashSub').textContent     = data.site_desc.split('\n')[0];
     }
     if (data.logo_url) {
-      const logo = document.getElementById('loginLogo');
       document.getElementById('loginLogoEmoji').style.display = 'none';
-      const img = document.createElement('img');
+      const logo = document.getElementById('loginLogo');
+      const img  = document.createElement('img');
       img.src = data.logo_url; img.alt = 'Logo';
       logo.appendChild(img);
-      // Splash logo
       const sb2 = document.getElementById('splashLogoBox');
-      sb2.innerHTML = '';
+      sb2.textContent = '';
       const si = document.createElement('img');
-      si.src = data.logo_url; si.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%';
+      si.src = data.logo_url;
+      si.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%';
       sb2.appendChild(si);
     }
     if (data.favicon_url) document.getElementById('faviconEl').href = data.favicon_url;
-  } catch(e) {}
+  } catch(e) { /* ignore */ }
 }
 
-// ── INIT ──────────────────────────────────────────────────────
 async function init() {
-  await loadSiteConfig();
-  // Tampilkan splash 900ms
+  // Load config (non-blocking)
+  loadSiteConfigLogin().catch(() => {});
+
+  // Splash 900ms lalu show login
   setTimeout(() => {
     const s = document.getElementById('splashScreen');
     s.style.opacity = '0';
@@ -128,35 +122,35 @@ async function init() {
     }, 500);
   }, 900);
 
-  // Jika sudah login (session ada) langsung redirect
-  const { data: { session } } = await sb.auth.getSession();
-  if (session) {
-    const { data: p } = await sb.from('pegawai').select('role').eq('user_id', session.user.id).maybeSingle();
-    if (p) { location.href = p.role === 'admin' ? 'admin.html' : 'user.html'; return; }
-  }
+  // Jika sudah punya sesi Supabase Auth yang valid, langsung redirect
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session?.user?.id) {
+      const { data: p } = await sb.from('pegawai')
+        .select('role,status')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+      if (p && p.status === 'aktif') {
+        location.href = p.role === 'admin' ? 'admin.html' : 'user.html';
+        return;
+      }
+    }
+  } catch(e) { /* biarkan user login manual */ }
 }
 
-// ── TOGGLE PASSWORD ───────────────────────────────────────────
-document.getElementById('togglePwd').addEventListener('click', () => {
-  const inp = document.getElementById('loginPassword');
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-});
-
-// ── LOGIN ─────────────────────────────────────────────────────
 async function doLogin() {
-  const username = document.getElementById('loginUsername').value.trim();
-  const password = document.getElementById('loginPassword').value;
-  const btn      = document.getElementById('loginBtn');
-  const btnText  = document.getElementById('loginBtnText');
+  const username = (document.getElementById('fUsername').value || '').trim();
+  const password = (document.getElementById('fPassword').value || '');
+  const btn      = document.getElementById('btnLogin');
+  const btnText  = document.getElementById('btnLoginText');
 
-  if (!username || !password) {
-    showAlert('warning', 'Perhatian', 'Username dan password harus diisi!'); return;
-  }
+  if (!username) { showAlert('warning','Perhatian','Username wajib diisi!'); return; }
+  if (!password) { showAlert('warning','Perhatian','Password wajib diisi!'); return; }
 
   btn.disabled = true; btnText.textContent = 'Memverifikasi...';
 
   try {
-    // ── Cari pegawai berdasarkan username ──
+    // 1. Cari pegawai berdasarkan username di tabel
     const { data: pegawai, error: pe } = await sb
       .from('pegawai')
       .select('id, user_id, nama, username, password_plain, role, status')
@@ -164,88 +158,68 @@ async function doLogin() {
       .maybeSingle();
 
     if (pe || !pegawai) {
-      showAlert('error', 'Login Gagal', 'Username tidak ditemukan!');
+      showAlert('error','Login Gagal','Username tidak ditemukan!');
       btn.disabled = false; btnText.textContent = 'Masuk'; return;
     }
 
     if (pegawai.status === 'nonaktif') {
-      showAlert('error', 'Akun Nonaktif', 'Akun Anda dinonaktifkan. Hubungi admin.');
+      showAlert('error','Akun Nonaktif','Akun Anda telah dinonaktifkan. Hubungi admin.');
       btn.disabled = false; btnText.textContent = 'Masuk'; return;
     }
 
-    // ── Cek password (password_plain) ──
     if (!pegawai.password_plain) {
-      showAlert('error', 'Login Gagal', 'Akun belum memiliki password. Hubungi admin!');
+      showAlert('error','Login Gagal','Akun belum memiliki password. Hubungi admin!');
       btn.disabled = false; btnText.textContent = 'Masuk'; return;
     }
 
+    // 2. Cek password
     if (password !== pegawai.password_plain) {
-      showAlert('error', 'Login Gagal', 'Password salah!');
+      showAlert('error','Login Gagal','Password salah!');
       btn.disabled = false; btnText.textContent = 'Masuk'; return;
     }
 
-    // ── Password cocok — cek apakah sudah punya sesi Supabase Auth ──
-    if (pegawai.user_id) {
-      // Sudah punya akun auth — coba login via Supabase
-      // Gunakan email dummy berbasis username
-      const emailDummy = `${username}@simawar.internal`;
-      const { data: authData, error: ae } = await sb.auth.signInWithPassword({
-        email: emailDummy, password
-      });
+    // 3. Password cocok — simpan info di sessionStorage untuk akses tanpa Supabase Auth
+    sessionStorage.setItem('sw_id',       pegawai.id);
+    sessionStorage.setItem('sw_nama',     pegawai.nama);
+    sessionStorage.setItem('sw_username', pegawai.username);
+    sessionStorage.setItem('sw_role',     pegawai.role);
+    sessionStorage.setItem('sw_status',   pegawai.status);
 
-      if (ae) {
-        // Auth gagal tapi password_plain cocok — bisa jadi password diubah
-        // Izinkan masuk dengan simpan flag di sessionStorage
-        sessionStorage.setItem('simawar_user_id', pegawai.id);
-        sessionStorage.setItem('simawar_role', pegawai.role);
-        sessionStorage.setItem('simawar_nama', pegawai.nama);
-        sessionStorage.setItem('simawar_username', pegawai.username);
-        showAlert('success', 'Masuk!', `Selamat datang, ${pegawai.nama}!`);
-        setTimeout(() => {
-          location.href = pegawai.role === 'admin' ? 'admin.html' : 'user.html';
-        }, 800);
-        return;
+    // 4. Coba buat/login Supabase Auth di background (opsional, tidak blocking)
+    const emailDummy = `${username.replace(/\s+/g,'')}@simawar.internal`;
+    try {
+      if (pegawai.user_id) {
+        // Sudah punya akun — coba sign in
+        const { error: se } = await sb.auth.signInWithPassword({ email: emailDummy, password });
+        // Jika gagal, tidak apa-apa — sessionStorage sudah di-set
+      } else {
+        // Buat akun baru di Supabase Auth
+        const { data: au, error: ae } = await sb.auth.signUp({
+          email: emailDummy, password,
+          options: { data: { username } }
+        });
+        if (!ae && au?.user) {
+          await sb.from('pegawai').update({ user_id: au.user.id }).eq('id', pegawai.id);
+          await sb.auth.signInWithPassword({ email: emailDummy, password });
+        } else if (ae?.message?.includes('registered')) {
+          await sb.auth.signInWithPassword({ email: emailDummy, password });
+        }
       }
-    } else {
-      // Belum punya akun Supabase Auth — buat otomatis
-      const emailDummy = `${username}@simawar.internal`;
-      const { data: authData, error: ae } = await sb.auth.signUp({
-        email: emailDummy, password,
-        options: { data: { username } }
-      });
+    } catch(e) { /* Auth opsional — abaikan error */ }
 
-      if (!ae && authData?.user) {
-        // Link user_id ke tabel pegawai
-        await sb.from('pegawai').update({ user_id: authData.user.id }).eq('id', pegawai.id);
-        // Langsung sign in
-        await sb.auth.signInWithPassword({ email: emailDummy, password });
-      } else if (ae?.message?.includes('already registered')) {
-        // Email sudah ada — coba sign in langsung
-        await sb.auth.signInWithPassword({ email: emailDummy, password });
-      }
-    }
-
-    showAlert('success', 'Berhasil!', `Selamat datang, ${pegawai.nama}!`);
+    showAlert('success','Berhasil!',`Selamat datang, ${pegawai.nama}!`);
     setTimeout(() => {
       location.href = pegawai.role === 'admin' ? 'admin.html' : 'user.html';
-    }, 800);
+    }, 700);
 
   } catch(e) {
-    showAlert('error', 'Error', 'Terjadi kesalahan. Coba lagi!');
-    console.error(e);
-  } finally {
+    console.error('Login error:', e);
+    showAlert('error','Error','Terjadi kesalahan. Coba lagi!');
     btn.disabled = false; btnText.textContent = 'Masuk';
   }
 }
 
-document.getElementById('loginBtn').addEventListener('click', doLogin);
-document.getElementById('loginPassword').addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
-});
-document.getElementById('loginUsername').addEventListener('keydown', e => {
-  if (e.key === 'Enter') document.getElementById('loginPassword').focus();
-});
-
+document.getElementById('btnLogin').onclick = doLogin;
 init();
 </script>
 </body>
