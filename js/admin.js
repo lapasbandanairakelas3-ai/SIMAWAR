@@ -93,7 +93,7 @@ function closeModal(id) {
 }
 async function doLogout() {
   showConfirm('Keluar', 'Yakin ingin keluar?', async () => {
-    sessionStorage.removeItem('simawar_admin_page');
+    sessionStorage.clear();
     await sb.auth.signOut();
     location.href = 'index.html';
   });
@@ -348,7 +348,7 @@ async function loadWbp() {
   document.getElementById('wbpCount').textContent = `${count||0} data`;
 
   if (!data?.length) {
-    tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state">
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state">
       <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-8 h-8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
       <div class="empty-title">Belum Ada Data WBP</div>
       <div class="empty-desc">Tambahkan WBP melalui tombol Tambah WBP</div>
@@ -499,7 +499,7 @@ async function loadPegawai() {
   document.getElementById('pegawaiCount').textContent = `${count||0} data`;
 
   if (!data?.length) {
-    tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state">
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state">
       <div class="empty-title">Belum Ada Pegawai</div>
       <div class="empty-desc">Tambahkan pegawai melalui tombol Tambah Pegawai</div>
     </div></td></tr>`;
@@ -509,32 +509,47 @@ async function loadPegawai() {
   tbody.innerHTML = data.map((p, i) => `
     <tr class="fade-in">
       <td class="text-gray-400 text-xs">${i+1}</td>
-      <td><div style="display:flex;align-items:center;gap:10px">
-        <div class="table-avatar">${p.nama?.[0]||'?'}</div>
-        <div><div class="font-semibold text-sm">${p.nama}</div><div class="text-xs text-gray-400">${p.nip||'—'}</div></div>
-      </div></td>
-      <td class="text-sm">${p.jabatan||'—'}</td>
-      <td class="text-sm">${p.pangkat||'—'}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="table-avatar" style="background:${p.role==='admin'?'linear-gradient(135deg,#7c3aed,#4f46e5)':'linear-gradient(135deg,#3b82f6,#1e40af)'}">${p.nama?.[0]||'?'}</div>
+          <div class="font-semibold text-sm">${p.nama}</div>
+        </div>
+      </td>
       <td><code class="text-xs bg-gray-100 px-2 py-1 rounded">${p.username}</code></td>
-      <td>${p.role!=='admin'&&p.password_plain?`<div style="display:flex;align-items:center;gap:4px"><code class="text-xs bg-yellow-50 border border-yellow-200 px-2 py-1 rounded text-yellow-800" id="pwd_${p.id}">••••••••</code><button onclick="togglePwd('${p.id}','${p.password_plain||''}')" style="background:none;border:none;cursor:pointer;padding:2px" title="Lihat/sembunyikan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:#94a3b8"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button></div>`:'<span class="text-xs text-gray-300">—</span>'}</td>
-      <td><span class="badge ${p.role==='admin'?'badge-purple':'badge-blue'}">${p.role==='admin'?'Admin':'Petugas'}</span></td>
+      <td>
+        ${p.password_plain
+          ? `<div style="display:flex;align-items:center;gap:6px">
+              <code class="text-xs bg-yellow-50 border border-yellow-200 px-2 py-1 rounded text-yellow-800" id="pwd_${p.id}" style="letter-spacing:2px">••••••••</code>
+              <button onclick="togglePwd('${p.id}','${(p.password_plain||'').replace(/'/g,"\\'")}')" style="background:none;border:none;cursor:pointer;padding:2px;color:#94a3b8" title="Tampilkan/Sembunyikan">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              </button>
+             </div>`
+          : '<span class="text-xs text-gray-300">—</span>'}
+      </td>
+      <td><span class="badge ${p.role==='admin'?'badge-purple':'badge-blue'}">${p.role==='admin'?'Admin':'Rupam'}</span></td>
       <td><span class="badge ${p.status==='aktif'?'badge-green':'badge-red'}">${p.status||'aktif'}</span></td>
       <td><div style="display:flex;gap:6px">
-        <button class="btn btn-warning btn-sm btn-icon" title="Edit" onclick="editPegawai('${p.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/></svg></button>
-        ${p.id !== currentAdmin?.id ? `<button class="btn btn-danger btn-sm btn-icon" title="Hapus" onclick="deletePegawai('${p.id}','${p.nama.replace(/'/g,"\\'")}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>` : ''}
+        <button class="btn btn-warning btn-sm btn-icon" title="Edit" onclick="editPegawai('${p.id}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/></svg>
+        </button>
+        ${p.id !== currentAdmin?.id
+          ? `<button class="btn btn-danger btn-sm btn-icon" title="Hapus" onclick="deletePegawai('${p.id}','${p.nama.replace(/'/g,"\\'")}')">
+               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+             </button>`
+          : ''}
       </div></td>
     </tr>`).join('');
 }
 
 function openPegawaiModal() {
-  ['pegawaiId','pegawaiUserId','pegawaiNama','pegawaiJabatan','pegawaiPangkat',
-   'pegawaiUsername','pegawaiEmail','pegawaiPassword','pegawaiNip'].forEach(id => {
+  ['pegawaiId','pegawaiNama','pegawaiUsername','pegawaiPassword'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
-  document.getElementById('pegawaiRole').value = 'user';
+  document.getElementById('pegawaiRole').value   = 'user';
   document.getElementById('pegawaiStatus').value = 'aktif';
-  document.getElementById('pegawaiPwdGroup').style.display = 'block';
-  document.getElementById('pegawaiModalTitle').textContent = 'Tambah Pegawai';
+  const pg = document.getElementById('pegawaiPwdGroup');
+  if (pg) pg.style.display = 'block';
+  document.getElementById('pegawaiModalTitle').textContent = 'Tambah Petugas (Karupam)';
   openModal('pegawaiModal');
 }
 
@@ -542,74 +557,58 @@ async function editPegawai(id) {
   openPegawaiModal();
   const { data: p } = await sb.from('pegawai').select('*').eq('id', id).maybeSingle();
   if (!p) return;
-  document.getElementById('pegawaiModalTitle').textContent = 'Edit Data Pegawai';
-  const v = (eid, val) => { const el = document.getElementById(eid); if (el) el.value = val || ''; };
-  v('pegawaiId', p.id); v('pegawaiUserId', p.user_id); v('pegawaiNama', p.nama);
-  v('pegawaiJabatan', p.jabatan); v('pegawaiPangkat', p.pangkat);
-  v('pegawaiUsername', p.username); v('pegawaiEmail', p.email); v('pegawaiNip', p.nip);
-  document.getElementById('pegawaiRole').value = p.role || 'user';
-  document.getElementById('pegawaiStatus').value = p.status || 'aktif';
-  document.getElementById('pegawaiPwdGroup').style.display = 'none';
+  document.getElementById('pegawaiModalTitle').textContent = 'Edit Petugas';
+  document.getElementById('pegawaiId').value        = p.id       || '';
+  document.getElementById('pegawaiNama').value      = p.nama     || '';
+  document.getElementById('pegawaiUsername').value  = p.username || '';
+  document.getElementById('pegawaiPassword').value  = p.password_plain || '';
+  document.getElementById('pegawaiRole').value      = p.role     || 'user';
+  document.getElementById('pegawaiStatus').value    = p.status   || 'aktif';
+  // Saat edit, password tetap bisa diubah
+  const pg = document.getElementById('pegawaiPwdGroup');
+  if (pg) pg.style.display = 'block';
 }
 
 async function savePegawai() {
   const id       = document.getElementById('pegawaiId').value;
   const nama     = document.getElementById('pegawaiNama').value.trim();
-  const username = document.getElementById('pegawaiUsername').value.trim();
-  const email    = document.getElementById('pegawaiEmail').value.trim();
+  const username = document.getElementById('pegawaiUsername').value.trim().toLowerCase();
   const password = document.getElementById('pegawaiPassword').value;
 
-  if (!nama || !username) {
-    showAlert('warning', 'Perhatian', 'Nama dan username wajib diisi!'); return;
-  }
-  if (!id && (!password || password.length < 8)) {
-    showAlert('warning', 'Perhatian', 'Password minimal 8 karakter!'); return;
-  }
+  if (!nama)     { showAlert('warning','Perhatian','Nama Rupam wajib diisi!'); return; }
+  if (!username) { showAlert('warning','Perhatian','Username wajib diisi!'); return; }
+  if (!password) { showAlert('warning','Perhatian','Password wajib diisi!'); return; }
 
   const btn = document.getElementById('pegawaiSaveBtn');
   btn.disabled = true; btn.textContent = 'Menyimpan...';
-
   try {
-    // Jika email kosong, buat dummy email dari username
-    const emailFinal = email || `${username.toLowerCase().replace(/\s+/g,'')}@simawar.lapas`;
-
-    const payload = {
-      nama,
-      jabatan:  document.getElementById('pegawaiJabatan').value,
-      pangkat:  document.getElementById('pegawaiPangkat').value,
-      username,
-      email:    emailFinal,
-      nip:      document.getElementById('pegawaiNip').value,
-      role:     document.getElementById('pegawaiRole').value,
-      status:   document.getElementById('pegawaiStatus').value
-    };
-
-    if (id) {
-      // Edit data pegawai saja
-      const { error } = await sb.from('pegawai').update(payload).eq('id', id);
-      if (error) throw error;
-      showAlert('success', 'Berhasil!', 'Data pegawai diperbarui');
-    } else {
-      // Tambah baru TANPA email verification
+    if (!id) {
       // Cek duplikat username
-      const { data: existU } = await sb.from('pegawai').select('id').eq('username', username).maybeSingle();
-      if (existU) throw new Error('Username sudah dipakai!');
-
-      // Simpan password_plain untuk referensi admin
-      payload.password_plain = password;
-      payload.user_id = null; // akan diisi saat pegawai pertama kali login
-
-      const { error } = await sb.from('pegawai').insert(payload);
-      if (error) throw error;
-
-      showAlert('success', 'Ditambahkan!',
-        `Petugas ${nama} berhasil ditambahkan. Username: ${username} | Password: ${password}`, 6000);
+      const { data: ex } = await sb.from('pegawai').select('id').eq('username', username).maybeSingle();
+      if (ex) throw new Error(`Username "${username}" sudah dipakai!`);
     }
 
+    const payload = {
+      nama, username,
+      password_plain: password,
+      role:   document.getElementById('pegawaiRole').value   || 'user',
+      status: document.getElementById('pegawaiStatus').value || 'aktif'
+    };
+
+    const res = id
+      ? await sb.from('pegawai').update(payload).eq('id', id)
+      : await sb.from('pegawai').insert(payload);
+
+    if (res.error) throw res.error;
+
+    showAlert('success','Berhasil!',
+      id ? `Data ${nama} diperbarui`
+         : `${nama} ditambahkan! Login: username="${username}" | password="${password}"`,
+      id ? 3000 : 7000);
     closeModal('pegawaiModal');
     loadPegawai();
   } catch(e) {
-    showAlert('error', 'Gagal', e.message);
+    showAlert('error','Gagal',e.message);
   } finally {
     btn.disabled = false;
     btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg> Simpan';
@@ -834,41 +833,31 @@ async function loadAkun() {
   if (!currentAdmin) return;
   const t = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
   const v = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
-  t('akunNamaDisplay', currentAdmin.nama);
-  t('akunJabatanDisplay', currentAdmin.jabatan);
-  t('akunPangkatDisplay', currentAdmin.pangkat);
+  t('akunNamaDisplay',     currentAdmin.nama);
+  t('akunJabatanDisplay',  currentAdmin.role === 'admin' ? 'Administrator' : 'Rupam');
+  t('akunPangkatDisplay',  '—');
   t('akunUsernameDisplay', currentAdmin.username);
-  t('akunRoleDisplay', currentAdmin.role === 'admin' ? 'Administrator' : 'Petugas');
+  t('akunRoleDisplay',     currentAdmin.role === 'admin' ? 'Administrator' : 'Petugas');
   const av = document.getElementById('akunAvatarBig');
   if (av) av.textContent = currentAdmin.nama?.[0]?.toUpperCase() || 'A';
-  v('akunNama', currentAdmin.nama);
-  v('akunJabatan', currentAdmin.jabatan);
-  const { data: { user } } = await sb.auth.getUser();
-  t('akunEmailDisplay', user?.email);
-  v('akunEmail', user?.email);
+  v('akunNama',     currentAdmin.nama);
+  v('akunUsername', currentAdmin.username);
+  t('akunEmailDisplay', '—');
 }
 
 async function saveAkun() {
-  const nama    = document.getElementById('akunNama')?.value.trim();
-  const jabatan = document.getElementById('akunJabatan')?.value.trim();
-  const email   = document.getElementById('akunEmail')?.value.trim();
-  if (!nama) { showAlert('warning', 'Perhatian', 'Nama tidak boleh kosong!'); return; }
+  const nama = document.getElementById('akunNama')?.value.trim();
+  if (!nama) { showAlert('warning','Perhatian','Nama tidak boleh kosong!'); return; }
   try {
-    const { error } = await sb.from('pegawai').update({ nama, jabatan }).eq('id', currentAdmin.id);
+    const { error } = await sb.from('pegawai').update({ nama }).eq('id', currentAdmin.id);
     if (error) throw error;
-    const { data: { user } } = await sb.auth.getUser();
-    if (email && email !== user.email) {
-      const { error: e2 } = await sb.auth.updateUser({ email });
-      if (e2) throw e2;
-    }
-    currentAdmin.nama = nama; currentAdmin.jabatan = jabatan;
-    document.getElementById('headerUname').textContent = nama;
-    document.getElementById('headerAvatar').textContent = nama[0].toUpperCase();
-    document.getElementById('akunAvatarBig').textContent = nama[0].toUpperCase();
+    currentAdmin.nama = nama;
+    document.getElementById('headerUname').textContent    = nama;
+    document.getElementById('headerAvatar').textContent   = nama[0].toUpperCase();
+    document.getElementById('akunAvatarBig').textContent  = nama[0].toUpperCase();
     document.getElementById('akunNamaDisplay').textContent = nama;
-    document.getElementById('akunJabatanDisplay').textContent = jabatan || '—';
-    showAlert('success', 'Berhasil!', 'Data akun diperbarui');
-  } catch(e) { showAlert('error', 'Gagal', e.message); }
+    showAlert('success','Berhasil!','Nama akun diperbarui');
+  } catch(e) { showAlert('error','Gagal',e.message); }
 }
 
 async function savePassword() {

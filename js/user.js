@@ -7,21 +7,34 @@ let activeSessionId = null;
 
 // ── INIT ──────────────────────────────────────────────────────
 async function init() {
-  // Splash 800ms lalu hapus dari DOM
   setTimeout(() => {
     const s = document.getElementById('splashScreen');
     if (s) { s.style.opacity = '0'; setTimeout(() => s.remove(), 500); }
   }, 800);
 
+  // Cek Supabase Auth session
   const { data: { session } } = await sb.auth.getSession();
-  if (!session) { location.href = 'index.html'; return; }
+  let p = null;
 
-  const { data: p } = await sb.from('pegawai').select('*').eq('user_id', session.user.id).maybeSingle();
-  if (!p) { await sb.auth.signOut(); location.href = 'index.html'; return; }
+  if (session) {
+    const { data } = await sb.from('pegawai').select('*').eq('user_id', session.user.id).maybeSingle();
+    p = data;
+  }
+
+  // Fallback: sessionStorage (login via password_plain)
+  if (!p) {
+    const ssId = sessionStorage.getItem('simawar_user_id');
+    if (ssId) {
+      const { data } = await sb.from('pegawai').select('*').eq('id', ssId).maybeSingle();
+      p = data;
+    }
+  }
+
+  if (!p) { location.href = 'index.html'; return; }
   currentUser = p;
 
   document.getElementById('headerUname').textContent = p.nama;
-  document.getElementById('headerRole').textContent  = p.jabatan || 'Regu Pengamanan';
+  document.getElementById('headerRole').textContent  = p.nama || 'Regu Pengamanan';
   document.getElementById('headerAvatar').textContent = p.nama?.[0]?.toUpperCase() || 'P';
   document.getElementById('headerDate').textContent = new Date().toLocaleDateString('id-ID', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
@@ -93,7 +106,9 @@ function closeModal(id) {
 async function doLogout() {
   if (activeSessionId) await releaseSession();
   showConfirm('Keluar', 'Yakin ingin keluar?', async () => {
-    await sb.auth.signOut(); location.href = 'index.html';
+    sessionStorage.clear();
+    await sb.auth.signOut();
+    location.href = 'index.html';
   });
 }
 
@@ -519,10 +534,8 @@ async function exportRiwayatUser() {
 async function loadProfil() {
   if (!currentUser) return;
   const t = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
-  t('profilNama', currentUser.nama);
-  t('profilJabatan', currentUser.jabatan);
-  t('profilNip', currentUser.nip);
-  t('profilPangkat', currentUser.pangkat);
+  t('profilNama',     currentUser.nama);
+  t('profilJabatan',  'Regu Pengamanan');
   t('profilUsername', currentUser.username);
   const av = document.getElementById('profilAvatar');
   if (av) av.textContent = currentUser.nama?.[0]?.toUpperCase() || 'P';

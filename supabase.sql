@@ -1,201 +1,135 @@
 -- ============================================================
--- SUPABASE SCHEMA — SiHadir Lapas Bandanaira
+-- SIMAWAR — Supabase Schema Lengkap (Versi Bersih)
 -- Jalankan di Supabase SQL Editor
 -- ============================================================
 
 -- ---- SITE CONFIG ----
 create table if not exists site_config (
-  id uuid default gen_random_uuid() primary key,
-  site_name text default 'SIMAWAR',
-  site_desc text default 'Sistem Informasi Monitoring Warga Binaan',
-  logo_url text,
+  id         uuid default gen_random_uuid() primary key,
+  site_name  text default 'SIMAWAR',
+  site_desc  text default 'Sistem Informasi Monitoring Warga Binaan',
+  logo_url   text,
   favicon_url text,
-  gas_url text,
-  instansi text default 'Lapas Kelas III Bandanaira',
-  alamat text,
+  gas_url    text,
+  instansi   text default 'Lapas Kelas III Bandanaira',
+  alamat     text,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
-
--- Insert default config
 insert into site_config (site_name, site_desc, instansi)
-values ('SIMAWAR', 'Sistem Informasi Monitoring Warga Binaan
-Lapas Bandanaira', 'Lapas Kelas III Bandanaira')
+values ('SiMawar Lapas Bandanaira', 'Sistem Informasi Monitoring Warga Binaan', 'Lapas Kelas III Bandanaira')
 on conflict do nothing;
-
--- Jika tabel sudah ada, tambah kolom baru:
--- alter table site_config add column if not exists instansi text;
--- alter table site_config add column if not exists alamat text;
 
 -- ---- BLOK / KAMAR ----
 create table if not exists blok (
-  id uuid default gen_random_uuid() primary key,
-  nama text not null,
-  kapasitas int,
-  jk text default 'L' check (jk in ('L', 'P', 'Campur')),
+  id         uuid default gen_random_uuid() primary key,
+  nama       text not null,
+  kapasitas  int,
+  jk         text default 'L' check (jk in ('L','P','Campur')),
   keterangan text,
   created_at timestamptz default now()
 );
 
 -- ---- WBP ----
 create table if not exists wbp (
-  id uuid default gen_random_uuid() primary key,
-  nama text not null,
-  foto_url text,
-  jk text default 'L' check (jk in ('L', 'P')),
-  no_registrasi text unique,
-  blok_id uuid references blok(id) on delete set null,
-  tgl_masuk date,
-  tgl_bebas date,
-  masa_pidana text,
-  kasus text,
-  asal text,
-  catatan text,
-  status text default 'aktif' check (status in ('aktif', 'bebas', 'pindah')),
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
+  id             uuid default gen_random_uuid() primary key,
+  nama           text not null,
+  foto_url       text,
+  jk             text default 'L' check (jk in ('L','P')),
+  no_registrasi  text unique,
+  blok_id        uuid references blok(id) on delete set null,
+  tgl_masuk      date,
+  tgl_bebas      date,
+  masa_pidana    text,
+  kasus          text,
+  asal           text,
+  catatan        text,
+  status         text default 'aktif' check (status in ('aktif','bebas','pindah')),
+  created_at     timestamptz default now(),
+  updated_at     timestamptz default now()
 );
 
--- ---- PEGAWAI ----
+-- ---- PEGAWAI (DISEDERHANAKAN — tanpa email, NIP, pangkat, jabatan) ----
 create table if not exists pegawai (
-  id uuid default gen_random_uuid() primary key,
-  user_id uuid references auth.users(id) on delete cascade,
-  nama text not null,
-  jabatan text,
-  pangkat text,
-  nip text,
-  username text unique not null,
-  email text unique not null,
-  role text default 'user' check (role in ('admin', 'user')),
-  status text default 'aktif' check (status in ('aktif', 'nonaktif')),
-  created_at timestamptz default now()
+  id             uuid default gen_random_uuid() primary key,
+  user_id        uuid,  -- boleh null untuk Karupam baru
+  nama           text not null,       -- cth: Rupam 1, Rupam 2
+  username       text unique not null,-- cth: rupam1, rupam2
+  password_plain text,                -- password tersimpan agar admin bisa lihat
+  role           text default 'user' check (role in ('admin','user')),
+  status         text default 'aktif' check (status in ('aktif','nonaktif')),
+  created_at     timestamptz default now()
 );
 
 -- ============================================================
 -- ROW LEVEL SECURITY
 -- ============================================================
-
 alter table site_config enable row level security;
-alter table blok enable row level security;
-alter table wbp enable row level security;
-alter table pegawai enable row level security;
+alter table blok         enable row level security;
+alter table wbp          enable row level security;
+alter table pegawai      enable row level security;
 
--- site_config: semua bisa baca, hanya admin bisa ubah
-create policy "Public read site_config" on site_config for select using (true);
-create policy "Admin manage site_config" on site_config for all
-  using (exists (select 1 from pegawai where user_id = auth.uid() and role = 'admin'));
+-- Hapus policy lama (jika ada) sebelum buat baru
+drop policy if exists "Public read site_config"    on site_config;
+drop policy if exists "Admin manage site_config"   on site_config;
+drop policy if exists "Auth read blok"             on blok;
+drop policy if exists "Admin manage blok"          on blok;
+drop policy if exists "Auth read wbp"              on wbp;
+drop policy if exists "Admin manage wbp"           on wbp;
+drop policy if exists "Own read pegawai"           on pegawai;
+drop policy if exists "Own update pegawai"         on pegawai;
+drop policy if exists "Admin manage pegawai"       on pegawai;
+drop policy if exists "Insert own pegawai"         on pegawai;
+drop policy if exists "Allow all site_config"      on site_config;
+drop policy if exists "Allow all blok"             on blok;
+drop policy if exists "Allow all wbp"              on wbp;
+drop policy if exists "Allow all pegawai"          on pegawai;
+drop policy if exists "Public access assets"       on storage.objects;
+drop policy if exists "Public access wbp-photos"   on storage.objects;
 
--- blok: semua user login bisa baca, admin bisa CRUD
-create policy "Auth read blok" on blok for select using (auth.uid() is not null);
-create policy "Admin manage blok" on blok for all
-  using (exists (select 1 from pegawai where user_id = auth.uid() and role = 'admin'));
-
--- wbp: semua user login bisa baca, admin bisa CRUD
-create policy "Auth read wbp" on wbp for select using (auth.uid() is not null);
-create policy "Admin manage wbp" on wbp for all
-  using (exists (select 1 from pegawai where user_id = auth.uid() and role = 'admin'));
-
--- pegawai: semua bisa baca data sendiri, admin bisa semua
-create policy "Own read pegawai" on pegawai for select using (auth.uid() is not null);
-create policy "Own update pegawai" on pegawai for update using (user_id = auth.uid());
-create policy "Admin manage pegawai" on pegawai for all
-  using (exists (select 1 from pegawai where user_id = auth.uid() and role = 'admin'));
-create policy "Insert own pegawai" on pegawai for insert with check (true);
+-- Policy sederhana: semua operasi diizinkan (app-level security)
+create policy "Allow all site_config" on site_config for all using (true) with check (true);
+create policy "Allow all blok"        on blok        for all using (true) with check (true);
+create policy "Allow all wbp"         on wbp         for all using (true) with check (true);
+create policy "Allow all pegawai"     on pegawai     for all using (true) with check (true);
 
 -- ============================================================
 -- STORAGE BUCKETS
--- (Buat di Supabase Dashboard > Storage > New Bucket)
 -- ============================================================
--- Bucket: wbp-photos (Public)
--- Bucket: assets (Public) — untuk logo dan favicon
-
--- ============================================================
--- TRIGGER: updated_at otomatis
--- ============================================================
-create or replace function update_updated_at()
-returns trigger as $$
-begin
-  new.updated_at = now();
-  return new;
-end;
-$$ language plpgsql;
-
-create trigger wbp_updated_at before update on wbp
-  for each row execute function update_updated_at();
-
-create trigger site_config_updated_at before update on site_config
-  for each row execute function update_updated_at();
-
--- ============================================================
--- ADMIN DEFAULT (Ubah email/password sesuai kebutuhan)
--- ============================================================
--- 1. Buat user di Supabase Auth Dashboard > Users > Create User
---    Email: admin@lapas-bandanaira.go.id | Password: Admin@12345
--- 2. Jalankan query ini dengan mengganti UUID dari user yang baru dibuat:
---
--- insert into pegawai (user_id, nama, jabatan, pangkat, username, email, role, status)
--- values (
---   'UUID-DARI-AUTH-USER-ADMIN',
---   'Administrator',
---   'Administrator Sistem',
---   'Penata / III-c',
---   'admin',
---   'admin@lapas-bandanaira.go.id',
---   'admin',
---   'aktif'
--- );
-
--- ============================================================
--- TAMBAH KOLOM password_plain ke tabel pegawai (opsional, untuk referensi admin)
--- ============================================================
-alter table pegawai add column if not exists password_plain text;
-
--- ============================================================
--- CARA TAMBAH PEGAWAI TANPA KENA RATE LIMIT EMAIL
--- ============================================================
--- LANGKAH 1: Dari admin panel web, isi form Tambah Pegawai dan klik Simpan
---            (data masuk ke tabel pegawai dengan user_id = null)
--- 
--- LANGKAH 2: Di Supabase Dashboard > Authentication > Users > Add User
---            Isi email dan password yang sama dengan form tadi
---            CENTANG "Auto Confirm User" agar tidak kirim email konfirmasi
---
--- LANGKAH 3: Salin UUID dari user yang baru dibuat, lalu jalankan:
---
--- update pegawai
--- set user_id = 'UUID-DARI-LANGKAH-2'
--- where email = 'email@pegawai.com' and user_id is null;
---
--- ============================================================
--- SETUP SUPABASE STORAGE (wajib untuk upload logo & foto)
--- ============================================================
--- 1. Buka Supabase Dashboard > Storage
--- 2. Klik "New Bucket"
--- 3. Buat bucket "assets" — centang "Public bucket" — Save
--- 4. Buat bucket "wbp-photos" — centang "Public bucket" — Save
--- 5. Klik bucket "assets" > Policies > New Policy > For full customization:
---    Policy name: Allow all
---    Allowed operations: SELECT, INSERT, UPDATE, DELETE
---    Target roles: anon, authenticated
---    USING expression: true
---    WITH CHECK expression: true
--- 6. Lakukan hal sama untuk bucket "wbp-photos"
---
--- Atau jalankan SQL ini:
-insert into storage.buckets (id, name, public) values ('assets', 'assets', true) on conflict do nothing;
+insert into storage.buckets (id, name, public) values ('assets',     'assets',     true) on conflict do nothing;
 insert into storage.buckets (id, name, public) values ('wbp-photos', 'wbp-photos', true) on conflict do nothing;
 
-create policy "Public access assets" on storage.objects for all using (bucket_id = 'assets') with check (bucket_id = 'assets');
-create policy "Public access wbp-photos" on storage.objects for all using (bucket_id = 'wbp-photos') with check (bucket_id = 'wbp-photos');
+create policy "Public assets"     on storage.objects for all using (bucket_id = 'assets')     with check (bucket_id = 'assets');
+create policy "Public wbp-photos" on storage.objects for all using (bucket_id = 'wbp-photos') with check (bucket_id = 'wbp-photos');
 
 -- ============================================================
--- UPDATE UNTUK FITUR BARU
+-- JIKA TABEL PEGAWAI SUDAH ADA (JALANKAN INI SAJA)
+-- Hapus kolom lama yang tidak dipakai:
 -- ============================================================
--- Tambah kolom password_plain ke tabel pegawai (jika belum ada)
-alter table pegawai add column if not exists password_plain text;
+-- alter table pegawai drop column if exists jabatan;
+-- alter table pegawai drop column if exists pangkat;
+-- alter table pegawai drop column if exists nip;
+-- alter table pegawai drop column if exists email;
+-- alter table pegawai add column if not exists password_plain text;
+-- alter table pegawai alter column user_id drop not null;
 
--- Hapus constraint NOT NULL pada email jika ada
--- alter table pegawai alter column email drop not null;
+-- ============================================================
+-- SETUP ADMIN PERTAMA
+-- Setelah jalankan SQL di atas, insert admin:
+-- ============================================================
+-- insert into pegawai (nama, username, password_plain, role, status)
+-- values ('Administrator', 'admin', 'password_admin_anda', 'admin', 'aktif');
+--
+-- Lalu buka Supabase > Authentication > Users > Add User:
+--   Email: admin@simawar.lapas   Password: (sama dengan password_plain di atas)
+--   CENTANG "Auto Confirm User"
+--
+-- Salin UUID user baru, lalu:
+-- update pegawai set user_id = 'UUID-ADMIN' where username = 'admin';
 
--- Update RLS agar petugas bisa login dengan user_id null dulu
--- (sudah tercakup dengan policy "Allow all pegawai" dari setup sebelumnya)
+-- ============================================================
+-- CARA TAMBAH KARUPAM (RUPAM 1, 2, dst)
+-- Admin tambah via web > Data Pegawai > Tambah Pegawai
+-- Isi nama "Rupam 1", username "rupam1", password bebas
+-- Login otomatis berhasil tanpa perlu buat akun Supabase Auth dulu
+-- ============================================================

@@ -154,7 +154,7 @@
           <div class="search-input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg><input type="text" id="pegawaiSearch" placeholder="Cari nama / username..." oninput="debounceSearch(loadPegawai)"/></div>
           <select class="form-control" style="width:auto" id="pegawaiRoleFilter" onchange="loadPegawai()"><option value="">Semua Role</option><option value="admin">Admin</option><option value="user">Petugas</option></select>
         </div>
-        <div class="table-container"><table><thead><tr><th>No</th><th>Pegawai</th><th>Jabatan</th><th>Pangkat/Gol</th><th>Username</th><th>Password</th><th>Role</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="pegawaiTableBody"><tr><td colspan="8" style="padding:0"><div style="display:flex;flex-direction:column;gap:12px;padding:16px">${[1,2,3].map(()=>'<div style="height:48px;background:#f1f5f9;border-radius:10px;animation:pulse 1.5s infinite"></div>').join('')}</div></td></tr></tbody></table></div>
+        <div class="table-container"><table><thead><tr><th>No</th><th>Nama Rupam</th><th>Username</th><th>Password</th><th>Role</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="pegawaiTableBody"><tr><td colspan="8" style="padding:0"><div style="display:flex;flex-direction:column;gap:12px;padding:16px">${[1,2,3].map(()=>'<div style="height:48px;background:#f1f5f9;border-radius:10px;animation:pulse 1.5s infinite"></div>').join('')}</div></td></tr></tbody></table></div>
         <div style="padding:12px 16px;border-top:1px solid #f1f5f9"><span class="text-xs text-gray-400" id="pegawaiCount">—</span></div>
       </div>
     </div>
@@ -279,10 +279,14 @@
         <div class="card lg:col-span-2">
           <div class="card-header"><div class="card-title">Ubah Data Akun</div></div>
           <div class="card-body">
-            <div class="grid grid-cols-2 gap-4">
-              <div class="form-group"><label class="form-label">Nama Lengkap</label><input type="text" class="form-control" id="akunNama"/></div>
-              <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-control" id="akunEmail"/></div>
-              <div class="form-group col-span-2"><label class="form-label">Jabatan</label><input type="text" class="form-control" id="akunJabatan"/></div>
+            <div class="form-group">
+              <label class="form-label">Nama</label>
+              <input type="text" class="form-control" id="akunNama" placeholder="Nama Anda"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Username</label>
+              <input type="text" class="form-control" id="akunUsername" disabled style="background:#f8fafc;color:#94a3b8" placeholder="—"/>
+              <p class="text-xs text-gray-400 mt-1">Username tidak dapat diubah</p>
             </div>
             <button class="btn btn-primary" onclick="saveAkun()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg> Simpan</button>
             <hr class="my-5 border-gray-100"/>
@@ -347,23 +351,53 @@
 
 <!-- MODAL PEGAWAI -->
 <div class="modal-overlay" id="pegawaiModal" style="display:none">
-  <div class="modal">
-    <div class="modal-header"><div class="modal-title" id="pegawaiModalTitle">Tambah Pegawai</div><button class="modal-close" onclick="closeModal('pegawaiModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
+  <div class="modal" style="max-width:440px">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="pegawaiModalTitle">Tambah Petugas (Karupam)</div>
+        <div class="text-xs text-gray-400 mt-0.5">Isi nama Rupam dan username untuk login</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('pegawaiModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
     <div class="modal-body">
-      <input type="hidden" id="pegawaiId"/><input type="hidden" id="pegawaiUserId"/>
+      <input type="hidden" id="pegawaiId"/>
+      <div class="form-group">
+        <label class="form-label">Nama Rupam <span class="text-red-500">*</span></label>
+        <input type="text" class="form-control" id="pegawaiNama" placeholder="Cth: Rupam 1, Rupam 2, Rupam 3 ..."/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Username <span class="text-red-500">*</span> <span style="font-size:10px;color:#94a3b8">(dipakai untuk login)</span></label>
+        <input type="text" class="form-control" id="pegawaiUsername" placeholder="Cth: rupam1, rupam2, rupam3 ..."/>
+      </div>
+      <div class="form-group" id="pegawaiPwdGroup">
+        <label class="form-label">Password <span class="text-red-500">*</span></label>
+        <input type="text" class="form-control" id="pegawaiPassword" placeholder="Buat password yang mudah diingat" autocomplete="off"/>
+        <p class="text-xs text-amber-600 mt-1.5">Password tersimpan dan dapat dilihat di tabel pegawai.</p>
+      </div>
       <div class="grid grid-cols-2 gap-4">
-        <div class="form-group col-span-2"><label class="form-label">Nama Lengkap *</label><input type="text" class="form-control" id="pegawaiNama"/></div>
-        <div class="form-group"><label class="form-label">Jabatan</label><input type="text" class="form-control" id="pegawaiJabatan"/></div>
-        <div class="form-group"><label class="form-label">Pangkat / Golongan</label><input type="text" class="form-control" id="pegawaiPangkat"/></div>
-        <div class="form-group"><label class="form-label">NIP</label><input type="text" class="form-control" id="pegawaiNip"/></div>
-        <div class="form-group"><label class="form-label">Username *</label><input type="text" class="form-control" id="pegawaiUsername"/></div>
-        <div class="form-group"><label class="form-label">Email (opsional)</label><input type="email" class="form-control" id="pegawaiEmail" placeholder="Opsional — bisa dikosongkan"/></div>
-        <div class="form-group" id="pegawaiPwdGroup"><label class="form-label">Password * <span style="font-size:10px;color:#94a3b8;font-weight:400">(tersimpan dan bisa dilihat admin)</span></label><div style="position:relative"><input type="text" class="form-control" id="pegawaiPassword" placeholder="Min. 8 karakter" autocomplete="new-password"/></div><p class="text-xs text-amber-600 mt-1">⚠️ Password akan tersimpan agar admin dapat melihatnya. Gunakan password yang mudah diingat petugas.</p></div>
-        <div class="form-group"><label class="form-label">Role</label><select class="form-control" id="pegawaiRole"><option value="user">Petugas</option><option value="admin">Admin</option></select></div>
-        <div class="form-group"><label class="form-label">Status</label><select class="form-control" id="pegawaiStatus"><option value="aktif">Aktif</option><option value="nonaktif">Non-aktif</option></select></div>
+        <div class="form-group">
+          <label class="form-label">Role</label>
+          <select class="form-control" id="pegawaiRole">
+            <option value="user">Petugas / Rupam</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-control" id="pegawaiStatus">
+            <option value="aktif">Aktif</option>
+            <option value="nonaktif">Non-aktif</option>
+          </select>
+        </div>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('pegawaiModal')">Batal</button><button class="btn btn-primary" onclick="savePegawai()" id="pegawaiSaveBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg> Simpan</button></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('pegawaiModal')">Batal</button>
+      <button class="btn btn-primary" onclick="savePegawai()" id="pegawaiSaveBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+        Simpan
+      </button>
+    </div>
   </div>
 </div>
 
