@@ -113,7 +113,6 @@ async function loadSiteConfig() {
     if (!sl.querySelector('img')) { const img=document.createElement('img'); img.src=data.logo_url; img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:8px'; sl.appendChild(img); }
   }
   if (data.favicon_url) document.getElementById('faviconEl').href=data.favicon_url;
-  window.GAS_URL = data.gas_url || APPS_SCRIPT_URL;
 }
 
 async function loadSiteConfigForm() {
@@ -121,7 +120,7 @@ async function loadSiteConfigForm() {
   if (!data) return;
   siteConfigId = data.id;
   const v=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val||'';};
-  v('cfgName',data.site_name); v('cfgDesc',data.site_desc); v('cfgGas',data.gas_url); v('cfgInstansi',data.instansi); v('cfgAlamat',data.alamat);
+  v('cfgName',data.site_name); v('cfgDesc',data.site_desc); v('cfgInstansi',data.instansi); v('cfgAlamat',data.alamat);
   if (data.logo_url) {
     const img=document.getElementById('logoPreview'); if(img){img.src=data.logo_url;img.style.display='block';}
     const ph=document.getElementById('logoPlaceholder');if(ph)ph.style.display='none';
@@ -146,11 +145,10 @@ function updatePreviewLogo(url) {
 function previewLogo(e){logoFile=e.target.files[0];if(!logoFile)return;const r=new FileReader();r.onload=ev=>{const img=document.getElementById('logoPreview');if(img){img.src=ev.target.result;img.style.display='block';}const ph=document.getElementById('logoPlaceholder');if(ph)ph.style.display='none';const rb=document.getElementById('removeLogoBtn');if(rb)rb.style.display='inline-flex';updatePreviewLogo(ev.target.result);};r.readAsDataURL(logoFile);}
 function previewFav(e){favFile=e.target.files[0];if(!favFile)return;const r=new FileReader();r.onload=ev=>{const img=document.getElementById('favPreview');if(img){img.src=ev.target.result;img.style.display='block';}const ph=document.getElementById('favPlaceholder');if(ph)ph.style.display='none';};r.readAsDataURL(favFile);}
 function removeLogo(){showConfirm('Hapus Logo','Yakin hapus logo?',async()=>{if(siteConfigId)await sb.from('site_config').update({logo_url:null}).eq('id',siteConfigId);const img=document.getElementById('logoPreview');if(img)img.style.display='none';const ph=document.getElementById('logoPlaceholder');if(ph)ph.style.display='flex';const rb=document.getElementById('removeLogoBtn');if(rb)rb.style.display='none';logoFile=null;updatePreviewLogo(null);showAlert('success','Dihapus!','Logo dihapus');loadSiteConfig();},'danger');}
-async function testGasConnection(){const url=document.getElementById('cfgGas')?.value.trim();const el=document.getElementById('gasTestResult');if(!url){showAlert('warning','Perhatian','Isi URL GAS dulu!');return;}if(el){el.style.display='block';el.style.cssText='display:block;padding:10px 14px;border-radius:10px;font-size:12px;margin-bottom:10px;background:#eff6ff;color:#1d4ed8';}el.textContent='⏳ Menguji koneksi...';try{await fetch(`${url}?action=ping`);el.style.background='#f0fdf4';el.style.color='#15803d';el.textContent='✅ Koneksi berhasil! GAS dapat dijangkau.';}catch{el.style.background='#fef2f2';el.style.color='#dc2626';el.textContent='❌ Gagal. Pastikan URL benar dan deploy sebagai "Anyone".';}}
-async function resetSiteConfig(){showConfirm('Reset','Yakin reset semua konfigurasi ke default?',async()=>{await sb.from('site_config').update({site_name:'SIMAWAR',site_desc:'Sistem Informasi Monitoring Warga Binaan',logo_url:null,favicon_url:null,gas_url:null}).eq('id',siteConfigId);showAlert('success','Reset!','Konfigurasi direset');loadSiteConfig();loadSiteConfigForm();},'danger');}
+async function resetSiteConfig(){showConfirm('Reset','Yakin reset semua konfigurasi ke default?',async()=>{await sb.from('site_config').update({site_name:'SIMAWAR',site_desc:'Sistem Informasi Monitoring Warga Binaan',logo_url:null,favicon_url:null}).eq('id',siteConfigId);showAlert('success','Reset!','Konfigurasi direset');loadSiteConfig();loadSiteConfigForm();},'danger');}
 async function uploadFile(file,bucket,path){if(file.size>3*1024*1024)throw new Error('File terlalu besar (maks 3MB)!');const{error}=await sb.storage.from(bucket).upload(path,file,{upsert:true});if(error){if(error.message?.includes('bucket'))throw new Error(`Bucket "${bucket}" belum dibuat. Buka Supabase > Storage > New Bucket.`);throw error;}return sb.storage.from(bucket).getPublicUrl(path).data.publicUrl;}
 async function saveSiteConfig(){
-  const payload={site_name:document.getElementById('cfgName')?.value.trim(),site_desc:document.getElementById('cfgDesc')?.value,gas_url:document.getElementById('cfgGas')?.value.trim(),instansi:document.getElementById('cfgInstansi')?.value,alamat:document.getElementById('cfgAlamat')?.value};
+  const payload={site_name:document.getElementById('cfgName')?.value.trim(),site_desc:document.getElementById('cfgDesc')?.value,instansi:document.getElementById('cfgInstansi')?.value,alamat:document.getElementById('cfgAlamat')?.value};
   try{
     if(logoFile){showAlert('info','Upload','Mengupload logo...');payload.logo_url=await uploadFile(logoFile,'assets',`logo_${Date.now()}.${logoFile.name.split('.').pop()}`);}
     if(favFile){payload.favicon_url=await uploadFile(favFile,'assets',`fav_${Date.now()}.${favFile.name.split('.').pop()}`);}
@@ -374,30 +372,51 @@ async function loadRiwayat(){
   const tbody=document.getElementById('riwayatTableBody');
   if(tbody)tbody.innerHTML=skel(16,7).repeat(4);
   try{
-    const gasUrl=window.GAS_URL||APPS_SCRIPT_URL;
-    const params=new URLSearchParams({action:'getRiwayat',isAdmin:'true'});
-    const dari=document.getElementById('riwayatDari')?.value,sampai=document.getElementById('riwayatSampai')?.value;
-    const blok=document.getElementById('riwayatBlokFilter')?.value,peg=document.getElementById('riwayatPegawaiFilter')?.value;
-    const search=document.getElementById('riwayatSearch')?.value.trim();
-    if(dari)params.append('dari',dari);if(sampai)params.append('sampai',sampai);if(blok)params.append('blok_id',blok);if(peg)params.append('pegawai_id',peg);if(search)params.append('search',search);
-    const r=await fetch(`${gasUrl}?${params}`);const d=await r.json();const data=d.data||[];
-    window._riwayatData=data;document.getElementById('riwayatCount').textContent=`${data.length} data`;
-    if(!data.length){if(tbody)tbody.innerHTML=`<tr><td colspan="7">${emptyState('Tidak Ada Data','Ubah filter atau konfigurasi GAS')}</td></tr>`;document.getElementById('riwayatPagination').innerHTML='';return;}
-    const no0=(riwayatPage-1)*RIWAYAT_PER_PAGE,pd=data.slice(no0,no0+RIWAYAT_PER_PAGE);
+    const dari=document.getElementById('riwayatDari')?.value||'';
+    const sampai=document.getElementById('riwayatSampai')?.value||'';
+    const blok=document.getElementById('riwayatBlokFilter')?.value||'';
+    const peg=document.getElementById('riwayatPegawaiFilter')?.value||'';
+    const search=document.getElementById('riwayatSearch')?.value.trim()||'';
+
+    let q=sb.from('absen_detail')
+      .select('*, wbp:wbp_id(nama,no_registrasi), blok:blok_id(nama), pegawai:pegawai_id(nama)', {count:'exact'})
+      .order('waktu',{ascending:false});
+    if(dari)   q=q.gte('tanggal',dari);
+    if(sampai) q=q.lte('tanggal',sampai);
+    if(blok)   q=q.eq('blok_id',blok);
+    if(peg)    q=q.eq('pegawai_id',peg);
+    const {data,count}=await q;
+
+    let rows=(data||[]);
+    if(search) rows=rows.filter(r=>(r.wbp?.nama||'').toLowerCase().includes(search.toLowerCase())||(r.pegawai?.nama||'').toLowerCase().includes(search.toLowerCase()));
+
+    window._riwayatData=rows;
+    document.getElementById('riwayatCount').textContent=`${rows.length} data`;
+
+    if(!rows.length){if(tbody)tbody.innerHTML=`<tr><td colspan="7">${emptyState('Tidak Ada Data','Coba ubah filter tanggal atau blok')}</td></tr>`;document.getElementById('riwayatPagination').innerHTML='';return;}
+
+    const no0=(riwayatPage-1)*RIWAYAT_PER_PAGE,pd=rows.slice(no0,no0+RIWAYAT_PER_PAGE);
     if(tbody)tbody.innerHTML=pd.map((row,i)=>`<tr class="fade-in">
       <td style="font-size:12px;color:#94a3b8">${no0+i+1}</td>
       <td style="font-size:12px;color:#64748b">${formatTglWaktu(row.waktu)}</td>
-      <td><div style="font-size:13px;font-weight:700">${row.pegawai_nama||'—'}</div></td>
-      <td><span class="badge badge-blue">${row.blok_nama||'—'}</span></td>
-      <td><div style="font-size:13px;font-weight:600">${row.wbp_nama||'—'}</div><div style="font-size:11px;color:#94a3b8">${row.no_registrasi||''}</div></td>
+      <td><div style="font-size:13px;font-weight:700">${row.pegawai?.nama||'—'}</div></td>
+      <td><span class="badge badge-blue">${row.blok?.nama||'—'}</span></td>
+      <td><div style="font-size:13px;font-weight:600">${row.wbp?.nama||'—'}</div><div style="font-size:11px;color:#94a3b8">${row.wbp?.no_registrasi||''}</div></td>
       <td><span class="badge ${row.status==='Hadir'?'badge-green':'badge-red'}">${row.status||'—'}</span></td>
       <td style="font-size:12px;color:#64748b">${row.keterangan||'—'}</td>
     </tr>`).join('');
-    const tot=Math.ceil(data.length/RIWAYAT_PER_PAGE);
+
+    const tot=Math.ceil(rows.length/RIWAYAT_PER_PAGE);
     document.getElementById('riwayatPagination').innerHTML=tot>1?Array.from({length:Math.min(tot,10)},(_,i)=>`<button onclick="riwayatPage=${i+1};loadRiwayat()" class="btn btn-sm ${i+1===riwayatPage?'btn-primary':'btn-ghost'}" style="min-width:32px">${i+1}</button>`).join(''):'';
-  }catch{if(tbody)tbody.innerHTML=`<tr><td colspan="7">${emptyState('GAS Belum Dikonfigurasi','Atur URL di Konfigurasi Website')}</td></tr>`;}
+  }catch(e){console.error(e);if(tbody)tbody.innerHTML=`<tr><td colspan="7">${emptyState('Gagal Memuat','Error: '+e.message)}</td></tr>`;}
 }
-function resetRiwayatFilter(){const today=new Date().toISOString().split('T')[0];['riwayatSearch','riwayatBlokFilter','riwayatPegawaiFilter'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('riwayatDari').value=today;document.getElementById('riwayatSampai').value=today;riwayatPage=1;loadRiwayat();}
+function resetRiwayatFilter(){
+  const today=new Date().toISOString().split('T')[0];
+  ['riwayatSearch','riwayatBlokFilter','riwayatPegawaiFilter'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('riwayatDari').value=today;
+  document.getElementById('riwayatSampai').value=today;
+  riwayatPage=1; loadRiwayat();
+}
 async function exportRiwayat(){
   const data=window._riwayatData;if(!data?.length){showAlert('warning','Perhatian','Tidak ada data!');return;}
   const dari=document.getElementById('riwayatDari')?.value||'',sampai=document.getElementById('riwayatSampai')?.value||'';
@@ -406,7 +425,9 @@ async function exportRiwayat(){
     doc.setFontSize(14);doc.setFont('helvetica','bold');doc.text('LAPORAN ABSENSI WBP',148,14,{align:'center'});
     doc.setFontSize(10);doc.setFont('helvetica','normal');doc.text(document.getElementById('sidebarName')?.textContent||'SIMAWAR',148,20,{align:'center'});
     doc.setFontSize(9);doc.text(`Periode: ${dari} s.d. ${sampai}  |  Dicetak: ${formatTglWaktu(new Date())}`,148,26,{align:'center'});doc.line(14,29,283,29);
-    doc.autoTable({startY:33,head:[['No','Waktu','Petugas','Blok','WBP','No. Reg','Status','Keterangan']],body:data.map((r,i)=>[i+1,formatTglWaktu(r.waktu),r.pegawai_nama||'—',r.blok_nama||'—',r.wbp_nama||'—',r.no_registrasi||'—',r.status||'—',r.keterangan||'—']),styles:{fontSize:8,cellPadding:3},headStyles:{fillColor:[30,64,175],textColor:255,fontStyle:'bold'},alternateRowStyles:{fillColor:[248,250,252]}});
+    doc.autoTable({startY:33,head:[['No','Waktu','Petugas','Blok','WBP','No. Reg','Status','Keterangan']],
+      body:data.map((r,i)=>[i+1,formatTglWaktu(r.waktu),r.pegawai?.nama||'—',r.blok?.nama||'—',r.wbp?.nama||'—',r.wbp?.no_registrasi||'—',r.status||'—',r.keterangan||'—']),
+      styles:{fontSize:8,cellPadding:3},headStyles:{fillColor:[30,64,175],textColor:255,fontStyle:'bold'},alternateRowStyles:{fillColor:[248,250,252]}});
     doc.save(`laporan_absensi_${dari}_${sampai}.pdf`);showAlert('success','Berhasil!','PDF diunduh');
   }catch(e){showAlert('error','Gagal',e.message);}
 }

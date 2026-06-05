@@ -1,12 +1,9 @@
 // ============================================================
-// CONFIG.JS — SIMAWAR
-// WAJIB: Ganti dengan kredensial Supabase Anda
-// ============================================================
-// ============================================================
 // KONFIGURASI - Ganti dengan kredensial Anda
 // ============================================================
 const SUPABASE_URL = 'https://ulxghrhnovtkodqpubbr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseGdocmhub3Z0a29kcXB1YmJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MDAwMTUsImV4cCI6MjA5NjE3NjAxNX0.GdjCCY5RN3nLeAlYqibMWV_AyNw14zZIkMCZqMtzYIc';
+
 
 // Init Supabase client
 const { createClient } = supabase;
