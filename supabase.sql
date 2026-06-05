@@ -144,3 +144,58 @@ create trigger site_config_updated_at before update on site_config
 --   'admin',
 --   'aktif'
 -- );
+
+-- ============================================================
+-- TAMBAH KOLOM password_plain ke tabel pegawai (opsional, untuk referensi admin)
+-- ============================================================
+alter table pegawai add column if not exists password_plain text;
+
+-- ============================================================
+-- CARA TAMBAH PEGAWAI TANPA KENA RATE LIMIT EMAIL
+-- ============================================================
+-- LANGKAH 1: Dari admin panel web, isi form Tambah Pegawai dan klik Simpan
+--            (data masuk ke tabel pegawai dengan user_id = null)
+-- 
+-- LANGKAH 2: Di Supabase Dashboard > Authentication > Users > Add User
+--            Isi email dan password yang sama dengan form tadi
+--            CENTANG "Auto Confirm User" agar tidak kirim email konfirmasi
+--
+-- LANGKAH 3: Salin UUID dari user yang baru dibuat, lalu jalankan:
+--
+-- update pegawai
+-- set user_id = 'UUID-DARI-LANGKAH-2'
+-- where email = 'email@pegawai.com' and user_id is null;
+--
+-- ============================================================
+-- SETUP SUPABASE STORAGE (wajib untuk upload logo & foto)
+-- ============================================================
+-- 1. Buka Supabase Dashboard > Storage
+-- 2. Klik "New Bucket"
+-- 3. Buat bucket "assets" — centang "Public bucket" — Save
+-- 4. Buat bucket "wbp-photos" — centang "Public bucket" — Save
+-- 5. Klik bucket "assets" > Policies > New Policy > For full customization:
+--    Policy name: Allow all
+--    Allowed operations: SELECT, INSERT, UPDATE, DELETE
+--    Target roles: anon, authenticated
+--    USING expression: true
+--    WITH CHECK expression: true
+-- 6. Lakukan hal sama untuk bucket "wbp-photos"
+--
+-- Atau jalankan SQL ini:
+insert into storage.buckets (id, name, public) values ('assets', 'assets', true) on conflict do nothing;
+insert into storage.buckets (id, name, public) values ('wbp-photos', 'wbp-photos', true) on conflict do nothing;
+
+create policy "Public access assets" on storage.objects for all using (bucket_id = 'assets') with check (bucket_id = 'assets');
+create policy "Public access wbp-photos" on storage.objects for all using (bucket_id = 'wbp-photos') with check (bucket_id = 'wbp-photos');
+
+-- ============================================================
+-- UPDATE UNTUK FITUR BARU
+-- ============================================================
+-- Tambah kolom password_plain ke tabel pegawai (jika belum ada)
+alter table pegawai add column if not exists password_plain text;
+
+-- Hapus constraint NOT NULL pada email jika ada
+-- alter table pegawai alter column email drop not null;
+
+-- Update RLS agar petugas bisa login dengan user_id null dulu
+-- (sudah tercakup dengan policy "Allow all pegawai" dari setup sebelumnya)

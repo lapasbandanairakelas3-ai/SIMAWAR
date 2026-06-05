@@ -163,7 +163,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
     } else {
       // Login pakai username
       const { data, error } = await sb.from('pegawai')
-        .select('email, role, status, nama')
+        .select('email, role, status, nama, username, password_plain, user_id')
         .eq('username', input)
         .maybeSingle();
       if (error || !data) {
@@ -178,13 +178,43 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
       btn.disabled = false; btnText.textContent = 'Masuk'; return;
     }
 
-    const { data: auth, error: ae } = await sb.auth.signInWithPassword({
-      email: pegawai.email, password
-    });
-
-    if (ae) {
-      showAlert('error', 'Login Gagal', 'Password salah!');
-      btn.disabled = false; btnText.textContent = 'Masuk'; return;
+    // Jika petugas belum punya user_id (Karupam baru) — cek password_plain
+    if (!pegawai.user_id && pegawai.password_plain) {
+      if (password !== pegawai.password_plain) {
+        showAlert('error', 'Login Gagal', 'Password salah!');
+        btn.disabled = false; btnText.textContent = 'Masuk'; return;
+      }
+      // Buat akun Supabase Auth otomatis untuk Karupam ini
+      const emailAuth = pegawai.email || `${pegawai.username}@simawar.lapas`;
+      const { data: newAuth, error: newErr } = await sb.auth.signUp({
+        email: emailAuth, password,
+        options: { data: { username: pegawai.username } }
+      });
+      if (!newErr && newAuth?.user) {
+        // Link user_id ke tabel pegawai
+        await sb.from('pegawai').update({ user_id: newAuth.user.id }).eq('username', pegawai.username);
+        pegawai.user_id = newAuth.user.id;
+      }
+      // Coba login langsung
+      const { data: auth2, error: ae2 } = await sb.auth.signInWithPassword({ email: emailAuth, password });
+      if (ae2) {
+        showAlert('error', 'Login Gagal', 'Gagal membuat sesi. Hubungi admin!');
+        btn.disabled = false; btnText.textContent = 'Masuk'; return;
+      }
+    } else {
+      // Login normal pakai Supabase Auth
+      const { data: auth, error: ae } = await sb.auth.signInWithPassword({
+        email: pegawai.email, password
+      });
+      if (ae) {
+        // Coba cek password_plain sebagai fallback
+        if (pegawai.password_plain && password === pegawai.password_plain) {
+          showAlert('warning', 'Perhatian', 'Sesi auth bermasalah. Hubungi admin untuk reset akun.');
+        } else {
+          showAlert('error', 'Login Gagal', 'Password salah!');
+        }
+        btn.disabled = false; btnText.textContent = 'Masuk'; return;
+      }
     }
 
     showAlert('success', 'Berhasil!', `Selamat datang, ${pegawai.nama}!`);
