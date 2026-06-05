@@ -1,13 +1,11 @@
 // ============================================================
 // KONFIGURASI - Ganti dengan kredensial Anda
 // ============================================================
-const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
+const SUPABASE_URL = 'https://ulxghrhnovtkodqpubbr.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseGdocmhub3Z0a29kcXB1YmJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MDAwMTUsImV4cCI6MjA5NjE3NjAxNX0.GdjCCY5RN3nLeAlYqibMWV_AyNw14zZIkMCZqMtzYIc';
 
 // Google Apps Script URL untuk data absensi
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
-
-// Instagram & TikTok pembuat
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwsbtc6-2WzTLgKnCkeWssmH_DxoSVRME5Ka5Wb9upobETp4DHrQL6gOZqIyB3S_7AHUA/exec';// Instagram & TikTok pembuat
 const CREATOR_IG = 'https://instagram.com/wa_miranti';
 const CREATOR_TT = 'https://tiktok.com/@wa_miranti';
 
