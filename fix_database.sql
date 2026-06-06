@@ -1,31 +1,57 @@
 -- ============================================================
--- FIX DATABASE — Jalankan di Supabase SQL Editor
+-- FIX DATABASE SIMAWAR — Jalankan SATU PER SATU di SQL Editor
 -- ============================================================
 
--- STEP 1: Hapus data duplikat absen_detail dulu
--- (Simpan hanya 1 record per WBP per hari — ambil yang paling baru)
-DELETE FROM absen_detail
-WHERE id NOT IN (
-  SELECT DISTINCT ON (wbp_id, tanggal) id
-  FROM absen_detail
-  ORDER BY wbp_id, tanggal, created_at DESC
-);
+-- STEP 1: Cek struktur absen_session yang ada
+SELECT column_name, data_type 
+FROM information_schema.columns 
+WHERE table_name = 'absen_session' ORDER BY ordinal_position;
 
--- STEP 2: Buat unique index (setelah duplikat dihapus)
-DROP INDEX IF EXISTS idx_absen_wbp_hari;
-CREATE UNIQUE INDEX idx_absen_wbp_hari ON absen_detail(wbp_id, tanggal);
-
--- STEP 3: Fix absen_session — hapus constraint lama jika ada
-DROP INDEX IF EXISTS idx_sesi_aktif;
-CREATE UNIQUE INDEX idx_sesi_aktif ON absen_session(blok_id, tanggal) WHERE selesai = false;
-
--- STEP 4: Hapus kolom status dari absen_session jika masih ada (pakai kolom selesai boolean)
--- ALTER TABLE absen_session DROP COLUMN IF EXISTS status;
-
--- STEP 5: Pastikan kolom selesai ada
+-- ============================================================
+-- STEP 2: Tambah kolom selesai jika belum ada
+-- ============================================================
 ALTER TABLE absen_session ADD COLUMN IF NOT EXISTS selesai boolean DEFAULT false;
 
--- Verifikasi
-SELECT 'absen_detail rows' as info, count(*) FROM absen_detail
+-- Jika ada kolom status lama, migrasikan ke selesai
+UPDATE absen_session SET selesai = (status = 'selesai') WHERE selesai IS NULL;
+
+-- Hapus kolom status lama jika ada
+ALTER TABLE absen_session DROP COLUMN IF EXISTS status;
+
+-- ============================================================
+-- STEP 3: Hapus duplikat di absen_detail
+-- Simpan hanya 1 record per WBP per hari (yang paling baru)
+-- ============================================================
+DELETE FROM absen_detail a
+USING absen_detail b
+WHERE a.wbp_id = b.wbp_id 
+  AND a.tanggal = b.tanggal 
+  AND a.created_at < b.created_at;
+
+-- ============================================================
+-- STEP 4: Hapus index lama lalu buat baru
+-- ============================================================
+DROP INDEX IF EXISTS idx_absen_wbp_hari;
+DROP INDEX IF EXISTS idx_sesi_aktif;
+
+CREATE UNIQUE INDEX idx_absen_wbp_hari ON absen_detail(wbp_id, tanggal);
+CREATE UNIQUE INDEX idx_sesi_aktif ON absen_session(blok_id, tanggal) WHERE selesai = false;
+
+-- ============================================================
+-- STEP 5: Tutup semua sesi lama yang mungkin masih terbuka
+-- ============================================================
+UPDATE absen_session SET selesai = true
+WHERE tanggal < CURRENT_DATE;
+
+-- ============================================================
+-- STEP 6: Verifikasi
+-- ============================================================
+SELECT 'absen_session' as tabel, count(*) FROM absen_session
 UNION ALL
-SELECT 'absen_session rows', count(*) FROM absen_session;
+SELECT 'absen_detail', count(*) FROM absen_detail;
+
+-- Cek masih ada duplikat?
+SELECT wbp_id, tanggal, count(*) as jumlah
+FROM absen_detail
+GROUP BY wbp_id, tanggal
+HAVING count(*) > 1;

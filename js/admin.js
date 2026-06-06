@@ -92,6 +92,7 @@ function resetSiteConfig(){showConfirm('Reset','Reset konfigurasi ke default?',a
 
 // ── DASHBOARD ────────────────────────────────────────────────
 async function loadDashboard(){
+  // Lazy: hanya count, tidak ambil semua data
   const[wR,pR,bR,aR]=await Promise.all([
     sb.from('wbp').select('id',{count:'exact',head:true}),
     sb.from('pegawai').select('id',{count:'exact',head:true}).eq('role','user'),
@@ -123,6 +124,7 @@ async function loadWbp(){
   let q=sb.from('wbp').select('*,blok(nama)',{count:'exact'});
   if(search)q=q.or(`nama.ilike.%${search}%,no_registrasi.ilike.%${search}%`);
   if(blokF)q=q.eq('blok_id',blokF);if(jkF)q=q.eq('jk',jkF);
+  // Lazy: hanya field yang dibutuhkan, dengan pagination
   q=q.order('nama').range((wbpPage-1)*WBP_PER,wbpPage*WBP_PER-1);
   const{data,count}=await q;
   document.getElementById('wbpCount').textContent=`${count||0} data`;
@@ -179,7 +181,8 @@ async function loadPegawai(){
   const roleF=document.getElementById('pegawaiRoleFilter')?.value||'';
   const tbody=document.getElementById('pegawaiTableBody');
   if(tbody)tbody.innerHTML=skel(16,6).repeat(3);
-  let q=sb.from('pegawai').select('*',{count:'exact'});
+  // Lazy: hanya field yang dibutuhkan
+  let q=sb.from('pegawai').select('id,nama,username,password_plain,role,created_at',{count:'exact'});
   if(search)q=q.or(`nama.ilike.%${search}%,username.ilike.%${search}%`);
   if(roleF)q=q.eq('role',roleF);q=q.order('nama');
   const{data,count}=await q;
@@ -255,7 +258,8 @@ async function loadRiwayat(){
     const dari=document.getElementById('riwayatDari')?.value||'',sampai=document.getElementById('riwayatSampai')?.value||'';
     const blok=document.getElementById('riwayatBlokFilter')?.value||'',peg=document.getElementById('riwayatPegawaiFilter')?.value||'';
     const search=document.getElementById('riwayatSearch')?.value.trim()||'';
-    let q=sb.from('absen_detail').select('*,wbp:wbp_id(nama,no_registrasi),blok:blok_id(nama),pegawai:pegawai_id(nama)',{count:'exact'}).order('waktu',{ascending:false});
+    // Lazy: field terbatas + limit 200
+    let q=sb.from('absen_detail').select('id,waktu,tanggal,status,keterangan,wbp:wbp_id(nama,no_registrasi),blok:blok_id(nama),pegawai:pegawai_id(nama)',{count:'exact'}).order('waktu',{ascending:false}).limit(200);
     if(dari)q=q.gte('tanggal',dari);if(sampai)q=q.lte('tanggal',sampai);if(blok)q=q.eq('blok_id',blok);if(peg)q=q.eq('pegawai_id',peg);
     const{data,count}=await q;
     let rows=data||[];
