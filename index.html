@@ -8,28 +8,37 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="css/style.css"/>
+  <style>
+    @keyframes swpulse{0%,100%{opacity:1}50%{opacity:.5}}
+    @keyframes sbar{to{width:100%}}
+  </style>
 </head>
 <body>
+
+<!-- SPLASH — skeleton, tanpa data dummy -->
 <div id="splashScreen" style="position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#1e3a8a,#2563eb);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.5s">
-  <div style="width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.12);border:2px solid rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;margin-bottom:18px;font-size:32px;overflow:hidden" id="splashLogoBox">🏛️</div>
-  <div style="color:white;font-size:20px;font-weight:800" id="splashTitle">SIMAWAR</div>
-  <div style="color:rgba(255,255,255,0.7);font-size:12px;margin-top:5px;text-align:center" id="splashSub">Sistem Informasi Monitoring Warga Binaan</div>
-  <div style="margin-top:28px;width:130px;height:3px;background:rgba(255,255,255,0.15);border-radius:100px;overflow:hidden">
-    <div style="height:100%;background:rgba(255,255,255,0.8);animation:sbar 0.9s ease forwards;width:0%" ></div>
+  <!-- Logo: skeleton dulu, ganti dengan logo asli setelah load -->
+  <div id="splashLogoWrap" style="width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:18px;overflow:hidden;animation:swpulse 1.5s infinite">
+  </div>
+  <!-- Nama: skeleton -->
+  <div id="splashNameWrap" style="height:24px;width:160px;background:rgba(255,255,255,0.15);border-radius:8px;margin-bottom:6px;animation:swpulse 1.5s infinite"></div>
+  <div id="splashDescWrap" style="height:14px;width:200px;background:rgba(255,255,255,0.1);border-radius:6px;animation:swpulse 1.5s infinite"></div>
+  <!-- Progress bar -->
+  <div style="margin-top:32px;width:130px;height:3px;background:rgba(255,255,255,0.15);border-radius:100px;overflow:hidden">
+    <div style="height:100%;background:rgba(255,255,255,0.8);animation:sbar 0.9s ease forwards;width:0%"></div>
   </div>
 </div>
-<style>
-@keyframes sbar{to{width:100%}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
-</style>
 
 <div id="loginPage" class="login-page" style="display:none">
   <div class="login-card fade-in">
-    <div class="login-logo" id="loginLogo">
-      <span id="loginLogoEmoji" style="font-size:32px">🏛️</span>
+    <!-- Logo: skeleton dulu -->
+    <div class="login-logo" id="loginLogo" style="background:#f1f5f9;animation:swpulse 1.5s infinite">
+      <span id="loginLogoPlaceholder" style="font-size:32px;display:none">🏛️</span>
     </div>
-    <h1 class="text-center font-extrabold text-gray-900 text-xl mb-1" id="loginSiteName">SIMAWAR</h1>
-    <p class="text-center text-sm text-gray-400 mb-7" id="loginSiteDesc">Sistem Informasi Monitoring Warga Binaan</p>
+    <div id="loginSiteNameWrap" style="height:20px;background:#f1f5f9;border-radius:8px;width:60%;margin:0 auto 6px;animation:swpulse 1.5s infinite"></div>
+    <div id="loginSiteDescWrap" style="height:14px;background:#f1f5f9;border-radius:6px;width:80%;margin:0 auto 24px;animation:swpulse 1.5s infinite"></div>
+    <h1 class="text-center font-extrabold text-gray-900 text-xl mb-1" id="loginSiteName" style="display:none">SIMAWAR</h1>
+    <p class="text-center text-sm text-gray-400 mb-7" id="loginSiteDesc" style="display:none">Sistem Informasi Monitoring Warga Binaan</p>
 
     <div class="form-group">
       <label class="form-label">Username</label>
@@ -42,11 +51,8 @@
       <label class="form-label">Password</label>
       <div style="position:relative">
         <input type="password" id="fPassword" class="form-control" placeholder="Masukkan password" style="padding-right:40px" autocomplete="current-password"/>
-        <button type="button" id="btnTogglePwd" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;color:#94a3b8">
-          <svg id="eyeIcon" style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-          </svg>
+        <button type="button" onclick="togglePwd('fPassword',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;color:#94a3b8">
+          <svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
         </button>
       </div>
     </div>
@@ -55,7 +61,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
       <span id="btnLoginText">Masuk</span>
     </button>
-    <p style="text-align:center;font-size:11px;color:#94a3b8;margin-top:16px">Hubungi admin jika lupa password</p>
+    <p style="text-align:center;font-size:11px;color:#94a3b8;margin-top:14px">Hubungi admin jika lupa password</p>
   </div>
 
   <div class="app-footer" style="position:fixed;bottom:0;left:0;right:0;background:transparent;border:none;padding:14px">
@@ -68,158 +74,112 @@
 
 <script src="js/config.js"></script>
 <script>
-// Toggle password visibility
-document.getElementById('btnTogglePwd').onclick = () => {
-  const f = document.getElementById('fPassword');
-  f.type = f.type === 'password' ? 'text' : 'password';
-};
+function togglePwd(id, btn) {
+  const f = document.getElementById(id);
+  f.type = f.type==='password' ? 'text' : 'password';
+}
 
-// Enter key support
-document.getElementById('fUsername').onkeydown = e => { if(e.key==='Enter') document.getElementById('fPassword').focus(); };
-document.getElementById('fPassword').onkeydown = e => { if(e.key==='Enter') doLogin(); };
-
-async function loadSiteConfigLogin() {
+async function loadCfg() {
   try {
     const { data } = await sb.from('site_config').select('*').maybeSingle();
-    if (!data) return;
-    if (data.site_name) {
-      document.title = `Masuk — ${data.site_name}`;
-      document.getElementById('loginSiteName').textContent = data.site_name;
-      document.getElementById('splashTitle').textContent   = data.site_name;
-    }
-    if (data.site_desc) {
-      document.getElementById('loginSiteDesc').textContent = data.site_desc.split('\n')[0];
-      document.getElementById('splashSub').textContent     = data.site_desc.split('\n')[0];
-    }
+    if (!data) { showLoginFallback(); return; }
+
+    // Update splash: ganti skeleton dengan konten asli
+    const splashLogo = document.getElementById('splashLogoWrap');
+    splashLogo.style.animation = 'none';
     if (data.logo_url) {
-      document.getElementById('loginLogoEmoji').style.display = 'none';
-      const logo = document.getElementById('loginLogo');
-      const img  = document.createElement('img');
-      img.src = data.logo_url; img.alt = 'Logo';
-      logo.appendChild(img);
-      const sb2 = document.getElementById('splashLogoBox');
-      sb2.textContent = '';
-      const si = document.createElement('img');
-      si.src = data.logo_url;
-      si.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%';
-      sb2.appendChild(si);
+      const img = document.createElement('img');
+      img.src = data.logo_url;
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover';
+      splashLogo.appendChild(img);
+    } else {
+      splashLogo.textContent = '🏛️';
+      splashLogo.style.fontSize = '32px';
     }
+    const sn = document.getElementById('splashNameWrap');
+    sn.style.cssText = 'color:white;font-size:20px;font-weight:800;background:none;animation:none;height:auto;width:auto;border-radius:0;margin-bottom:6px';
+    sn.textContent = data.site_name || 'SIMAWAR';
+    const sd = document.getElementById('splashDescWrap');
+    sd.style.cssText = 'color:rgba(255,255,255,0.7);font-size:12px;background:none;animation:none;height:auto;width:auto;border-radius:0;text-align:center';
+    sd.textContent = data.site_desc?.split('\n')[0] || 'Sistem Informasi Monitoring Warga Binaan';
+
+    // Update login card: hapus skeleton, tampilkan konten
+    const loginLogo = document.getElementById('loginLogo');
+    loginLogo.style.animation = 'none'; loginLogo.style.background = 'linear-gradient(135deg,#3b82f6,#1e40af)';
+    if (data.logo_url) {
+      const img = document.createElement('img'); img.src = data.logo_url; img.alt='Logo';
+      loginLogo.appendChild(img);
+    } else {
+      document.getElementById('loginLogoPlaceholder').style.display = 'block';
+    }
+    document.getElementById('loginSiteNameWrap').style.display='none';
+    document.getElementById('loginSiteDescWrap').style.display='none';
+    const sname = document.getElementById('loginSiteName');
+    sname.textContent = data.site_name || 'SIMAWAR'; sname.style.display='block';
+    const sdesc = document.getElementById('loginSiteDesc');
+    sdesc.textContent = data.site_desc || 'Sistem Informasi Monitoring Warga Binaan'; sdesc.style.display='block';
+    document.title = `Masuk — ${data.site_name||'SIMAWAR'}`;
     if (data.favicon_url) document.getElementById('faviconEl').href = data.favicon_url;
-  } catch(e) { /* ignore */ }
+  } catch(e) { showLoginFallback(); }
 }
 
-async function init() {
-  // Load config (non-blocking)
-  loadSiteConfigLogin().catch(() => {});
-
-  // Splash 900ms lalu show login
-  setTimeout(() => {
-    const s = document.getElementById('splashScreen');
-    s.style.opacity = '0';
-    setTimeout(() => {
-      s.style.display = 'none';
-      document.getElementById('loginPage').style.display = 'flex';
-    }, 500);
-  }, 900);
-
-  // Jika sudah punya sesi Supabase Auth yang valid, langsung redirect
-  try {
-    const { data: { session } } = await sb.auth.getSession();
-    if (session?.user?.id) {
-      const { data: p } = await sb.from('pegawai')
-        .select('role,status')
-        .eq('user_id', session.user.id)
-        .maybeSingle();
-      if (p && p.status === 'aktif') {
-        location.href = p.role === 'admin' ? 'admin.html' : 'user.html';
-        return;
-      }
-    }
-  } catch(e) { /* biarkan user login manual */ }
+function showLoginFallback() {
+  document.getElementById('splashLogoWrap').textContent='🏛️'; document.getElementById('splashLogoWrap').style.fontSize='32px'; document.getElementById('splashLogoWrap').style.animation='none';
+  document.getElementById('splashNameWrap').style.cssText='color:white;font-size:20px;font-weight:800;background:none;animation:none;height:auto;width:auto;border-radius:0'; document.getElementById('splashNameWrap').textContent='SIMAWAR';
+  document.getElementById('splashDescWrap').style.cssText='color:rgba(255,255,255,0.7);font-size:12px;background:none;animation:none;height:auto;width:auto;border-radius:0;text-align:center'; document.getElementById('splashDescWrap').textContent='Sistem Informasi Monitoring Warga Binaan';
+  document.getElementById('loginSiteNameWrap').style.display='none'; document.getElementById('loginSiteDescWrap').style.display='none';
+  document.getElementById('loginLogoPlaceholder').style.display='block'; document.getElementById('loginLogo').style.animation='none'; document.getElementById('loginLogo').style.background='linear-gradient(135deg,#3b82f6,#1e40af)';
+  document.getElementById('loginSiteName').style.display='block'; document.getElementById('loginSiteDesc').style.display='block';
 }
+
+document.getElementById('fUsername').onkeydown = e => { if(e.key==='Enter') document.getElementById('fPassword').focus(); };
+document.getElementById('fPassword').onkeydown = e => { if(e.key==='Enter') doLogin(); };
+document.getElementById('btnLogin').onclick = doLogin;
 
 async function doLogin() {
-  const username = (document.getElementById('fUsername').value || '').trim();
-  const password = (document.getElementById('fPassword').value || '');
-  const btn      = document.getElementById('btnLogin');
-  const btnText  = document.getElementById('btnLoginText');
-
-  if (!username) { showAlert('warning','Perhatian','Username wajib diisi!'); return; }
-  if (!password) { showAlert('warning','Perhatian','Password wajib diisi!'); return; }
-
-  btn.disabled = true; btnText.textContent = 'Memverifikasi...';
-
+  const username = (document.getElementById('fUsername').value||'').trim();
+  const password = (document.getElementById('fPassword').value||'');
+  const btn=document.getElementById('btnLogin'), btnTxt=document.getElementById('btnLoginText');
+  if(!username){showAlert('warning','Perhatian','Username wajib diisi!');return;}
+  if(!password){showAlert('warning','Perhatian','Password wajib diisi!');return;}
+  btn.disabled=true; btnTxt.textContent='Memverifikasi...';
   try {
-    // 1. Cari pegawai berdasarkan username di tabel
-    const { data: pegawai, error: pe } = await sb
-      .from('pegawai')
-      .select('id, user_id, nama, username, password_plain, role, status')
-      .eq('username', username)
-      .maybeSingle();
-
-    if (pe || !pegawai) {
-      showAlert('error','Login Gagal','Username tidak ditemukan!');
-      btn.disabled = false; btnText.textContent = 'Masuk'; return;
-    }
-
-    if (pegawai.status === 'nonaktif') {
-      showAlert('error','Akun Nonaktif','Akun Anda telah dinonaktifkan. Hubungi admin.');
-      btn.disabled = false; btnText.textContent = 'Masuk'; return;
-    }
-
-    if (!pegawai.password_plain) {
-      showAlert('error','Login Gagal','Akun belum memiliki password. Hubungi admin!');
-      btn.disabled = false; btnText.textContent = 'Masuk'; return;
-    }
-
-    // 2. Cek password
-    if (password !== pegawai.password_plain) {
-      showAlert('error','Login Gagal','Password salah!');
-      btn.disabled = false; btnText.textContent = 'Masuk'; return;
-    }
-
-    // 3. Password cocok — simpan info di sessionStorage untuk akses tanpa Supabase Auth
-    sessionStorage.setItem('sw_id',       pegawai.id);
-    sessionStorage.setItem('sw_nama',     pegawai.nama);
-    sessionStorage.setItem('sw_username', pegawai.username);
-    sessionStorage.setItem('sw_role',     pegawai.role);
-    sessionStorage.setItem('sw_status',   pegawai.status);
-
-    // 4. Coba buat/login Supabase Auth di background (opsional, tidak blocking)
-    const emailDummy = `${username.replace(/\s+/g,'')}@simawar.internal`;
+    const {data:pg,error:pe}=await sb.from('pegawai').select('id,user_id,nama,username,password_plain,role').eq('username',username).maybeSingle();
+    if(pe||!pg){showAlert('error','Login Gagal','Username tidak ditemukan!');btn.disabled=false;btnTxt.textContent='Masuk';return;}
+    if(password!==pg.password_plain){showAlert('error','Login Gagal','Password salah!');btn.disabled=false;btnTxt.textContent='Masuk';return;}
+    sessionStorage.setItem('sw_id',pg.id);
+    sessionStorage.setItem('sw_nama',pg.nama);
+    sessionStorage.setItem('sw_username',pg.username);
+    sessionStorage.setItem('sw_role',pg.role);
+    // Buat sesi Supabase Auth di background
+    const emailDummy=`${username}@simawar.internal`;
     try {
-      if (pegawai.user_id) {
-        // Sudah punya akun — coba sign in
-        const { error: se } = await sb.auth.signInWithPassword({ email: emailDummy, password });
-        // Jika gagal, tidak apa-apa — sessionStorage sudah di-set
-      } else {
-        // Buat akun baru di Supabase Auth
-        const { data: au, error: ae } = await sb.auth.signUp({
-          email: emailDummy, password,
-          options: { data: { username } }
-        });
-        if (!ae && au?.user) {
-          await sb.from('pegawai').update({ user_id: au.user.id }).eq('id', pegawai.id);
-          await sb.auth.signInWithPassword({ email: emailDummy, password });
-        } else if (ae?.message?.includes('registered')) {
-          await sb.auth.signInWithPassword({ email: emailDummy, password });
-        }
-      }
-    } catch(e) { /* Auth opsional — abaikan error */ }
-
-    showAlert('success','Berhasil!',`Selamat datang, ${pegawai.nama}!`);
-    setTimeout(() => {
-      location.href = pegawai.role === 'admin' ? 'admin.html' : 'user.html';
-    }, 700);
-
+      if(pg.user_id){await sb.auth.signInWithPassword({email:emailDummy,password});}
+      else{const{data:au,error:ae}=await sb.auth.signUp({email:emailDummy,password});if(!ae&&au?.user){await sb.from('pegawai').update({user_id:au.user.id}).eq('id',pg.id);await sb.auth.signInWithPassword({email:emailDummy,password});}else if(ae?.message?.includes('registered')){await sb.auth.signInWithPassword({email:emailDummy,password});}}
+    }catch(e){}
+    showAlert('success','Berhasil!',`Selamat datang, ${pg.nama}!`);
+    setTimeout(()=>{ location.href=pg.role==='admin'?'admin.html':'user.html'; },700);
   } catch(e) {
-    console.error('Login error:', e);
     showAlert('error','Error','Terjadi kesalahan. Coba lagi!');
-    btn.disabled = false; btnText.textContent = 'Masuk';
+    btn.disabled=false; btnTxt.textContent='Masuk';
   }
 }
 
-document.getElementById('btnLogin').onclick = doLogin;
+async function init() {
+  // Load config (non-blocking, update splash/login setelah selesai)
+  loadCfg().catch(()=>showLoginFallback());
+  // Splash 1000ms lalu tampilkan login
+  setTimeout(()=>{
+    const s=document.getElementById('splashScreen');
+    s.style.opacity='0';
+    setTimeout(()=>{ s.style.display='none'; document.getElementById('loginPage').style.display='flex'; },500);
+  },1000);
+  // Redirect jika sudah login
+  try {
+    const swId=sessionStorage.getItem('sw_id'), swRole=sessionStorage.getItem('sw_role');
+    if(swId&&swRole){ location.href=swRole==='admin'?'admin.html':'user.html'; return; }
+  } catch(e){}
+}
 init();
 </script>
 </body>

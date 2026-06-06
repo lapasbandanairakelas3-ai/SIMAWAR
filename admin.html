@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Admin — SIMAWAR</title>
   <link rel="icon" id="faviconEl" href="data:,"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -10,103 +10,60 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.6.0/jspdf.plugin.autotable.min.js"></script>
   <link rel="stylesheet" href="css/style.css"/>
+  <style>@keyframes swpulse{0%,100%{opacity:1}50%{opacity:.5}}.kamar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px}.kamar-card{background:white;border-radius:14px;padding:14px 10px;text-align:center;border:2px solid #e2e8f0;cursor:pointer;transition:all .2s;box-shadow:0 2px 6px rgba(0,0,0,.04)}.kamar-card:hover{border-color:#3b82f6;background:#eff6ff}</style>
 </head>
 <body>
 
-<!-- SPLASH: posisi fixed, akan di-remove dari DOM setelah selesai -->
-<div id="splashScreen" style="position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#1e3a8a,#1e40af,#2563eb);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.5s ease">
-  <div style="width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;margin-bottom:20px">
-    <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:28px" id="splashLogoBox">🏛️</div>
-  </div>
-  <div style="color:white;font-size:22px;font-weight:800;letter-spacing:-0.5px" id="splashTitle">SIMAWAR</div>
-  <div style="color:rgba(255,255,255,0.7);font-size:12px;margin-top:6px" id="splashSub">Sistem Informasi Monitoring Warga Binaan</div>
-  <div style="margin-top:32px;width:140px;height:3px;background:rgba(255,255,255,0.15);border-radius:100px;overflow:hidden">
-    <div style="height:100%;width:0%;background:rgba(255,255,255,0.8);border-radius:100px;animation:splashBar 0.8s ease forwards"></div>
-  </div>
+<!-- SPLASH — skeleton, logo dari DB -->
+<div id="splashScreen" style="position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#1e3a8a,#2563eb);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s">
+  <div id="splashLogoWrap" style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;margin-bottom:16px;overflow:hidden;animation:swpulse 1.5s infinite"></div>
+  <div id="splashNameWrap" style="height:22px;width:150px;background:rgba(255,255,255,.15);border-radius:8px;margin-bottom:6px;animation:swpulse 1.5s infinite"></div>
+  <div id="splashDescWrap" style="height:14px;width:200px;background:rgba(255,255,255,.1);border-radius:6px;animation:swpulse 1.5s infinite"></div>
+  <div style="margin-top:28px;width:120px;height:3px;background:rgba(255,255,255,.15);border-radius:100px;overflow:hidden"><div style="height:100%;background:rgba(255,255,255,.8);animation:sbar .8s ease forwards;width:0%"></div></div>
 </div>
-<style>@keyframes splashBar{to{width:100%}}</style>
+<style>@keyframes sbar{to{width:100%}}</style>
 
-<!-- APP SHELL: selalu visible, splash menutupi dari atas -->
 <div id="appShell">
 <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
-
-<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-brand">
     <div class="sidebar-brand-logo" id="sidebarLogo"><span id="sidebarLogoEmoji">🏛️</span></div>
-    <div class="sidebar-brand-text">
-      <div class="sidebar-brand-name" id="sidebarName">SIMAWAR</div>
-      <div class="sidebar-brand-sub">Panel Admin</div>
-    </div>
+    <div class="sidebar-brand-text"><div class="sidebar-brand-name" id="sidebarName">SIMAWAR</div><div class="sidebar-brand-sub">Panel Admin</div></div>
   </div>
   <nav class="sidebar-nav">
-    <div class="nav-section">
-      <div class="nav-section-title">Utama</div>
-      <div class="nav-item active" id="nav-dashboard" onclick="goPage('dashboard')">
-        <div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
-        Dashboard
-      </div>
+    <div class="nav-section"><div class="nav-section-title">Utama</div>
+      <div class="nav-item active" id="nav-dashboard" onclick="goPage('dashboard')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>Dashboard</div>
     </div>
-    <div class="nav-section">
-      <div class="nav-section-title">Data Master</div>
-      <div class="nav-item" id="nav-wbp" onclick="goPage('wbp')">
-        <div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
-        Data WBP
-      </div>
-      <div class="nav-item" id="nav-pegawai" onclick="goPage('pegawai')">
-        <div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6a4 4 0 11-8 0 4 4 0 018 0zm-4 9a9 9 0 00-9 9h18a9 9 0 00-9-9z"/></svg></div>
-        Data Pegawai
-      </div>
-      <div class="nav-item" id="nav-blok" onclick="goPage('blok')">
-        <div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></div>
-        Blok / Kamar
-      </div>
+    <div class="nav-section"><div class="nav-section-title">Data Master</div>
+      <div class="nav-item" id="nav-wbp" onclick="goPage('wbp')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>Data WBP</div>
+      <div class="nav-item" id="nav-pegawai" onclick="goPage('pegawai')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6a4 4 0 11-8 0 4 4 0 018 0zm-4 9a9 9 0 00-9 9h18a9 9 0 00-9-9z"/></svg></div>Data Pegawai/Rupam</div>
+      <div class="nav-item" id="nav-blok" onclick="goPage('blok')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></div>Blok / Kamar</div>
     </div>
-    <div class="nav-section">
-      <div class="nav-section-title">Laporan</div>
-      <div class="nav-item" id="nav-riwayat" onclick="goPage('riwayat')">
-        <div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
-        Riwayat Absensi
-      </div>
+    <div class="nav-section"><div class="nav-section-title">Laporan</div>
+      <div class="nav-item" id="nav-riwayat" onclick="goPage('riwayat')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6M7 7h10M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg></div>Riwayat Absensi</div>
     </div>
-    <div class="nav-section">
-      <div class="nav-section-title">Pengaturan</div>
-      <div class="nav-item" id="nav-siteconfig" onclick="goPage('siteconfig')">
-        <div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
-        Konfigurasi Website
-      </div>
-      <div class="nav-item" id="nav-akun" onclick="goPage('akun')">
-        <div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
-        Akun Saya
-      </div>
+    <div class="nav-section"><div class="nav-section-title">Pengaturan</div>
+      <div class="nav-item" id="nav-siteconfig" onclick="goPage('siteconfig')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>Konfigurasi</div>
+      <div class="nav-item" id="nav-akun" onclick="goPage('akun')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>Akun Saya</div>
     </div>
   </nav>
   <div class="sidebar-footer">
-    <div class="nav-item" onclick="doLogout()" style="background:rgba(239,68,68,0.12);color:#fca5a5">
-      <div class="nav-icon" style="background:rgba(239,68,68,0.15)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></div>
+    <div class="nav-item" onclick="doLogout()" style="background:rgba(239,68,68,.12);color:#fca5a5;cursor:pointer">
+      <div class="nav-icon" style="background:rgba(239,68,68,.15)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></div>
       Keluar
     </div>
   </div>
 </aside>
 
-<!-- MAIN -->
 <div class="main-wrapper">
   <header class="top-header">
-    <div style="display:flex;align-items:center;gap:12px">
-      <button onclick="toggleSidebar()" style="display:none;background:none;border:none;cursor:pointer;padding:6px" id="menuBtn">
-        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
-      </button>
-      <div>
-        <div class="header-title" id="headerTitle">Dashboard</div>
-        <div class="header-subtitle" id="headerDate"></div>
-      </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button onclick="toggleSidebar()" style="background:none;border:none;cursor:pointer;padding:6px"><svg style="width:20px;height:20px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <div><div class="header-title" id="headerTitle">Dashboard</div><div class="header-subtitle" id="headerDate"></div></div>
     </div>
     <div class="header-user" onclick="goPage('akun')" style="cursor:pointer">
       <div class="header-avatar" id="headerAvatar">A</div>
-      <div>
-        <div class="header-uname" id="headerUname">Admin</div>
-        <div class="header-role">Administrator</div>
-      </div>
+      <div><div class="header-uname" id="headerUname">Admin</div><div class="header-role">Administrator</div></div>
     </div>
   </header>
 
@@ -115,20 +72,14 @@
     <!-- DASHBOARD -->
     <div id="page-dashboard" class="page-section active">
       <div class="stat-grid" id="dashStats">
-        <div class="stat-card"><div class="stat-icon bg-blue-50" style="height:48px"></div><div style="height:28px;background:#f1f5f9;border-radius:8px;width:60px;margin-top:14px;animation:pulse 1.5s infinite"></div><div style="height:12px;background:#f1f5f9;border-radius:6px;width:80px;margin-top:8px;animation:pulse 1.5s infinite"></div></div>
-        <div class="stat-card"><div class="stat-icon bg-green-50" style="height:48px"></div><div style="height:28px;background:#f1f5f9;border-radius:8px;width:60px;margin-top:14px;animation:pulse 1.5s infinite"></div><div style="height:12px;background:#f1f5f9;border-radius:6px;width:80px;margin-top:8px;animation:pulse 1.5s infinite"></div></div>
-        <div class="stat-card"><div class="stat-icon bg-amber-50" style="height:48px"></div><div style="height:28px;background:#f1f5f9;border-radius:8px;width:60px;margin-top:14px;animation:pulse 1.5s infinite"></div><div style="height:12px;background:#f1f5f9;border-radius:6px;width:80px;margin-top:8px;animation:pulse 1.5s infinite"></div></div>
-        <div class="stat-card"><div class="stat-icon bg-purple-50" style="height:48px"></div><div style="height:28px;background:#f1f5f9;border-radius:8px;width:60px;margin-top:14px;animation:pulse 1.5s infinite"></div><div style="height:12px;background:#f1f5f9;border-radius:6px;width:80px;margin-top:8px;animation:pulse 1.5s infinite"></div></div>
+        <div class="stat-card"><div class="stat-icon bg-blue-50" style="height:48px;animation:swpulse 1.5s infinite"></div><div style="height:28px;background:#f1f5f9;border-radius:8px;width:60px;margin-top:14px;animation:swpulse 1.5s infinite"></div><div style="height:12px;background:#f1f5f9;border-radius:6px;width:80px;margin-top:8px;animation:swpulse 1.5s infinite"></div></div>
+        <div class="stat-card"><div class="stat-icon bg-green-50" style="height:48px;animation:swpulse 1.5s infinite"></div><div style="height:28px;background:#f1f5f9;border-radius:8px;width:60px;margin-top:14px;animation:swpulse 1.5s infinite"></div><div style="height:12px;background:#f1f5f9;border-radius:6px;width:80px;margin-top:8px;animation:swpulse 1.5s infinite"></div></div>
+        <div class="stat-card"><div class="stat-icon bg-amber-50" style="height:48px;animation:swpulse 1.5s infinite"></div><div style="height:28px;background:#f1f5f9;border-radius:8px;width:60px;margin-top:14px;animation:swpulse 1.5s infinite"></div><div style="height:12px;background:#f1f5f9;border-radius:6px;width:80px;margin-top:8px;animation:swpulse 1.5s infinite"></div></div>
+        <div class="stat-card"><div class="stat-icon bg-purple-50" style="height:48px;animation:swpulse 1.5s infinite"></div><div style="height:28px;background:#f1f5f9;border-radius:8px;width:60px;margin-top:14px;animation:swpulse 1.5s infinite"></div><div style="height:12px;background:#f1f5f9;border-radius:6px;width:80px;margin-top:8px;animation:swpulse 1.5s infinite"></div></div>
       </div>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div class="card">
-          <div class="card-header"><div><div class="card-title">Absensi Hari Ini</div><div class="text-xs text-gray-400 mt-0.5" id="dashTodayDate"></div></div><span class="badge badge-blue" id="dashTodayCount">0 sesi</span></div>
-          <div id="dashTodayList"><div class="empty-state py-10"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-8 h-8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6M7 7h10M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg></div><div class="empty-title">Belum Ada Absensi</div><div class="empty-desc">Belum ada sesi absen hari ini</div></div></div>
-        </div>
-        <div class="card">
-          <div class="card-header"><div class="card-title">Status Blok</div><button class="btn btn-ghost btn-sm" onclick="loadDashboard()">Refresh</button></div>
-          <div class="card-body"><div class="blok-grid" id="dashBlokGrid"><div style="height:90px;background:#f1f5f9;border-radius:14px;animation:pulse 1.5s infinite"></div><div style="height:90px;background:#f1f5f9;border-radius:14px;animation:pulse 1.5s infinite"></div><div style="height:90px;background:#f1f5f9;border-radius:14px;animation:pulse 1.5s infinite"></div></div></div>
-        </div>
+        <div class="card"><div class="card-header"><div><div class="card-title">Absensi Hari Ini</div><div style="font-size:12px;color:#94a3b8;margin-top:2px" id="dashTodayDate"></div></div><span class="badge badge-blue" id="dashTodayCount">0 catatan</span></div><div id="dashTodayList" style="padding:16px"><div style="padding:32px;text-align:center;color:#94a3b8;font-size:13px">Belum ada absensi hari ini</div></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Status Kamar</div><button class="btn btn-ghost btn-sm" onclick="loadDashboard()">Refresh</button></div><div class="card-body"><div class="kamar-grid" id="dashBlokGrid"><div style="height:80px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div><div style="height:80px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div></div></div></div>
       </div>
     </div>
 
@@ -137,35 +88,35 @@
       <div class="card">
         <div class="card-header"><div class="card-title">Data Warga Binaan (WBP)</div><button class="btn btn-primary btn-sm" onclick="openWbpModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg> Tambah WBP</button></div>
         <div class="filter-bar">
-          <div class="search-input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg><input type="text" id="wbpSearch" placeholder="Cari nama / no. registrasi..." oninput="debounceSearch(loadWbp)"/></div>
-          <select class="form-control" style="width:auto;min-width:140px" id="wbpBlokFilter" onchange="loadWbp()"><option value="">Semua Blok</option></select>
+          <div class="search-input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg><input type="text" id="wbpSearch" placeholder="Cari nama / no. reg..." oninput="debounce(loadWbp)"/></div>
+          <select class="form-control" style="width:auto;min-width:130px" id="wbpBlokFilter" onchange="loadWbp()"><option value="">Semua Blok</option></select>
           <select class="form-control" style="width:auto" id="wbpJkFilter" onchange="loadWbp()"><option value="">Semua JK</option><option value="L">Laki-laki</option><option value="P">Perempuan</option></select>
         </div>
-        <div class="table-container"><table><thead><tr><th>No</th><th>WBP</th><th>No. Registrasi</th><th>JK</th><th>Blok/Kamar</th><th>Masa Pidana</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="wbpTableBody"><tr><td colspan="8" style="padding:0"><div style="display:flex;flex-direction:column;gap:12px;padding:16px">${[1,2,3].map(()=>'<div style="height:48px;background:#f1f5f9;border-radius:10px;animation:pulse 1.5s infinite"></div>').join('')}</div></td></tr></tbody></table></div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid #f1f5f9"><span class="text-xs text-gray-400" id="wbpCount">—</span><div style="display:flex;gap:8px" id="wbpPagination"></div></div>
+        <div class="table-container"><table><thead><tr><th>No</th><th>Nama WBP</th><th>No. Reg</th><th>JK</th><th>Blok/Kamar</th><th>Masa Pidana</th><th>Aksi</th></tr></thead><tbody id="wbpTableBody"></tbody></table></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid #f1f5f9"><span style="font-size:12px;color:#94a3b8" id="wbpCount">—</span><div style="display:flex;gap:6px" id="wbpPagination"></div></div>
       </div>
     </div>
 
     <!-- PEGAWAI -->
     <div id="page-pegawai" class="page-section">
       <div class="card">
-        <div class="card-header"><div class="card-title">Data Pegawai / Regu Pengamanan</div><button class="btn btn-primary btn-sm" onclick="openPegawaiModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg> Tambah Pegawai</button></div>
+        <div class="card-header"><div class="card-title">Data Pegawai / Rupam</div><button class="btn btn-primary btn-sm" onclick="openPegawaiModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg> Tambah Rupam</button></div>
         <div class="filter-bar">
-          <div class="search-input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg><input type="text" id="pegawaiSearch" placeholder="Cari nama / username..." oninput="debounceSearch(loadPegawai)"/></div>
-          <select class="form-control" style="width:auto" id="pegawaiRoleFilter" onchange="loadPegawai()"><option value="">Semua Role</option><option value="admin">Admin</option><option value="user">Petugas</option></select>
+          <div class="search-input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg><input type="text" id="pegawaiSearch" placeholder="Cari nama/username..." oninput="debounce(loadPegawai)"/></div>
+          <select class="form-control" style="width:auto" id="pegawaiRoleFilter" onchange="loadPegawai()"><option value="">Semua Role</option><option value="admin">Admin</option><option value="user">Rupam</option></select>
         </div>
-        <div class="table-container"><table><thead><tr><th>No</th><th>Nama Rupam</th><th>Username</th><th>Password</th><th>Role</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="pegawaiTableBody"><tr><td colspan="8" style="padding:0"><div style="display:flex;flex-direction:column;gap:12px;padding:16px">${[1,2,3].map(()=>'<div style="height:48px;background:#f1f5f9;border-radius:10px;animation:pulse 1.5s infinite"></div>').join('')}</div></td></tr></tbody></table></div>
-        <div style="padding:12px 16px;border-top:1px solid #f1f5f9"><span class="text-xs text-gray-400" id="pegawaiCount">—</span></div>
+        <div class="table-container"><table><thead><tr><th>No</th><th>Nama</th><th>Username</th><th>Password</th><th>Role</th><th>Aksi</th></tr></thead><tbody id="pegawaiTableBody"></tbody></table></div>
+        <div style="padding:10px 16px;border-top:1px solid #f1f5f9"><span style="font-size:12px;color:#94a3b8" id="pegawaiCount">—</span></div>
       </div>
     </div>
 
     <!-- BLOK -->
     <div id="page-blok" class="page-section">
       <div class="card">
-        <div class="card-header"><div class="card-title">Kelola Blok / Kamar Hunian</div><button class="btn btn-primary btn-sm" onclick="openBlokModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg> Tambah Blok</button></div>
-        <div class="filter-bar"><div class="search-input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg><input type="text" id="blokSearch" placeholder="Cari blok..." oninput="debounceSearch(loadBlok)"/></div></div>
-        <div class="table-container"><table><thead><tr><th>No</th><th>Nama Blok/Kamar</th><th>Kapasitas</th><th>JK</th><th>Keterangan</th><th>Jml WBP</th><th>Aksi</th></tr></thead><tbody id="blokTableBody"><tr><td colspan="7" style="padding:0"><div style="display:flex;flex-direction:column;gap:12px;padding:16px">${[1,2].map(()=>'<div style="height:48px;background:#f1f5f9;border-radius:10px;animation:pulse 1.5s infinite"></div>').join('')}</div></td></tr></tbody></table></div>
-        <div style="padding:12px 16px;border-top:1px solid #f1f5f9"><span class="text-xs text-gray-400" id="blokCount">—</span></div>
+        <div class="card-header"><div class="card-title">Kelola Blok / Kamar</div><button class="btn btn-primary btn-sm" onclick="openBlokModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg> Tambah Blok</button></div>
+        <div class="filter-bar"><div class="search-input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg><input type="text" id="blokSearch" placeholder="Cari blok..." oninput="debounce(loadBlok)"/></div></div>
+        <div class="table-container"><table><thead><tr><th>No</th><th>Nama Blok</th><th>Kapasitas</th><th>JK</th><th>Isi / Kapasitas</th><th>Aksi</th></tr></thead><tbody id="blokTableBody"></tbody></table></div>
+        <div style="padding:10px 16px;border-top:1px solid #f1f5f9"><span style="font-size:12px;color:#94a3b8" id="blokCount">—</span></div>
       </div>
     </div>
 
@@ -173,16 +124,16 @@
     <div id="page-riwayat" class="page-section">
       <div class="card">
         <div class="card-header"><div class="card-title">Riwayat Absensi (Semua Petugas)</div><button class="btn btn-success btn-sm" onclick="exportRiwayat()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg> Ekspor PDF</button></div>
-        <div class="filter-bar">
-          <div class="search-input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg><input type="text" id="riwayatSearch" placeholder="Cari WBP / petugas..." oninput="debounceSearch(loadRiwayat)"/></div>
+        <div class="filter-bar" style="flex-wrap:wrap;gap:8px">
+          <div class="search-input" style="min-width:150px;flex:1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg><input type="text" id="riwayatSearch" placeholder="Cari WBP / petugas..." oninput="debounce(loadRiwayat)"/></div>
           <input type="date" class="form-control" style="width:auto" id="riwayatDari" onchange="loadRiwayat()"/>
           <input type="date" class="form-control" style="width:auto" id="riwayatSampai" onchange="loadRiwayat()"/>
-          <select class="form-control" style="width:auto;min-width:130px" id="riwayatBlokFilter" onchange="loadRiwayat()"><option value="">Semua Blok</option></select>
+          <select class="form-control" style="width:auto;min-width:120px" id="riwayatBlokFilter" onchange="loadRiwayat()"><option value="">Semua Blok</option></select>
           <select class="form-control" style="width:auto;min-width:130px" id="riwayatPegawaiFilter" onchange="loadRiwayat()"><option value="">Semua Petugas</option></select>
           <button class="btn btn-ghost btn-sm" onclick="resetRiwayatFilter()">Reset</button>
         </div>
-        <div class="table-container"><table><thead><tr><th>No</th><th>Tanggal & Waktu</th><th>Petugas</th><th>Blok</th><th>WBP</th><th>Status</th><th>Keterangan</th></tr></thead><tbody id="riwayatTableBody"><tr><td colspan="7"><div class="empty-state"><div class="empty-title">Atur filter lalu klik cari</div></div></td></tr></tbody></table></div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid #f1f5f9"><span class="text-xs text-gray-400" id="riwayatCount">—</span><div style="display:flex;gap:8px" id="riwayatPagination"></div></div>
+        <div class="table-container"><table><thead><tr><th>No</th><th>Waktu</th><th>Petugas</th><th>Blok</th><th>WBP</th><th>Status</th><th>Keterangan</th><th>Aksi</th></tr></thead><tbody id="riwayatTableBody"></tbody></table></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid #f1f5f9"><span style="font-size:12px;color:#94a3b8" id="riwayatCount">—</span><div style="display:flex;gap:6px" id="riwayatPagination"></div></div>
       </div>
     </div>
 
@@ -190,65 +141,53 @@
     <div id="page-siteconfig" class="page-section">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <div class="lg:col-span-2 space-y-5">
-          <div class="card">
-            <div class="card-header"><div class="card-title">🏛️ Identitas Website</div></div>
+          <div class="card"><div class="card-header"><div class="card-title">🏛️ Identitas Website</div></div>
             <div class="card-body">
               <div class="form-group"><label class="form-label">Nama Website</label><input type="text" class="form-control" id="cfgName" placeholder="SIMAWAR Lapas Bandanaira"/></div>
-              <div class="form-group"><label class="form-label">Deskripsi / Tagline</label><textarea class="form-control" id="cfgDesc" rows="2" placeholder="Sistem Informasi Monitoring Warga Binaan"></textarea></div>
-              <div class="grid grid-cols-2 gap-4">
-                <div class="form-group"><label class="form-label">Nama Instansi</label><input type="text" class="form-control" id="cfgInstansi" placeholder="Lapas Kelas III Bandanaira"/></div>
-                <div class="form-group"><label class="form-label">Alamat</label><input type="text" class="form-control" id="cfgAlamat" placeholder="Alamat instansi"/></div>
-              </div>
+              <div class="form-group"><label class="form-label">Deskripsi</label><textarea class="form-control" id="cfgDesc" rows="2"></textarea></div>
+              <div class="grid grid-cols-2 gap-4"><div class="form-group"><label class="form-label">Nama Instansi</label><input type="text" class="form-control" id="cfgInstansi"/></div><div class="form-group"><label class="form-label">Alamat</label><input type="text" class="form-control" id="cfgAlamat"/></div></div>
             </div>
           </div>
-          <div class="card">
-            <div class="card-header"><div class="card-title">🖼️ Logo & Favicon</div></div>
+          <div class="card"><div class="card-header"><div class="card-title">🖼️ Logo & Favicon</div></div>
             <div class="card-body">
               <div class="grid grid-cols-2 gap-6">
-                <div>
-                  <label class="form-label">Logo Website</label>
+                <div><label class="form-label">Logo</label>
                   <div style="display:flex;align-items:flex-start;gap:12px;margin-top:8px">
-                    <div onclick="document.getElementById('logoFileInput').click()" style="width:90px;height:90px;border-radius:14px;border:2px dashed #d1d5db;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;background:#fafbff;position:relative" id="logoUploadBox">
+                    <div onclick="document.getElementById('logoFileInput').click()" style="width:90px;height:90px;border-radius:14px;border:2px dashed #d1d5db;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;background:#fafbff">
                       <img id="logoPreview" src="" style="display:none;width:100%;height:100%;object-fit:cover"/>
-                      <div id="logoPlaceholder" style="display:flex;flex-direction:column;align-items:center;gap:4px"><svg class="w-8 h-8 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5z"/></svg><span style="font-size:9px;color:#94a3b8">Upload</span></div>
+                      <div id="logoPlaceholder" style="font-size:28px">🖼️</div>
                     </div>
                     <input type="file" id="logoFileInput" accept="image/*" style="display:none" onchange="previewLogo(event)"/>
-                    <div class="text-xs text-gray-400"><p>JPG, PNG, SVG</p><p>Maks. 2MB</p><p>200×200px</p><button class="btn btn-danger btn-sm mt-2" onclick="removeLogo()" id="removeLogoBtn" style="display:none;font-size:10px;padding:3px 8px">✕ Hapus</button></div>
+                    <div style="font-size:11px;color:#94a3b8"><p>JPG, PNG, SVG</p><p>Maks 2MB</p><button class="btn btn-danger btn-sm mt-2" id="removeLogoBtn" onclick="removeLogo()" style="display:none;font-size:10px;padding:3px 8px">✕ Hapus</button></div>
                   </div>
                 </div>
-                <div>
-                  <label class="form-label">Favicon</label>
+                <div><label class="form-label">Favicon</label>
                   <div style="display:flex;align-items:flex-start;gap:12px;margin-top:8px">
-                    <div onclick="document.getElementById('favFileInput').click()" style="width:56px;height:56px;border-radius:10px;border:2px dashed #d1d5db;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;background:#fafbff">
+                    <div onclick="document.getElementById('favFileInput').click()" style="width:56px;height:56px;border-radius:10px;border:2px dashed #d1d5db;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:#fafbff">
                       <img id="favPreview" src="" style="display:none;width:100%;height:100%;object-fit:cover"/>
-                      <div id="favPlaceholder"><svg class="w-5 h-5 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg></div>
+                      <div id="favPlaceholder" style="font-size:20px">⭐</div>
                     </div>
                     <input type="file" id="favFileInput" accept="image/*" style="display:none" onchange="previewFav(event)"/>
-                    <div class="text-xs text-gray-400"><p>ICO, PNG</p><p>16×16 atau 32×32px</p></div>
+                    <div style="font-size:11px;color:#94a3b8"><p>ICO, PNG</p><p>16×16px</p></div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-
-          <button class="btn btn-primary w-full justify-center py-3" onclick="saveSiteConfig()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg> Simpan Semua Konfigurasi</button>
+          <button class="btn btn-primary w-full justify-center py-3" onclick="saveSiteConfig()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg> Simpan Konfigurasi</button>
         </div>
         <div class="space-y-5">
-          <div class="card">
-            <div class="card-header"><div class="card-title">👁️ Preview Login</div></div>
+          <div class="card"><div class="card-header"><div class="card-title">👁️ Preview</div></div>
             <div class="card-body p-3">
-              <div style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);border-radius:14px;padding:20px;text-align:center">
-                <div style="width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,0.2);margin:0 auto 10px;overflow:hidden;display:flex;align-items:center;justify-content:center" id="previewLogoBox"><span id="previewLogoEmoji" style="font-size:22px">🏛️</span></div>
+              <div style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);border-radius:14px;padding:18px;text-align:center">
+                <div style="width:48px;height:48px;border-radius:12px;background:rgba(255,255,255,.2);margin:0 auto 10px;overflow:hidden;display:flex;align-items:center;justify-content:center" id="previewLogoBox"><span id="previewLogoEmoji" style="font-size:20px">🏛️</span></div>
                 <div style="color:white;font-weight:800;font-size:13px" id="previewName">SIMAWAR</div>
-                <div style="color:rgba(255,255,255,0.7);font-size:10px;margin-top:3px" id="previewDesc">Sistem Informasi Monitoring Warga Binaan</div>
+                <div style="color:rgba(255,255,255,.7);font-size:10px;margin-top:3px" id="previewDesc">Sistem Informasi Monitoring Warga Binaan</div>
                 <div style="background:white;border-radius:10px;padding:10px;margin-top:10px"><div style="height:7px;background:#e2e8f0;border-radius:4px;margin-bottom:5px"></div><div style="height:7px;background:#e2e8f0;border-radius:4px;width:70%"></div><div style="height:26px;background:linear-gradient(135deg,#3b82f6,#1e40af);border-radius:7px;margin-top:9px"></div></div>
               </div>
             </div>
           </div>
-          <div class="card" style="border-color:#fee2e2">
-            <div class="card-header" style="background:#fff5f5"><div class="card-title" style="color:#dc2626">⚠️ Reset</div></div>
-            <div class="card-body"><p class="text-xs text-gray-500 mb-3">Reset semua konfigurasi ke default.</p><button class="btn btn-danger btn-sm w-full justify-center" onclick="resetSiteConfig()">Reset Konfigurasi</button></div>
-          </div>
+          <div class="card" style="border-color:#fee2e2"><div class="card-header" style="background:#fff5f5"><div class="card-title" style="color:#dc2626">⚠️ Reset</div></div><div class="card-body"><p style="font-size:12px;color:#64748b;margin-bottom:10px">Reset konfigurasi ke default.</p><button class="btn btn-danger btn-sm w-full justify-center" onclick="resetSiteConfig()">Reset Konfigurasi</button></div></div>
         </div>
       </div>
     </div>
@@ -256,37 +195,32 @@
     <!-- AKUN -->
     <div id="page-akun" class="page-section">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div class="card">
-          <div class="card-body text-center py-8">
-            <div style="width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,#3b82f6,#1e40af);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;color:white;margin:0 auto 16px" id="akunAvatarBig">A</div>
-            <div class="font-bold text-lg text-gray-900" id="akunNamaDisplay">—</div>
-            <div class="text-sm text-gray-400 mt-1" id="akunJabatanDisplay">—</div>
-            <div class="mt-3"><span class="badge badge-blue" id="akunRoleDisplay">—</span></div>
-            <div class="mt-4 pt-4 border-t border-gray-50 text-left">
-              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f8fafc"><span class="text-xs text-gray-500">Pangkat</span><span class="text-xs font-semibold" id="akunPangkatDisplay">—</span></div>
-              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f8fafc"><span class="text-xs text-gray-500">Username</span><span class="text-xs font-semibold" id="akunUsernameDisplay">—</span></div>
-              <div style="display:flex;justify-content:space-between;padding:8px 0"><span class="text-xs text-gray-500">Email</span><span class="text-xs font-semibold" id="akunEmailDisplay">—</span></div>
-            </div>
+        <div class="card"><div class="card-body text-center py-8">
+          <div id="akunAvatarBig" style="width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,#3b82f6,#1e40af);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:white;margin:0 auto 14px">A</div>
+          <div style="font-size:18px;font-weight:800" id="akunNamaDisplay">—</div>
+          <div class="mt-3"><span class="badge badge-purple" id="akunRoleDisplay">Admin</span></div>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid #f1f5f9">
+            <div style="display:flex;justify-content:space-between;padding:6px 0"><span style="font-size:12px;color:#94a3b8">Username</span><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:5px" id="akunUsernameDisplay">—</code></div>
           </div>
-        </div>
-        <div class="card lg:col-span-2">
-          <div class="card-header"><div class="card-title">Ubah Data Akun</div></div>
+        </div></div>
+        <div class="card lg:col-span-2"><div class="card-header"><div class="card-title">Ubah Data Akun</div></div>
           <div class="card-body">
-            <div class="form-group">
-              <label class="form-label">Nama</label>
-              <input type="text" class="form-control" id="akunNama" placeholder="Nama Anda"/>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Username</label>
-              <input type="text" class="form-control" id="akunUsername" disabled style="background:#f8fafc;color:#94a3b8" placeholder="—"/>
-              <p class="text-xs text-gray-400 mt-1">Username tidak dapat diubah</p>
-            </div>
+            <div class="form-group"><label class="form-label">Nama</label><input type="text" class="form-control" id="akunNama"/></div>
+            <div class="form-group"><label class="form-label">Username</label><input type="text" class="form-control" id="akunUsername" disabled style="background:#f8fafc;color:#94a3b8"/><p style="font-size:11px;color:#94a3b8;margin-top:4px">Username tidak dapat diubah</p></div>
             <button class="btn btn-primary" onclick="saveAkun()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg> Simpan</button>
-            <hr class="my-5 border-gray-100"/>
-            <div class="font-bold text-sm text-gray-700 mb-4">Ganti Password</div>
+            <hr style="margin:20px 0;border-color:#f1f5f9"/>
+            <div style="font-size:14px;font-weight:700;color:#1e293b;margin-bottom:12px">Ganti Password</div>
             <div class="grid grid-cols-2 gap-4">
-              <div class="form-group"><label class="form-label">Password Baru</label><input type="password" class="form-control" id="akunPwdBaru" placeholder="Min. 8 karakter"/></div>
-              <div class="form-group"><label class="form-label">Konfirmasi Password</label><input type="password" class="form-control" id="akunPwdKonfirm"/></div>
+              <div class="form-group"><label class="form-label">Password Baru</label>
+                <div style="position:relative"><input type="password" class="form-control" id="akunPwdBaru" placeholder="Min. 4 karakter" autocomplete="new-password" style="padding-right:40px"/>
+                  <button type="button" onclick="togglePwd('akunPwdBaru',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;padding:4px"><svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
+                </div>
+              </div>
+              <div class="form-group"><label class="form-label">Konfirmasi Password</label>
+                <div style="position:relative"><input type="password" class="form-control" id="akunPwdKonfirm" placeholder="Ulangi password" autocomplete="new-password" style="padding-right:40px"/>
+                  <button type="button" onclick="togglePwd('akunPwdKonfirm',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;padding:4px"><svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
+                </div>
+              </div>
             </div>
             <button class="btn btn-warning" onclick="savePassword()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg> Ganti Password</button>
           </div>
@@ -294,124 +228,93 @@
       </div>
     </div>
 
-  </div><!-- /content-area -->
-
-  <footer class="app-footer">
-    <span>Dibuat dengan ❤️ Oleh</span><strong>WA MIRANTI</strong>
-    <a href="https://instagram.com/wa_miranti" target="_blank" class="social-link ig-link"><svg viewBox="0 0 24 24" class="w-3 h-3" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg> @wa_miranti</a>
-    <a href="https://tiktok.com/@wa_miranti" target="_blank" class="social-link tt-link"><svg viewBox="0 0 24 24" class="w-3 h-3" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V9.15a8.16 8.16 0 004.77 1.52V7.22a4.85 4.85 0 01-1-.53z"/></svg> @wa_miranti</a>
-  </footer>
+  </div>
+  <footer class="app-footer"><span>Dibuat dengan ❤️ Oleh</span><strong>WA MIRANTI</strong><a href="https://instagram.com/wa_miranti" target="_blank" class="social-link ig-link">@wa_miranti</a><a href="https://tiktok.com/@wa_miranti" target="_blank" class="social-link tt-link">@wa_miranti</a></footer>
 </div>
-</div><!-- /appShell -->
+</div>
 
 <!-- MODAL WBP -->
-<div class="modal-overlay" id="wbpModal" style="display:none">
-  <div class="modal" style="max-width:600px">
-    <div class="modal-header"><div class="modal-title" id="wbpModalTitle">Tambah WBP</div><button class="modal-close" onclick="closeModal('wbpModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
-    <div class="modal-body">
-      <input type="hidden" id="wbpId"/>
-      <div class="grid grid-cols-3 gap-4">
-        <div>
-          <label class="form-label">Foto WBP</label>
-          <div onclick="document.getElementById('wbpFotoInput').click()" style="width:100%;aspect-ratio:3/4;border:2px dashed #d1d5db;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:#fafbff;position:relative">
-            <img id="wbpFotoPreview" src="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover"/>
-            <div id="wbpFotoPlaceholder" style="display:flex;flex-direction:column;align-items:center;gap:6px"><svg class="w-8 h-8 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg><span style="font-size:10px;color:#94a3b8">Upload Foto</span></div>
-          </div>
-          <input type="file" id="wbpFotoInput" accept="image/*" style="display:none" onchange="previewWbpFoto(event)"/>
-        </div>
-        <div class="col-span-2 space-y-3">
-          <div class="form-group"><label class="form-label">Nama Lengkap *</label><input type="text" class="form-control" id="wbpNama" placeholder="Nama lengkap WBP"/></div>
-          <div class="form-group"><label class="form-label">No. Registrasi *</label><input type="text" class="form-control" id="wbpNoreg" placeholder="Cth: B.01.2024.001"/></div>
-          <div class="grid grid-cols-2 gap-3">
-            <div class="form-group"><label class="form-label">Jenis Kelamin</label><select class="form-control" id="wbpJk"><option value="L">Laki-laki</option><option value="P">Perempuan</option></select></div>
-            <div class="form-group"><label class="form-label">Blok/Kamar</label><select class="form-control" id="wbpBlok"><option value="">— Pilih —</option></select></div>
-          </div>
-        </div>
-      </div>
-      <div class="grid grid-cols-2 gap-4 mt-3">
-        <div class="form-group"><label class="form-label">Tgl Masuk</label><input type="date" class="form-control" id="wbpTglMasuk"/></div>
-        <div class="form-group"><label class="form-label">Tgl Bebas</label><input type="date" class="form-control" id="wbpTglBebas"/></div>
-        <div class="form-group"><label class="form-label">Masa Pidana</label><input type="text" class="form-control" id="wbpMasa" placeholder="Cth: 5 Tahun 6 Bulan"/></div>
-        <div class="form-group"><label class="form-label">Jenis Kasus</label><input type="text" class="form-control" id="wbpKasus"/></div>
-        <div class="form-group"><label class="form-label">Asal Daerah</label><input type="text" class="form-control" id="wbpAsal"/></div>
-        <div class="form-group"><label class="form-label">Status</label><select class="form-control" id="wbpStatus"><option value="aktif">Aktif</option><option value="bebas">Bebas</option><option value="pindah">Pindah</option></select></div>
-        <div class="form-group col-span-2"><label class="form-label">Catatan</label><textarea class="form-control" id="wbpCatatan" rows="2"></textarea></div>
-      </div>
+<div class="modal-overlay" id="wbpModal" style="display:none"><div class="modal" style="max-width:500px">
+  <div class="modal-header"><div class="modal-title" id="wbpModalTitle">Tambah WBP</div><button class="modal-close" onclick="closeModal('wbpModal')">✕</button></div>
+  <div class="modal-body">
+    <input type="hidden" id="wbpId"/>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="form-group col-span-2"><label class="form-label">Nama Lengkap *</label><input type="text" class="form-control" id="wbpNama" placeholder="Nama lengkap WBP"/></div>
+      <div class="form-group"><label class="form-label">No. Registrasi *</label><input type="text" class="form-control" id="wbpNoreg" placeholder="Cth: B.01.2024.001"/></div>
+      <div class="form-group"><label class="form-label">Jenis Kelamin</label><select class="form-control" id="wbpJk"><option value="L">Laki-laki</option><option value="P">Perempuan</option></select></div>
+      <div class="form-group"><label class="form-label">Blok/Kamar</label><select class="form-control" id="wbpBlok"><option value="">— Pilih —</option></select></div>
+      <div class="form-group"><label class="form-label">Tanggal Bebas</label><input type="date" class="form-control" id="wbpTglBebas"/></div>
+      <div class="form-group"><label class="form-label">Masa Pidana</label><input type="text" class="form-control" id="wbpMasa" placeholder="Cth: 5 Tahun"/></div>
+      <div class="form-group col-span-2"><label class="form-label">Perkara / Kasus</label><input type="text" class="form-control" id="wbpKasus" placeholder="Cth: Narkotika"/></div>
     </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('wbpModal')">Batal</button><button class="btn btn-primary" onclick="saveWbp()" id="wbpSaveBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg> Simpan</button></div>
   </div>
-</div>
+  <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('wbpModal')">Batal</button><button class="btn btn-primary" onclick="saveWbp()" id="wbpSaveBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg> Simpan</button></div>
+</div></div>
 
 <!-- MODAL PEGAWAI -->
-<div class="modal-overlay" id="pegawaiModal" style="display:none">
-  <div class="modal" style="max-width:440px">
-    <div class="modal-header">
-      <div>
-        <div class="modal-title" id="pegawaiModalTitle">Tambah Petugas (Karupam)</div>
-        <div class="text-xs text-gray-400 mt-0.5">Isi nama Rupam dan username untuk login</div>
+<div class="modal-overlay" id="pegawaiModal" style="display:none"><div class="modal" style="max-width:420px">
+  <div class="modal-header"><div><div class="modal-title" id="pegawaiModalTitle">Tambah Rupam</div><div style="font-size:12px;color:#94a3b8;margin-top:2px">Isi nama dan username untuk login</div></div><button class="modal-close" onclick="closeModal('pegawaiModal')">✕</button></div>
+  <div class="modal-body">
+    <input type="hidden" id="pegawaiId"/>
+    <div class="form-group"><label class="form-label">Nama Rupam *</label><input type="text" class="form-control" id="pegawaiNama" placeholder="Cth: Rupam 1, Rupam 2"/></div>
+    <div class="form-group"><label class="form-label">Username * <span style="font-size:10px;color:#94a3b8">(untuk login)</span></label><input type="text" class="form-control" id="pegawaiUsername" placeholder="Cth: rupam1, rupam2"/></div>
+    <div class="form-group"><label class="form-label">Password *</label>
+      <div style="position:relative"><input type="text" class="form-control" id="pegawaiPassword" placeholder="Buat password yang mudah diingat" autocomplete="off" style="padding-right:40px"/>
+        <button type="button" onclick="togglePwd('pegawaiPassword',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;padding:4px"><svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
       </div>
-      <button class="modal-close" onclick="closeModal('pegawaiModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+      <p style="font-size:11px;color:#f59e0b;margin-top:5px">Password tersimpan dan dapat dilihat admin di tabel.</p>
     </div>
-    <div class="modal-body">
-      <input type="hidden" id="pegawaiId"/>
-      <div class="form-group">
-        <label class="form-label">Nama Rupam <span class="text-red-500">*</span></label>
-        <input type="text" class="form-control" id="pegawaiNama" placeholder="Cth: Rupam 1, Rupam 2, Rupam 3 ..."/>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Username <span class="text-red-500">*</span> <span style="font-size:10px;color:#94a3b8">(dipakai untuk login)</span></label>
-        <input type="text" class="form-control" id="pegawaiUsername" placeholder="Cth: rupam1, rupam2, rupam3 ..."/>
-      </div>
-      <div class="form-group" id="pegawaiPwdGroup">
-        <label class="form-label">Password <span class="text-red-500">*</span></label>
-        <input type="text" class="form-control" id="pegawaiPassword" placeholder="Buat password yang mudah diingat" autocomplete="off"/>
-        <p class="text-xs text-amber-600 mt-1.5">Password tersimpan dan dapat dilihat di tabel pegawai.</p>
-      </div>
-      <div class="grid grid-cols-2 gap-4">
-        <div class="form-group">
-          <label class="form-label">Role</label>
-          <select class="form-control" id="pegawaiRole">
-            <option value="user">Petugas / Rupam</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Status</label>
-          <select class="form-control" id="pegawaiStatus">
-            <option value="aktif">Aktif</option>
-            <option value="nonaktif">Non-aktif</option>
-          </select>
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('pegawaiModal')">Batal</button>
-      <button class="btn btn-primary" onclick="savePegawai()" id="pegawaiSaveBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
-        Simpan
-      </button>
-    </div>
+    <div class="form-group"><label class="form-label">Role</label><select class="form-control" id="pegawaiRole"><option value="user">Petugas / Rupam</option><option value="admin">Admin</option></select></div>
   </div>
-</div>
+  <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('pegawaiModal')">Batal</button><button class="btn btn-primary" onclick="savePegawai()" id="pegawaiSaveBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg> Simpan</button></div>
+</div></div>
 
 <!-- MODAL BLOK -->
-<div class="modal-overlay" id="blokModal" style="display:none">
-  <div class="modal">
-    <div class="modal-header"><div class="modal-title" id="blokModalTitle">Tambah Blok</div><button class="modal-close" onclick="closeModal('blokModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
-    <div class="modal-body">
-      <input type="hidden" id="blokId"/>
-      <div class="form-group"><label class="form-label">Nama Blok / Kamar *</label><input type="text" class="form-control" id="blokNama" placeholder="Cth: Blok A, Kamar 1"/></div>
-      <div class="grid grid-cols-2 gap-4">
-        <div class="form-group"><label class="form-label">Kapasitas (Orang)</label><input type="number" class="form-control" id="blokKapasitas" min="1"/></div>
-        <div class="form-group"><label class="form-label">Untuk JK</label><select class="form-control" id="blokJk"><option value="L">Laki-laki</option><option value="P">Perempuan</option><option value="Campur">Campur</option></select></div>
-      </div>
-      <div class="form-group"><label class="form-label">Keterangan</label><textarea class="form-control" id="blokKet" rows="2"></textarea></div>
+<div class="modal-overlay" id="blokModal" style="display:none"><div class="modal" style="max-width:400px">
+  <div class="modal-header"><div class="modal-title" id="blokModalTitle">Tambah Blok</div><button class="modal-close" onclick="closeModal('blokModal')">✕</button></div>
+  <div class="modal-body">
+    <input type="hidden" id="blokId"/>
+    <div class="form-group"><label class="form-label">Nama Blok/Kamar *</label><input type="text" class="form-control" id="blokNama" placeholder="Cth: Blok A, Kamar 1"/></div>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="form-group"><label class="form-label">Kapasitas</label><input type="number" class="form-control" id="blokKapasitas" min="1"/></div>
+      <div class="form-group"><label class="form-label">Untuk JK</label><select class="form-control" id="blokJk"><option value="L">Laki-laki</option><option value="P">Perempuan</option><option value="Campur">Campur</option></select></div>
     </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('blokModal')">Batal</button><button class="btn btn-primary" onclick="saveBlok()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg> Simpan</button></div>
+    <div class="form-group"><label class="form-label">Keterangan</label><textarea class="form-control" id="blokKet" rows="2"></textarea></div>
   </div>
-</div>
+  <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('blokModal')">Batal</button><button class="btn btn-primary" onclick="saveBlok()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg> Simpan</button></div>
+</div></div>
 
+<!-- MODAL EDIT ABSEN (ADMIN) -->
+<div class="modal-overlay" id="editAbsenModal" style="display:none"><div class="modal" style="max-width:380px">
+  <div class="modal-header"><div class="modal-title">Edit Absensi</div><button class="modal-close" onclick="closeModal('editAbsenModal')">✕</button></div>
+  <div class="modal-body">
+    <input type="hidden" id="editAbsenId"/>
+    <div class="form-group"><label class="form-label">Status</label><select class="form-control" id="editAbsenStatus"><option value="Hadir">Hadir</option><option value="Tidak Hadir">Tidak Hadir</option></select></div>
+    <div class="form-group"><label class="form-label">Keterangan</label><input type="text" class="form-control" id="editAbsenKet" placeholder="Keterangan (jika tidak hadir)"/></div>
+  </div>
+  <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('editAbsenModal')">Batal</button><button class="btn btn-primary" onclick="saveAbsen()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg> Simpan</button></div>
+</div></div>
+
+<script>
+// Splash: load logo dari DB
+async function loadSplashCfg(){
+  try{
+    const{data}=await (window.sb||{from:()=>({select:()=>({maybeSingle:()=>({data:null})})})}).from('site_config').select('*').maybeSingle();
+    if(!data)return;
+    const sl=document.getElementById('splashLogoWrap');sl.style.animation='none';
+    if(data.logo_url){const img=document.createElement('img');img.src=data.logo_url;img.style.cssText='width:100%;height:100%;object-fit:cover';sl.appendChild(img);}
+    else{sl.textContent='🏛️';sl.style.fontSize='32px';}
+    const sn=document.getElementById('splashNameWrap');sn.style.cssText='color:white;font-size:20px;font-weight:800;background:none;animation:none;height:auto;width:auto;border-radius:0';sn.textContent=data.site_name||'SIMAWAR';
+    const sd=document.getElementById('splashDescWrap');sd.style.cssText='color:rgba(255,255,255,.7);font-size:12px;background:none;animation:none;height:auto;width:auto;border-radius:0;text-align:center';sd.textContent=(data.site_desc||'').split('\n')[0];
+  }catch(e){
+    document.getElementById('splashLogoWrap').textContent='🏛️';document.getElementById('splashLogoWrap').style.fontSize='32px';document.getElementById('splashLogoWrap').style.animation='none';
+    document.getElementById('splashNameWrap').style.cssText='color:white;font-size:20px;font-weight:800;background:none;animation:none;height:auto;width:auto;border-radius:0';document.getElementById('splashNameWrap').textContent='SIMAWAR';
+    document.getElementById('splashDescWrap').style.cssText='color:rgba(255,255,255,.7);font-size:12px;background:none;animation:none;height:auto;width:auto;border-radius:0;text-align:center';document.getElementById('splashDescWrap').textContent='Sistem Informasi Monitoring Warga Binaan';
+  }
+}
+</script>
 <script src="js/config.js"></script>
+<script>loadSplashCfg().catch(()=>{});</script>
 <script src="js/admin.js"></script>
 </body>
 </html>
