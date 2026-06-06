@@ -13,76 +13,22 @@
   <style>
 @keyframes swpulse{0%,100%{opacity:1}50%{opacity:.5}}
 @keyframes sbar{to{width:100%}}
-
-/* Grid WBP — card lebih lebar */
-.wbp-absen-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
-  gap:14px;
-}
-@media(max-width:500px){
-  .wbp-absen-grid{grid-template-columns:repeat(2,1fr);gap:10px}
-}
-
-/* Card WBP */
-.wbp-absen-card{
-  background:white;
-  border-radius:16px;
-  overflow:hidden;
-  border:2.5px solid #e2e8f0;
-  transition:all .2s;
-  box-shadow:0 2px 8px rgba(0,0,0,.06);
-}
-.wbp-absen-card.hadir{border-color:#10b981;background:#f0fdf4}
-.wbp-absen-card.tidak{border-color:#ef4444;background:#fef2f2}
-
-/* Foto 1:1 bukan 3:4 */
-.foto-wrap{
-  width:100%;
-  aspect-ratio:1/1;
-  background:linear-gradient(135deg,#dbeafe,#e0e7ff);
-  position:relative;
-  overflow:hidden;
-}
-.foto-wrap img{width:100%;height:100%;object-fit:cover}
-.blok-badge{
-  background:rgba(30,64,175,.82);
-  color:white;
-  font-size:10px;
-  font-weight:700;
-  text-align:center;
-  padding:3px 4px;
-}
-
-/* Kamar picker */
-.kamar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
-.kamar-card{
-  background:white;border-radius:16px;padding:16px 12px;text-align:center;
-  border:2.5px solid #e2e8f0;cursor:pointer;transition:all .2s;
-  box-shadow:0 2px 8px rgba(0,0,0,.04);
-}
-.kamar-card:hover:not(.in-use){border-color:#3b82f6;background:#eff6ff;transform:translateY(-2px)}
-.kamar-card.selected{border-color:#3b82f6;background:#eff6ff;box-shadow:0 0 0 4px rgba(59,130,246,.1)}
-.kamar-card.in-use{opacity:.6;cursor:not-allowed;background:#fffbeb;border-color:#f59e0b}
-
-/* Sticky bar */
-.absen-bar{
-  position:sticky;bottom:0;background:white;border-top:1px solid #e2e8f0;
-  padding:12px 16px;z-index:40;box-shadow:0 -4px 16px rgba(0,0,0,.08);
-}
-
-/* Tombol 3 opsi keterangan */
-.ket-opsi-btn{
-  background:#f8fafc;border:2px solid #e2e8f0;border-radius:14px;
-  padding:14px 8px;font-size:12px;font-weight:700;color:#374151;
-  cursor:pointer;transition:all .15s;text-align:center;line-height:1.6;width:100%;
-}
-.ket-opsi-btn:hover,.ket-opsi-btn.active{background:#eff6ff;border-color:#3b82f6;color:#1d4ed8}
+.wbp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:12px}
+@media(max-width:480px){.wbp-grid{grid-template-columns:repeat(2,1fr);gap:8px}}
+.wbp-card{background:white;border-radius:14px;overflow:hidden;border:2.5px solid #e2e8f0;transition:border-color .2s,background .2s;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.wbp-card.hadir{border-color:#10b981;background:#f0fdf4}
+.wbp-card.tidak{border-color:#ef4444;background:#fef2f2}
+.kamar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:10px}
+.kamar-card{background:white;border-radius:14px;padding:16px 10px 12px;text-align:center;border:2px solid #e2e8f0;transition:all .18s;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.kamar-card.clickable:hover{border-color:#3b82f6;background:#eff6ff;transform:translateY(-2px)}
+.kamar-card.my-session{border-color:#3b82f6;background:#eff6ff}
+.kamar-card.locked{opacity:.55;cursor:default}
+.kamar-card.done{opacity:.6;cursor:default;background:#f0fdf4;border-color:#86efac}
   </style>
 </head>
 <body>
 
-<!-- SPLASH — skeleton, logo dari DB -->
+<!-- SPLASH -->
 <div id="splashScreen" style="position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#1e3a8a,#2563eb);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s">
   <div id="splashLogoWrap" style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;margin-bottom:16px;overflow:hidden;animation:swpulse 1.5s infinite"></div>
   <div id="splashNameWrap" style="height:22px;width:150px;background:rgba(255,255,255,.15);border-radius:8px;margin-bottom:6px;animation:swpulse 1.5s infinite"></div>
@@ -94,198 +40,156 @@
 
 <div id="appShell">
 <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
-
-<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-brand">
     <div class="sidebar-brand-logo" id="sidebarLogo"><span id="sidebarLogoEmoji">🏛️</span></div>
-    <div class="sidebar-brand-text">
-      <div class="sidebar-brand-name" id="sidebarName">SIMAWAR</div>
-      <div class="sidebar-brand-sub">Portal Petugas</div>
-    </div>
+    <div class="sidebar-brand-text"><div class="sidebar-brand-name" id="sidebarName">SIMAWAR</div><div class="sidebar-brand-sub">Portal Petugas</div></div>
   </div>
   <nav class="sidebar-nav">
-    <div class="nav-section">
-      <div class="nav-section-title">Menu</div>
-      <div class="nav-item active" id="nav-absen" onclick="goPage('absen')">
-        <div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
-        Absensi WBP
-      </div>
-      <div class="nav-item" id="nav-riwayat" onclick="goPage('riwayat')">
-        <div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6M7 7h10M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg></div>
-        Riwayat Saya
-      </div>
-      <div class="nav-item" id="nav-profil" onclick="goPage('profil')">
-        <div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
-        Profil Saya
-      </div>
+    <div class="nav-section"><div class="nav-section-title">Menu</div>
+      <div class="nav-item active" id="nav-absen" onclick="goPage('absen')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>Absensi WBP</div>
+      <div class="nav-item" id="nav-riwayat" onclick="goPage('riwayat')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6M7 7h10M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg></div>Riwayat Absensi</div>
+      <div class="nav-item" id="nav-profil" onclick="goPage('profil')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>Profil Saya</div>
     </div>
   </nav>
   <div class="sidebar-footer">
     <div class="nav-item" onclick="doLogout()" style="background:rgba(239,68,68,.12);color:#fca5a5;cursor:pointer">
-      <div class="nav-icon" style="background:rgba(239,68,68,.15)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-      </div>
-      Keluar
+      <div class="nav-icon" style="background:rgba(239,68,68,.15)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></div>Keluar
     </div>
   </div>
 </aside>
 
-<!-- MAIN -->
 <div class="main-wrapper">
   <header class="top-header">
     <div style="display:flex;align-items:center;gap:10px">
-      <button onclick="toggleSidebar()" style="background:none;border:none;cursor:pointer;padding:6px">
-        <svg style="width:20px;height:20px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
-      </button>
-      <div>
-        <div class="header-title" id="headerTitle">Absensi WBP</div>
-        <div class="header-subtitle" id="headerDate"></div>
-      </div>
+      <button onclick="toggleSidebar()" style="background:none;border:none;cursor:pointer;padding:6px"><svg style="width:20px;height:20px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <div><div class="header-title" id="headerTitle">Absensi WBP</div><div class="header-subtitle" id="headerDate"></div></div>
     </div>
     <div class="header-user" onclick="goPage('profil')" style="cursor:pointer">
       <div class="header-avatar" id="headerAvatar">P</div>
-      <div>
-        <div class="header-uname" id="headerUname">Petugas</div>
-        <div class="header-role">Regu Pengamanan</div>
-      </div>
+      <div><div class="header-uname" id="headerUname">Petugas</div><div class="header-role">Regu Pengamanan</div></div>
     </div>
   </header>
 
-  <div class="content-area" style="padding-bottom:20px">
+  <div class="content-area">
 
-    <!-- ===== ABSENSI ===== -->
+    <!-- ========== ABSENSI ========== -->
     <div id="page-absen" class="page-section active">
 
-      <!-- STEP 1 -->
+      <!-- STEP 1: Pilih Kamar -->
       <div id="step1">
-        <div class="card mb-4">
+        <!-- Panduan singkat -->
+        <div style="background:linear-gradient(135deg,#eff6ff,#f0f9ff);border:1px solid #bfdbfe;border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start">
+          <span style="font-size:18px;flex-shrink:0">📋</span>
+          <div style="font-size:12px;color:#1e40af;line-height:1.6">
+            <strong>Cara absensi:</strong> Pilih kamar → tandai setiap WBP (Hadir/Tidak) → klik Simpan.<br>
+            Tombol Simpan aktif setelah <strong>semua WBP</strong> di kamar ditandai.
+          </div>
+        </div>
+        <div class="card">
           <div class="card-header">
-            <div>
-              <div class="card-title">Pilih Kamar / Blok</div>
-              <div style="font-size:12px;color:#94a3b8;margin-top:2px">Pilih kamar yang akan Anda periksa</div>
-            </div>
+            <div><div class="card-title">Pilih Kamar</div><div style="font-size:12px;color:#94a3b8;margin-top:2px">Tap kamar yang akan Anda periksa hari ini</div></div>
             <button class="btn btn-ghost btn-sm" onclick="loadKamarPicker()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
               Refresh
             </button>
           </div>
-          <div class="card-body">
-            <div class="kamar-grid" id="kamarPickerGrid">
-              <div style="height:100px;background:#f1f5f9;border-radius:16px;animation:swpulse 1.5s infinite"></div>
-              <div style="height:100px;background:#f1f5f9;border-radius:16px;animation:swpulse 1.5s infinite"></div>
-              <div style="height:100px;background:#f1f5f9;border-radius:16px;animation:swpulse 1.5s infinite"></div>
-            </div>
-          </div>
-        </div>
-        <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:11px;color:#64748b">
-          <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:3px;border:2px solid #3b82f6;background:#eff6ff;display:inline-block"></span>Tersedia</span>
-          <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:3px;border:2px solid #10b981;background:#f0fdf4;display:inline-block"></span>Selesai hari ini</span>
-          <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:3px;border:2px solid #f59e0b;background:#fffbeb;display:inline-block"></span>Dipakai petugas lain</span>
+          <div class="card-body"><div class="kamar-grid" id="kamarPickerGrid">
+            <div style="height:95px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div>
+            <div style="height:95px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div>
+            <div style="height:95px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div>
+          </div></div>
         </div>
       </div>
 
-      <!-- STEP 2 -->
+      <!-- STEP 2: Absen WBP -->
       <div id="step2" style="display:none">
-        <!-- Header -->
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+        <!-- Header step2 -->
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px">
           <div style="display:flex;align-items:center;gap:10px">
             <button onclick="backToStep1()" class="btn btn-ghost btn-sm">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
-              Kembali
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>Kembali
             </button>
             <div>
               <div style="font-size:17px;font-weight:800;color:#1e293b" id="step2KamarTitle">—</div>
               <div style="font-size:11px;color:#94a3b8" id="step2Tanggal"></div>
             </div>
           </div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap" id="headerBadges">
-            <span class="badge badge-green" id="cntHadir">0 Hadir</span>
-            <span class="badge badge-red"   id="cntTidak">0 Tidak</span>
-            <span class="badge badge-gray"  id="cntBelum">0 Belum</span>
+          <!-- Counter — ID unik, hanya di sini -->
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="badge badge-green" id="cntHadir">— Hadir</span>
+            <span class="badge badge-red"   id="cntTidak">— Tidak</span>
+            <span class="badge badge-gray"  id="cntBelum">— Belum</span>
           </div>
         </div>
 
-        <!-- Progress -->
+        <!-- Progress bar — khusus kamar ini -->
         <div class="card mb-4" style="padding:12px 16px">
           <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-            <span style="font-size:11px;font-weight:600;color:#64748b">Progress Absensi</span>
-            <span style="font-size:11px;font-weight:800;color:#3b82f6" id="progressText">0 / 0</span>
+            <span style="font-size:11px;font-weight:600;color:#64748b">Progress Absensi Kamar Ini</span>
+            <span style="font-size:11px;font-weight:800;color:#3b82f6" id="progressText">—</span>
           </div>
           <div style="height:8px;background:#f1f5f9;border-radius:100px;overflow:hidden">
             <div id="progressBar" style="height:100%;width:0%;background:linear-gradient(90deg,#3b82f6,#6366f1);border-radius:100px;transition:width .3s"></div>
           </div>
+          <div style="font-size:11px;color:#94a3b8;margin-top:6px" id="progressHint">Tandai setiap WBP di bawah untuk mengaktifkan tombol Simpan.</div>
         </div>
 
-        <!-- Progress info (tidak sticky) -->
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px" id="progressInfo" style="display:none">
-          <span class="badge badge-green" id="cntHadir">0 Hadir</span>
-          <span class="badge badge-red"   id="cntTidak">0 Tidak</span>
-          <span class="badge badge-gray"  id="cntBelum">0 Belum</span>
-          <span style="font-size:12px;color:#64748b;margin-left:4px" id="barSummary"></span>
+        <!-- Grid WBP -->
+        <div class="wbp-grid" id="wbpAbsenGrid">
+          <div style="height:240px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div>
+          <div style="height:240px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div>
+          <div style="height:240px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div>
         </div>
 
-        <!-- WBP Grid -->
-        <div class="wbp-absen-grid" id="wbpAbsenGrid">
-          <div style="height:240px;background:#f1f5f9;border-radius:16px;animation:swpulse 1.5s infinite"></div>
-          <div style="height:240px;background:#f1f5f9;border-radius:16px;animation:swpulse 1.5s infinite"></div>
-          <div style="height:240px;background:#f1f5f9;border-radius:16px;animation:swpulse 1.5s infinite"></div>
-        </div>
-
-        <!-- Tombol simpan — bukan sticky, di bawah grid -->
+        <!-- Tombol Simpan — tersembunyi dulu, muncul hanya saat semua ditandai -->
         <div id="simpanWrap" style="display:none;margin-top:20px;text-align:right">
-          <button class="btn btn-success" onclick="submitAbsen()" id="btnSubmit" style="padding:12px 28px;font-size:14px">
+          <button id="btnSubmit" onclick="submitAbsen()" class="btn btn-success" style="padding:12px 28px;font-size:14px" disabled>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
             Simpan Absensi
           </button>
         </div>
-
-        <!-- Hidden sticky bar (tidak dipakai, tapi ID dipertahankan agar JS tidak error) -->
-        <div id="absenBar" style="display:none">
-          <span id="dummy_summary"></span>
-        </div>
       </div>
     </div>
 
-    <!-- ===== RIWAYAT ===== -->
+    <!-- ========== RIWAYAT ========== -->
     <div id="page-riwayat" class="page-section">
+      <!-- Panduan singkat -->
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start">
+        <span style="font-size:18px;flex-shrink:0">📊</span>
+        <div style="font-size:12px;color:#166534;line-height:1.6">
+          Halaman ini menampilkan <strong>seluruh data absensi</strong> dari semua petugas. Gunakan filter tanggal atau kamar untuk mempersempit hasil.
+        </div>
+      </div>
       <div class="card">
         <div class="card-header">
-          <div class="card-title">Riwayat Absensi Saya</div>
-          <button class="btn btn-success btn-sm" onclick="exportRiwayatUser()">
+          <div class="card-title">Riwayat Absensi</div>
+          <button class="btn btn-success btn-sm" id="btnExportRiwayat" onclick="exportRiwayatUser()" disabled>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
             Ekspor PDF
           </button>
         </div>
         <div class="filter-bar" style="flex-wrap:wrap;gap:8px">
-          <div class="search-input" style="min-width:150px;flex:1">
+          <div class="search-input" style="min-width:140px;flex:1">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
-            <input type="text" id="myRiwayatSearch" placeholder="Cari nama WBP..." oninput="loadMyRiwayat()"/>
+            <input type="text" id="myRiwayatSearch" placeholder="Cari nama WBP / petugas..." oninput="loadMyRiwayat()"/>
           </div>
           <input type="date" class="form-control" style="width:auto" id="myRiwayatDari" onchange="loadMyRiwayat()"/>
           <input type="date" class="form-control" style="width:auto" id="myRiwayatSampai" onchange="loadMyRiwayat()"/>
-          <select class="form-control" style="width:auto" id="myRiwayatBlok" onchange="loadMyRiwayat()">
-            <option value="">Semua Kamar</option>
-          </select>
+          <select class="form-control" style="width:auto;min-width:120px" id="myRiwayatBlok" onchange="loadMyRiwayat()"><option value="">Semua Kamar</option></select>
           <button class="btn btn-ghost btn-sm" onclick="resetMyRiwayat()">Reset</button>
         </div>
         <div class="table-container">
           <table>
-            <thead>
-              <tr><th>No</th><th>Waktu</th><th>Kamar</th><th>WBP</th><th>Status</th><th>Keterangan</th><th>Edit</th></tr>
-            </thead>
-            <tbody id="myRiwayatBody">
-              <tr><td colspan="7" style="padding:40px;text-align:center;color:#94a3b8">Belum ada data</td></tr>
-            </tbody>
+            <thead><tr><th>No</th><th>Waktu</th><th>Petugas</th><th>Kamar</th><th>WBP</th><th>Status</th><th>Keterangan</th></tr></thead>
+            <tbody id="myRiwayatBody"><tr><td colspan="7" style="padding:40px;text-align:center;color:#94a3b8">Memuat data...</td></tr></tbody>
           </table>
         </div>
-        <div style="padding:10px 16px;border-top:1px solid #f1f5f9">
-          <span style="font-size:12px;color:#94a3b8" id="myRiwayatCount">—</span>
-        </div>
+        <div style="padding:10px 16px;border-top:1px solid #f1f5f9"><span style="font-size:12px;color:#94a3b8" id="myRiwayatCount">—</span></div>
       </div>
     </div>
 
-    <!-- ===== PROFIL ===== -->
+    <!-- ========== PROFIL ========== -->
     <div id="page-profil" class="page-section">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <div class="card">
@@ -294,41 +198,25 @@
             <div style="font-size:18px;font-weight:800;color:#1e293b" id="profilNama">—</div>
             <div class="mt-3"><span class="badge badge-blue">Petugas / Rupam</span></div>
             <div style="margin-top:14px;padding-top:14px;border-top:1px solid #f1f5f9">
-              <div style="display:flex;justify-content:space-between;padding:6px 0">
-                <span style="font-size:12px;color:#94a3b8">Username</span>
-                <code style="font-size:12px;background:#f1f5f9;padding:2px 8px;border-radius:6px" id="profilUsername">—</code>
-              </div>
+              <div style="display:flex;justify-content:space-between;padding:6px 0"><span style="font-size:12px;color:#94a3b8">Username</span><code style="font-size:12px;background:#f1f5f9;padding:2px 8px;border-radius:6px" id="profilUsername">—</code></div>
             </div>
           </div>
         </div>
         <div class="card">
           <div class="card-header"><div class="card-title">Ganti Password</div></div>
           <div class="card-body">
-            <div style="background:#fef9c3;border:1px solid #fde68a;border-radius:10px;padding:10px 12px;font-size:12px;color:#92400e;margin-bottom:14px">
-              ⚠️ Password minimal 4 karakter.
-            </div>
-            <div class="form-group">
-              <label class="form-label">Password Baru</label>
-              <div style="position:relative">
-                <input type="password" class="form-control" id="userPwdBaru" placeholder="Min. 4 karakter" autocomplete="new-password" style="padding-right:40px"/>
-                <button type="button" onclick="togglePwd('userPwdBaru',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;padding:4px">
-                  <svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                </button>
+            <div style="background:#fef9c3;border:1px solid #fde68a;border-radius:10px;padding:10px 12px;font-size:12px;color:#92400e;margin-bottom:14px">⚠️ Setelah mengganti password, gunakan password baru saat login berikutnya.</div>
+            <div class="form-group"><label class="form-label">Password Baru</label>
+              <div style="position:relative"><input type="password" class="form-control" id="userPwdBaru" placeholder="Min. 4 karakter" autocomplete="new-password" style="padding-right:40px"/>
+                <button type="button" onclick="togglePwd('userPwdBaru')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;padding:4px"><svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
               </div>
             </div>
-            <div class="form-group">
-              <label class="form-label">Konfirmasi Password</label>
-              <div style="position:relative">
-                <input type="password" class="form-control" id="userPwdKonfirm" placeholder="Ulangi password" autocomplete="new-password" style="padding-right:40px"/>
-                <button type="button" onclick="togglePwd('userPwdKonfirm',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;padding:4px">
-                  <svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                </button>
+            <div class="form-group"><label class="form-label">Konfirmasi Password</label>
+              <div style="position:relative"><input type="password" class="form-control" id="userPwdKonfirm" placeholder="Ulangi password baru" autocomplete="new-password" style="padding-right:40px"/>
+                <button type="button" onclick="togglePwd('userPwdKonfirm')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;padding:4px"><svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
               </div>
             </div>
-            <button class="btn btn-primary" onclick="userSavePassword()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
-              Ganti Password
-            </button>
+            <button class="btn btn-primary" onclick="userSavePassword()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>Ganti Password</button>
           </div>
         </div>
       </div>
@@ -342,16 +230,13 @@
     <a href="https://tiktok.com/@wa_miranti" target="_blank" class="social-link tt-link" title="TikTok @wa_miranti"><svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V9.15a8.16 8.16 0 004.77 1.52V7.22a4.85 4.85 0 01-1-.53z"/></svg></a>
   </footer>
 </div>
-</div><!-- /appShell -->
+</div>
 
-<!-- MODAL KETERANGAN — hanya 3 opsi -->
+<!-- MODAL KETERANGAN -->
 <div class="modal-overlay" id="ketModal" style="display:none">
   <div class="modal" style="max-width:360px">
     <div class="modal-header">
-      <div>
-        <div class="modal-title">Alasan Tidak Hadir</div>
-        <div style="font-size:12px;color:#94a3b8;margin-top:2px" id="ketWbpName">—</div>
-      </div>
+      <div><div class="modal-title">Alasan Tidak Hadir</div><div style="font-size:12px;color:#94a3b8;margin-top:2px" id="ketWbpName">—</div></div>
       <button class="modal-close" onclick="closeModal('ketModal')">✕</button>
     </div>
     <div class="modal-body">
@@ -359,46 +244,31 @@
       <input type="hidden" id="editAbsenDetailId"/>
       <p style="font-size:12px;color:#64748b;margin-bottom:12px">Pilih alasan WBP tidak ada di kamar:</p>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
-        <button type="button" class="ket-opsi-btn" data-val="Rumah Sakit" onclick="pilihAlasan(this)">
-          <div style="font-size:24px;margin-bottom:4px">🏥</div><div>Rumah Sakit</div>
-        </button>
-        <button type="button" class="ket-opsi-btn" data-val="Bangkel" onclick="pilihAlasan(this)">
-          <div style="font-size:24px;margin-bottom:4px">🔧</div><div>Bangkel</div>
-        </button>
-        <button type="button" class="ket-opsi-btn" data-val="Kebun" onclick="pilihAlasan(this)">
-          <div style="font-size:24px;margin-bottom:4px">🌿</div><div>Kebun</div>
-        </button>
+        <button type="button" class="ket-opsi-btn" data-val="Rumah Sakit" onclick="pilihAlasan(this)"><div style="font-size:24px;margin-bottom:4px">🏥</div><div>Rumah Sakit</div></button>
+        <button type="button" class="ket-opsi-btn" data-val="Bangkel" onclick="pilihAlasan(this)"><div style="font-size:24px;margin-bottom:4px">🔧</div><div>Bangkel</div></button>
+        <button type="button" class="ket-opsi-btn" data-val="Kebun" onclick="pilihAlasan(this)"><div style="font-size:24px;margin-bottom:4px">🌿</div><div>Kebun</div></button>
       </div>
-      <div class="form-group">
-        <label class="form-label">Keterangan Tambahan <span style="color:#94a3b8;font-weight:400">(opsional)</span></label>
+      <div class="form-group"><label class="form-label">Keterangan Tambahan <span style="color:#94a3b8;font-weight:400">(opsional)</span></label>
         <textarea class="form-control" id="ketDetail" rows="2" placeholder="Detail tambahan..."></textarea>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('ketModal')">Batal</button>
-      <button class="btn btn-danger" onclick="saveKeterangan()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
-        Simpan
-      </button>
+      <button class="btn btn-danger" onclick="saveKeterangan()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Simpan</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL EDIT RIWAYAT USER -->
+<!-- MODAL EDIT RIWAYAT -->
 <div class="modal-overlay" id="editMyAbsenModal" style="display:none">
   <div class="modal" style="max-width:360px">
     <div class="modal-header"><div class="modal-title">Edit Absensi</div><button class="modal-close" onclick="closeModal('editMyAbsenModal')">✕</button></div>
     <div class="modal-body">
       <input type="hidden" id="editMyAbsenId"/>
-      <div class="form-group">
-        <label class="form-label">Status</label>
-        <select class="form-control" id="editMyAbsenStatus">
-          <option value="Hadir">Hadir</option>
-          <option value="Tidak Hadir">Tidak Hadir</option>
-        </select>
+      <div class="form-group"><label class="form-label">Status</label>
+        <select class="form-control" id="editMyAbsenStatus"><option value="Hadir">Hadir</option><option value="Tidak Hadir">Tidak Hadir</option></select>
       </div>
-      <div class="form-group">
-        <label class="form-label">Keterangan</label>
+      <div class="form-group"><label class="form-label">Keterangan</label>
         <select class="form-control" id="editMyAbsenKet">
           <option value="">— Tidak ada —</option>
           <option value="Rumah Sakit">🏥 Rumah Sakit</option>
@@ -409,37 +279,41 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('editMyAbsenModal')">Batal</button>
-      <button class="btn btn-primary" onclick="saveMyAbsen()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
-        Simpan
-      </button>
+      <button class="btn btn-primary" onclick="saveMyAbsen()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Simpan</button>
     </div>
   </div>
 </div>
 
 <script>
-// Splash: load logo dari DB
 async function loadSplashCfg(){
   try{
-    const{data}=await (window.sb||{from:()=>({select:()=>({maybeSingle:()=>({data:null})})})}).from('site_config').select('*').maybeSingle();
+    const{data}=await window._sbTemp?.from('site_config').select('site_name,logo_url').maybeSingle()||{data:null};
     if(!data)return;
     const sl=document.getElementById('splashLogoWrap');sl.style.animation='none';
     if(data.logo_url){const img=document.createElement('img');img.src=data.logo_url;img.style.cssText='width:100%;height:100%;object-fit:cover';sl.appendChild(img);}
-    else{sl.textContent='🏛️';sl.style.fontSize='32px';}
-    const sn=document.getElementById('splashNameWrap');sn.style.cssText='color:white;font-size:20px;font-weight:800;background:none;animation:none;height:auto;width:auto;border-radius:0;margin-bottom:6px';sn.textContent=data.site_name||'SIMAWAR';
-    const sd=document.getElementById('splashDescWrap');sd.style.cssText='color:rgba(255,255,255,.7);font-size:12px;background:none;animation:none;height:auto;width:auto;border-radius:0;text-align:center';sd.textContent=(data.site_desc||'').split('\n')[0];
+    else{sl.textContent='🏛️';sl.style.fontSize='30px';}
+    const sn=document.getElementById('splashNameWrap');sn.style.cssText='color:white;font-size:20px;font-weight:800;background:none;animation:none;height:auto;width:auto;border-radius:0;margin-bottom:5px';sn.textContent=data.site_name||'SIMAWAR';
+    const sd=document.getElementById('splashDescWrap');sd.style.cssText='color:rgba(255,255,255,.7);font-size:12px;background:none;animation:none;height:auto;width:auto;border-radius:0;text-align:center';sd.textContent='Sistem Informasi Monitoring Warga Binaan';
   }catch(e){
-    document.getElementById('splashLogoWrap').textContent='🏛️';
-    document.getElementById('splashLogoWrap').style.cssText='font-size:32px;animation:none;display:flex;align-items:center;justify-content:center';
-    document.getElementById('splashNameWrap').style.cssText='color:white;font-size:20px;font-weight:800;background:none;animation:none;height:auto;width:auto;border-radius:0;margin-bottom:6px';
-    document.getElementById('splashNameWrap').textContent='SIMAWAR';
-    document.getElementById('splashDescWrap').style.cssText='color:rgba(255,255,255,.7);font-size:12px;background:none;animation:none;height:auto;width:auto;border-radius:0;text-align:center';
-    document.getElementById('splashDescWrap').textContent='Sistem Informasi Monitoring Warga Binaan';
+    document.getElementById('splashLogoWrap').textContent='🏛️';document.getElementById('splashLogoWrap').style.cssText='font-size:30px;animation:none;justify-content:center';
+    document.getElementById('splashNameWrap').style.cssText='color:white;font-size:20px;font-weight:800;background:none;animation:none;height:auto;width:auto;border-radius:0;margin-bottom:5px';document.getElementById('splashNameWrap').textContent='SIMAWAR';
+    document.getElementById('splashDescWrap').style.cssText='color:rgba(255,255,255,.7);font-size:12px;background:none;animation:none;height:auto;width:auto;border-radius:0;text-align:center';document.getElementById('splashDescWrap').textContent='Sistem Informasi Monitoring Warga Binaan';
   }
 }
 </script>
 <script src="js/config.js"></script>
-<script>loadSplashCfg().catch(()=>{});</script>
+<script>
+// Config sudah load, sekarang load splash
+(async()=>{
+  window._sbTemp=sb;
+  await loadSplashCfg().catch(()=>{});
+})();
+
+// Style tombol ket-opsi
+const _ks=document.createElement('style');
+_ks.textContent='.ket-opsi-btn{background:#f8fafc;border:2px solid #e2e8f0;border-radius:14px;padding:14px 8px;font-size:12px;font-weight:700;color:#374151;cursor:pointer;transition:all .15s;text-align:center;line-height:1.6;width:100%}.ket-opsi-btn:hover,.ket-opsi-btn.active{background:#eff6ff;border-color:#3b82f6;color:#1d4ed8}';
+document.head.appendChild(_ks);
+</script>
 <script src="js/user.js"></script>
 </body>
 </html>
