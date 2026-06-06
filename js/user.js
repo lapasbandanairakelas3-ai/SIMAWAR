@@ -128,8 +128,11 @@ async function loadWbpUntukAbsen(blokId){
   // Pre-fill absenData dari data yang sudah ada
   (sudahAbsen||[]).forEach(a=>{absenData[a.wbp_id]={status:a.status,keterangan:a.keterangan||'',sudahAbsen:true};});
 
-  document.getElementById('absenBar').style.display='block';
+  document.getElementById('absenBar').style.display='none'; // sticky bar dihapus
   renderKartu();updateProgress();
+  // Tampilkan tombol simpan non-sticky di bawah grid
+  const simpanWrap = document.getElementById('simpanWrap');
+  if (simpanWrap) simpanWrap.style.display = 'block';
 }
 
 function renderKartu(){
@@ -158,14 +161,13 @@ function renderKartu(){
         <div style="width:100%;aspect-ratio:1/1;background:linear-gradient(135deg,#dbeafe,#e0e7ff);overflow:hidden">
           <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:900;color:rgba(59,130,246,0.25)">${w.nama?.[0]||'?'}</div>
         </div>
-        <!-- Blok badge -->
-        <div style="background:rgba(30,64,175,0.82);color:white;font-size:10px;font-weight:700;text-align:center;padding:3px 4px">${selectedKamar?.nama||''}</div>
+        <!-- Nama WBP di bawah foto, bukan nama kamar -->
+        <div style="background:rgba(30,64,175,0.82);color:white;font-size:11px;font-weight:800;text-align:center;padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${w.nama}</div>
       </div>
-      <!-- INFO: hanya nama, no reg, perkara, putusan, ekspirasi -->
-      <div style="padding:10px 10px 0">
-        <div style="font-size:13px;font-weight:800;color:#1e293b;line-height:1.3">${w.nama}</div>
-        <div style="font-size:10px;color:#94a3b8;margin-top:1px">${w.no_registrasi||'—'}</div>
-        ${w.kasus?`<div style="font-size:10px;color:#64748b;margin-top:4px"><b style="color:#94a3b8">Perkara:</b> ${w.kasus}</div>`:''}
+      <!-- INFO: no reg, perkara, putusan (nama sudah di badge bawah foto) -->
+      <div style="padding:8px 10px 0">
+        <div style="font-size:10px;color:#94a3b8">${w.no_registrasi||'—'}</div>
+        ${w.kasus?`<div style="font-size:10px;color:#64748b;margin-top:3px"><b style="color:#94a3b8">Perkara:</b> ${w.kasus}</div>`:''}
         ${w.masa_pidana?`<div style="font-size:10px;font-weight:700;color:#1e293b;margin-top:2px"><b style="color:#94a3b8">Putusan:</b> ${w.masa_pidana}</div>`:''}
       </div>
       <!-- Ekspirasi -->
@@ -255,9 +257,14 @@ async function saveKeterangan(){
 function updateProgress(){
   const total=wbpList.length,hadir=Object.values(absenData).filter(d=>d.status==='Hadir').length,tidak=Object.values(absenData).filter(d=>d.status==='Tidak Hadir').length,done=hadir+tidak;
   const pct=total?Math.round(done/total*100):0;
-  document.getElementById('progressBar').style.width=pct+'%';document.getElementById('progressText').textContent=`${done} / ${total}`;
-  document.getElementById('cntHadir').textContent=`${hadir} Hadir`;document.getElementById('cntTidak').textContent=`${tidak} Tidak`;document.getElementById('cntBelum').textContent=`${total-done} Belum`;
-  document.getElementById('barSummary').textContent=`${done} dari ${total} WBP sudah diabsen`;
+  const pb=document.getElementById('progressBar');if(pb)pb.style.width=pct+'%';
+  const pt=document.getElementById('progressText');if(pt)pt.textContent=`${done} / ${total}`;
+  const elH=document.getElementById('cntHadir');if(elH)elH.textContent=`${hadir} Hadir`;
+  const elT=document.getElementById('cntTidak');if(elT)elT.textContent=`${tidak} Tidak`;
+  const elB=document.getElementById('cntBelum');if(elB)elB.textContent=`${total-done} Belum`;
+  const bs=document.getElementById('barSummary');if(bs)bs.textContent=`${done} dari ${total} WBP sudah diabsen`;
+  // Tampilkan progressInfo
+  const pi=document.getElementById('progressInfo');if(pi)pi.style.display='flex';
 }
 
 async function backToStep1(){
@@ -266,7 +273,14 @@ async function backToStep1(){
   else{await releaseSession();resetStep();}
 }
 async function releaseSession(){if(!activeSessionId)return;await sb.from('absen_session').update({selesai:true}).eq('id',activeSessionId);activeSessionId=null;}
-function resetStep(){selectedKamar=null;absenData={};wbpList=[];document.getElementById('step2').style.display='none';document.getElementById('step1').style.display='block';loadKamarPicker();}
+function resetStep(){
+  selectedKamar=null;absenData={};wbpList=[];
+  document.getElementById('step2').style.display='none';
+  document.getElementById('step1').style.display='block';
+  const sw=document.getElementById('simpanWrap');if(sw)sw.style.display='none';
+  const pi=document.getElementById('progressInfo');if(pi)pi.style.display='none';
+  loadKamarPicker();
+}
 
 async function submitAbsen(){
   const total=wbpList.length;

@@ -199,7 +199,7 @@
               <div style="font-size:11px;color:#94a3b8" id="step2Tanggal"></div>
             </div>
           </div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <div style="display:flex;gap:6px;flex-wrap:wrap" id="headerBadges">
             <span class="badge badge-green" id="cntHadir">0 Hadir</span>
             <span class="badge badge-red"   id="cntTidak">0 Tidak</span>
             <span class="badge badge-gray"  id="cntBelum">0 Belum</span>
@@ -217,6 +217,14 @@
           </div>
         </div>
 
+        <!-- Progress info (tidak sticky) -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px" id="progressInfo" style="display:none">
+          <span class="badge badge-green" id="cntHadir">0 Hadir</span>
+          <span class="badge badge-red"   id="cntTidak">0 Tidak</span>
+          <span class="badge badge-gray"  id="cntBelum">0 Belum</span>
+          <span style="font-size:12px;color:#64748b;margin-left:4px" id="barSummary"></span>
+        </div>
+
         <!-- WBP Grid -->
         <div class="wbp-absen-grid" id="wbpAbsenGrid">
           <div style="height:240px;background:#f1f5f9;border-radius:16px;animation:swpulse 1.5s infinite"></div>
@@ -224,15 +232,17 @@
           <div style="height:240px;background:#f1f5f9;border-radius:16px;animation:swpulse 1.5s infinite"></div>
         </div>
 
-        <!-- Sticky bar -->
-        <div class="absen-bar" id="absenBar" style="display:none">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-            <span style="font-size:12px;color:#64748b" id="barSummary">—</span>
-            <button class="btn btn-success" onclick="submitAbsen()" id="btnSubmit" style="white-space:nowrap;padding:10px 18px">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
-              Simpan Absensi
-            </button>
-          </div>
+        <!-- Tombol simpan — bukan sticky, di bawah grid -->
+        <div id="simpanWrap" style="display:none;margin-top:20px;text-align:right">
+          <button class="btn btn-success" onclick="submitAbsen()" id="btnSubmit" style="padding:12px 28px;font-size:14px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+            Simpan Absensi
+          </button>
+        </div>
+
+        <!-- Hidden sticky bar (tidak dipakai, tapi ID dipertahankan agar JS tidak error) -->
+        <div id="absenBar" style="display:none">
+          <span id="dummy_summary"></span>
         </div>
       </div>
     </div>
