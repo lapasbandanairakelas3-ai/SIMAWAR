@@ -264,13 +264,18 @@
 
 <!-- MODAL EDIT KETERANGAN RIWAYAT -->
 <div class="modal-overlay" id="editMyAbsenModal" style="display:none">
-  <div class="modal" style="max-width:360px">
+  <div class="modal" style="max-width:400px">
     <div class="modal-header"><div class="modal-title">Edit Keterangan</div><button class="modal-close" onclick="closeModal('editMyAbsenModal')">✕</button></div>
     <div class="modal-body">
       <input type="hidden" id="editMyAbsenId"/>
-      <div class="form-group"><label class="form-label">Keterangan</label>
-        <input type="text" class="form-control" id="editMyAbsenKet" placeholder="Contoh: Di Bengkel, Di Kebun..."/>
-        <p style="font-size:11px;color:#94a3b8;margin-top:4px">Kosongkan jika tidak ada keterangan khusus.</p>
+      <div class="form-group"><label class="form-label">Keterangan <span style="color:#94a3b8;font-weight:400">(pilih jika ada)</span></label>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px">
+          <button type="button" class="ket-opsi-btn" data-val="Di Bengkel" onclick="pilihAlasanMyEdit(this)"><div style="font-size:20px;margin-bottom:3px">🔧</div><div>Bengkel</div></button>
+          <button type="button" class="ket-opsi-btn" data-val="Di Kebun"   onclick="pilihAlasanMyEdit(this)"><div style="font-size:20px;margin-bottom:3px">🌿</div><div>Kebun</div></button>
+          <button type="button" class="ket-opsi-btn" data-val="Di Rumah Sakit" onclick="pilihAlasanMyEdit(this)"><div style="font-size:20px;margin-bottom:3px">🏥</div><div>Rumah Sakit</div></button>
+        </div>
+        <input type="text" class="form-control" id="editMyAbsenKetExtra" placeholder="Keterangan tambahan (opsional)"/>
+        <p style="font-size:11px;color:#94a3b8;margin-top:5px">Biarkan kosong jika tidak ada keterangan.</p>
       </div>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('editMyAbsenModal')">Batal</button><button class="btn btn-primary" onclick="saveMyAbsen()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Simpan</button></div>

@@ -315,16 +315,16 @@ async function loadRiwayatFilters(){
 async function loadRiwayat(){
   const tbody=document.getElementById('riwayatTableBody');
   if(tbody)tbody.innerHTML=skel(16,9).repeat(4);
-  // Sync visual state tombol preset
+  // Sync visual state tombol preset (tanpa reload ulang)
   const preset=document.getElementById('riwayatPreset')?.value||'today';
-  setPresetAdmin(preset);
+  setPresetAdmin(preset, false);
   const dari=document.getElementById('riwayatDari')?.value||'';
   const sampai=document.getElementById('riwayatSampai')?.value||'';
   const blok=document.getElementById('riwayatBlokFilter')?.value||'';
   const peg=document.getElementById('riwayatPegawaiFilter')?.value||'';
   const search=document.getElementById('riwayatSearch')?.value.trim()||'';
   const shiftF=document.getElementById('riwayatShiftFilter')?.value||'';
-  const preset=document.getElementById('riwayatPreset')?.value||'';
+  // preset sudah dideklarasi di atas
   let realDari=dari,realSampai=sampai;
   if(preset==='today'){realDari=realSampai=todayWIT();}
   else if(preset==='month'){const d=new Date();const y=d.getFullYear();const m=String(d.getMonth()+1).padStart(2,'0');realDari=`${y}-${m}-01`;realSampai=todayWIT();}
@@ -356,22 +356,37 @@ async function loadRiwayat(){
   document.getElementById('riwayatPagination').innerHTML=tot>1?Array.from({length:Math.min(tot,10)},(_,i)=>`<button onclick="riwayatPage=${i+1};loadRiwayat()" class="btn btn-sm ${i+1===riwayatPage?'btn-primary':'btn-ghost'}" style="min-width:32px">${i+1}</button>`).join(''):'';
 }
 // Edit hanya keterangan
+function pilihAlasanEdit(btn){document.querySelectorAll('#editAbsenModal .ket-opsi-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+
 function editAbsen(id,status,ket){
   document.getElementById('editAbsenId').value=id;
-  document.getElementById('editAbsenKet').value=ket||'';
-  document.getElementById('editAbsenStatusShow').textContent=status||'—';
+  document.getElementById('editAbsenStatusShow').textContent=status||'Hadir';
+  // Reset pilihan
+  document.querySelectorAll('#editAbsenModal .ket-opsi-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('editAbsenKetExtra').value='';
+  // Pre-select keterangan yang sudah ada
+  if(ket){
+    const parts=ket.split(' - ');
+    const btn=document.querySelector(`#editAbsenModal .ket-opsi-btn[data-val="${parts[0]}"]`);
+    if(btn){btn.classList.add('active');document.getElementById('editAbsenKetExtra').value=parts.slice(1).join(' - ');}
+    else{document.getElementById('editAbsenKetExtra').value=ket;}
+  }
   openModal('editAbsenModal');
 }
 async function saveAbsen(){
   const id=document.getElementById('editAbsenId').value;
-  const ket=document.getElementById('editAbsenKet').value;
+  const aktif=document.querySelector('#editAbsenModal .ket-opsi-btn.active');
+  const extra=document.getElementById('editAbsenKetExtra')?.value.trim()||'';
+  let ket='';
+  if(aktif){ket=extra?`${aktif.dataset.val} - ${extra}`:aktif.dataset.val;}
+  else if(extra){ket=extra;}
   const{error}=await sb.from('absen_detail').update({keterangan:ket||null}).eq('id',id);
   if(error){showAlert('error','Gagal',error.message);return;}
   showAlert('success','Diperbarui','Keterangan diperbarui.');closeModal('editAbsenModal');loadRiwayat();
 }
 async function deleteAbsen(id){showConfirm('Hapus','Yakin hapus data absensi ini?',async()=>{const{error}=await sb.from('absen_detail').delete().eq('id',id);if(error){showAlert('error','Gagal',error.message);return;}showAlert('success','Dihapus','Data dihapus.');loadRiwayat();});}
-function setPresetAdmin(val){
-  document.getElementById('riwayatPreset').value=val;
+function setPresetAdmin(val, reload=true){
+  const el=document.getElementById('riwayatPreset');if(el)el.value=val;
   // Update visual active state
   const btns={today:'presetBtnToday',month:'presetBtnMonth',custom:'presetBtnCustom'};
   Object.entries(btns).forEach(([k,id])=>{
@@ -385,7 +400,7 @@ function setPresetAdmin(val){
   // Tampilkan/sembunyikan date picker
   const datePickers=document.querySelectorAll('#riwayatDari,#riwayatSampai');
   datePickers.forEach(el=>{if(el)el.style.display=val==='custom'?'':'none';});
-  loadRiwayat();
+  if(reload)loadRiwayat();
 }
 function resetRiwayatFilter(){
   const today=todayWIT();
