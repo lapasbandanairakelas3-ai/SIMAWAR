@@ -78,3 +78,20 @@ SELECT
 FROM information_schema.columns 
 WHERE table_name = 'absen_detail'
   AND column_name IN ('shift','status');
+
+-- ── STEP 9: Hapus tabel absen_session (tidak dipakai lagi) ──
+-- Karena tidak pakai sesi rupam, hapus juga index-nya:
+-- DROP INDEX IF EXISTS idx_sesi_aktif_shift;
+-- DROP TABLE IF EXISTS absen_session;
+
+-- Atau cukup kosongkan saja (aman):
+-- TRUNCATE absen_session;
+
+-- ── STEP 10: Update status absen yang masih Di Kamar/Lainnya menjadi Hadir ──
+-- Karena sekarang hanya 1 status: Hadir
+-- Update constraint dulu:
+ALTER TABLE absen_detail DROP CONSTRAINT IF EXISTS absen_detail_status_check;
+-- Ganti semua status ke Hadir karena sistem baru hanya pakai Hadir
+UPDATE absen_detail SET status = 'Hadir' WHERE status IN ('Di Kamar','Lainnya','Di Bengkel','Di Kebun','Di Rumah Sakit');
+-- Tambah constraint baru
+ALTER TABLE absen_detail ADD CONSTRAINT absen_detail_status_check CHECK (status = 'Hadir');

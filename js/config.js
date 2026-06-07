@@ -1,9 +1,6 @@
-// ============================================================
-// KONFIGURASI - Ganti dengan kredensial Anda
-// ============================================================
-const SUPABASE_URL = 'https://ulxghrhnovtkodqpubbr.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseGdocmhub3Z0a29kcXB1YmJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MDAwMTUsImV4cCI6MjA5NjE3NjAxNX0.GdjCCY5RN3nLeAlYqibMWV_AyNw14zZIkMCZqMtzYIc';
-
+// SIMAWAR config.js v8
+const SUPABASE_URL      = 'https://YOUR_PROJECT.supabase.co';
+const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -33,7 +30,15 @@ const STATUS_TC    = { 'Di Kamar':'#065f46','Di Bengkel':'#92400e','Di Kebun':'#
 
 function statusBadge(status) {
   const s = status || '—';
-  return `<span style="background:${STATUS_BG[s]||'#f1f5f9'};color:${STATUS_TC[s]||'#475569'};padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;white-space:nowrap">${STATUS_ICON[s]||''} ${s}</span>`;
+  // Status sekarang hanya Hadir
+  if(s === 'Hadir' || s === 'Di Kamar') {
+    return `<span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">✅ Hadir</span>`;
+  }
+  // Legacy status
+  const bg = STATUS_BG[s] || '#f1f5f9';
+  const tc = STATUS_TC[s] || '#475569';
+  const ic = STATUS_ICON[s] || '';
+  return `<span style="background:${bg};color:${tc};padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;white-space:nowrap">${ic} ${s}</span>`;
 }
 
 // ── TIMEZONE WIT ─────────────────────────────────────────────

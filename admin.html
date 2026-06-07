@@ -103,7 +103,7 @@
           <select class="form-control" style="width:auto;min-width:130px" id="wbpBlokFilter" onchange="loadWbp()"><option value="">Semua Blok</option></select>
           <select class="form-control" style="width:auto" id="wbpJkFilter" onchange="loadWbp()"><option value="">Semua JK</option><option value="L">Laki-laki</option><option value="P">Perempuan</option></select>
         </div>
-        <div class="table-container"><table><thead><tr><th>No</th><th>Nama WBP</th><th>No. Reg</th><th>JK</th><th>Blok/Kamar</th><th>Masa Pidana</th><th>Aksi</th></tr></thead><tbody id="wbpTableBody"></tbody></table></div>
+        <div class="table-container"><table><thead><tr><th>No</th><th>Nama WBP</th><th>JK</th><th>Blok/Kamar</th><th>Perkara</th><th>Masa Pidana</th><th>Aksi</th></tr></thead><tbody id="wbpTableBody"></tbody></table></div>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid #f1f5f9"><span style="font-size:12px;color:#94a3b8" id="wbpCount">—</span><div style="display:flex;gap:6px" id="wbpPagination"></div></div>
       </div>
     </div>
@@ -127,7 +127,7 @@
       <div class="card">
         <div class="card-header"><div class="card-title">Kelola Blok / Kamar</div><button class="btn btn-primary btn-sm" onclick="openBlokModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg> Tambah Blok</button></div>
         <div class="filter-bar"><div class="search-input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg><input type="text" id="blokSearch" placeholder="Cari blok..." oninput="debounce(loadBlok)"/></div></div>
-        <div class="table-container"><table><thead><tr><th>No</th><th>Nama Blok</th><th>Kapasitas</th><th>JK</th><th>Isi / Kapasitas</th><th>Aksi</th></tr></thead><tbody id="blokTableBody"></tbody></table></div>
+        <div class="table-container"><table><thead><tr><th>No</th><th>Nama Blok</th><th>Isi / Kapasitas</th><th>JK</th><th>Aksi</th></tr></thead><tbody id="blokTableBody"></tbody></table></div>
         <div style="padding:10px 16px;border-top:1px solid #f1f5f9"><span style="font-size:12px;color:#94a3b8" id="blokCount">—</span></div>
       </div>
     </div>
@@ -137,6 +137,12 @@
       <div class="card">
         <div style="background:#fef9c3;border:1px solid #fde68a;border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#92400e">📊 <strong>Riwayat Absensi</strong> — Semua catatan absensi dari seluruh petugas. Filter berdasarkan tanggal, kamar, atau petugas. Klik ✏️ untuk koreksi data.</div>
         <div class="card-header"><div class="card-title">Riwayat Absensi (Semua Petugas)</div><button class="btn btn-success btn-sm" onclick="exportRiwayat()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg> Ekspor PDF</button></div>
+        <input type="hidden" id="riwayatPreset" value="today"/>
+        <div style="display:flex;gap:8px;padding:10px 16px 0;flex-wrap:wrap">
+          <button onclick="setPresetAdmin('today')" class="btn btn-sm" style="background:#eff6ff;color:#1d4ed8;border:1.5px solid #bfdbfe;font-size:12px">Hari Ini</button>
+          <button onclick="setPresetAdmin('month')" class="btn btn-sm" style="background:#f0fdf4;color:#166534;border:1.5px solid #bbf7d0;font-size:12px">Bulan Ini</button>
+          <button onclick="setPresetAdmin('custom')" class="btn btn-sm btn-ghost" style="font-size:12px">Pilih Tanggal</button>
+        </div>
         <div class="filter-bar" style="flex-wrap:wrap;gap:8px">
           <div class="search-input" style="min-width:150px;flex:1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg><input type="text" id="riwayatSearch" placeholder="Cari WBP / petugas..." oninput="debounce(loadRiwayat)"/></div>
           <input type="date" class="form-control" style="width:auto" id="riwayatDari" onchange="loadRiwayat()"/>
@@ -151,7 +157,7 @@
           </select>
           <button class="btn btn-ghost btn-sm" onclick="resetRiwayatFilter()">Reset</button>
         </div>
-        <div class="table-container"><table><thead><tr><th>No</th><th>Waktu</th><th>Shift</th><th>Petugas</th><th>Status</th><th>Blok</th><th>WBP</th><th>Keterangan</th><th>Aksi</th></tr></thead><tbody id="riwayatTableBody"></tbody></table></div>
+        <div class="table-container"><table><thead><tr><th>No</th><th>Waktu</th><th>Shift</th><th>Petugas</th><th>Kamar</th><th>WBP</th><th>Status</th><th>Keterangan</th><th>Aksi</th></tr></thead><tbody id="riwayatTableBody"></tbody></table></div>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid #f1f5f9"><span style="font-size:12px;color:#94a3b8" id="riwayatCount">—</span><div style="display:flex;gap:6px" id="riwayatPagination"></div></div>
       </div>
     </div>
@@ -340,6 +346,12 @@ async function loadSplashCfg(){
   }
 }
 </script>
+  <!-- MODAL LIHAT WBP -->
+  <div class="modal-overlay" id="showWbpModal" style="display:none"><div class="modal" style="max-width:440px">
+    <div class="modal-header"><div class="modal-title">Detail WBP</div><button class="modal-close" onclick="closeModal('showWbpModal')">✕</button></div>
+    <div class="modal-body" id="showWbpContent"></div>
+    <div class="modal-footer"><button class="btn btn-primary" onclick="closeModal('showWbpModal')">Tutup</button></div>
+  </div></div>
 <script src="js/config.js"></script>
 <script>loadSplashCfg().catch(()=>{});</script>
 <script src="js/admin.js"></script>

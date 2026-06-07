@@ -46,8 +46,8 @@
     <div class="sidebar-brand-text"><div class="sidebar-brand-name" id="sidebarName">SIMAWAR</div><div class="sidebar-brand-sub">Portal Petugas</div></div>
   </div>
   <nav class="sidebar-nav"><div class="nav-section"><div class="nav-section-title">Menu</div>
-    <div class="nav-item" id="nav-dashboard" onclick="goPage('dashboard')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>Dashboard</div>
-    <div class="nav-item active" id="nav-absen" onclick="goPage('absen')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>Absensi WBP</div>
+    <div class="nav-item active" id="nav-dashboard" onclick="goPage('dashboard')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>Dashboard</div>
+    <div class="nav-item" id="nav-absen" onclick="goPage('absen')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>Absensi WBP</div>
     <div class="nav-item" id="nav-riwayat" onclick="goPage('riwayat')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6M7 7h10M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg></div>Riwayat</div>
     <div class="nav-item" id="nav-profil" onclick="goPage('profil')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>Profil</div>
   </div></nav>
@@ -187,7 +187,7 @@
           <button class="btn btn-ghost btn-sm" onclick="resetMyRiwayat()">Reset</button>
         </div>
         <div class="table-container">
-          <table><thead><tr><th>No</th><th>Waktu</th><th>Shift</th><th>Petugas</th><th>Kamar</th><th>WBP</th><th>Status</th><th>Aksi</th></tr></thead>
+          <table><thead><tr><th>No</th><th>Waktu</th><th>Shift</th><th>Petugas</th><th>Kamar</th><th>WBP</th><th>Status</th><th>Keterangan</th><th>Aksi</th></tr></thead>
           <tbody id="myRiwayatBody"><tr><td colspan="8" style="padding:40px;text-align:center;color:#94a3b8">Memuat...</td></tr></tbody></table>
         </div>
         <div style="padding:10px 16px;border-top:1px solid #f1f5f9"><span style="font-size:12px;color:#94a3b8" id="myRiwayatCount">—</span></div>
@@ -229,39 +229,48 @@
 </div>
 </div>
 
-<!-- MODAL LOKASI WBP -->
+<!-- MODAL KETERANGAN ABSENSI -->
 <div class="modal-overlay" id="ketModal" style="display:none">
-  <div class="modal" style="max-width:340px">
-    <div class="modal-header"><div><div class="modal-title">WBP Sedang Di Mana?</div><div style="font-size:12px;color:#94a3b8;margin-top:2px" id="ketWbpName">—</div></div><button class="modal-close" onclick="closeModal('ketModal')">✕</button></div>
+  <div class="modal" style="max-width:360px">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Keterangan Absensi</div>
+        <div style="font-size:12px;color:#94a3b8;margin-top:2px" id="ketWbpName">—</div>
+      </div>
+      <button class="modal-close" onclick="tutupKetModal()">✕</button>
+    </div>
     <div class="modal-body">
       <input type="hidden" id="ketWbpId"/>
+      <p style="font-size:12px;color:#64748b;margin-bottom:10px">WBP sudah ditandai <strong>Hadir</strong>. Tambahkan keterangan jika WBP sedang di luar kamar:</p>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
         <button type="button" class="ket-opsi-btn" data-val="Di Bengkel" onclick="pilihAlasan(this)"><div style="font-size:22px;margin-bottom:4px">🔧</div><div>Bengkel</div></button>
         <button type="button" class="ket-opsi-btn" data-val="Di Kebun"   onclick="pilihAlasan(this)"><div style="font-size:22px;margin-bottom:4px">🌿</div><div>Kebun</div></button>
-        <button type="button" class="ket-opsi-btn" data-val="Di Rumah Sakit" onclick="pilihAlasan(this)"><div style="font-size:22px;margin-bottom:4px">🏥</div><div>RS</div></button>
+        <button type="button" class="ket-opsi-btn" data-val="Di Rumah Sakit" onclick="pilihAlasan(this)"><div style="font-size:22px;margin-bottom:4px">🏥</div><div>Rumah Sakit</div></button>
       </div>
-      <div class="form-group"><label class="form-label">Keterangan Tambahan <span style="color:#94a3b8;font-weight:400">(opsional)</span></label><textarea class="form-control" id="ketDetail" rows="2" placeholder="Detail..."></textarea></div>
+      <div class="form-group">
+        <label class="form-label">Keterangan Tambahan <span style="color:#94a3b8;font-weight:400">(opsional)</span></label>
+        <textarea class="form-control" id="ketDetail" rows="2" placeholder="Detail tambahan..."></textarea>
+      </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('ketModal')">Batal</button><button class="btn btn-warning" onclick="saveKeterangan()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Simpan</button></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="tutupKetModal()">Lewati</button>
+      <button class="btn btn-success" onclick="saveKeterangan()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Simpan
+      </button>
+    </div>
   </div>
 </div>
 
-<!-- MODAL EDIT RIWAYAT -->
+<!-- MODAL EDIT KETERANGAN RIWAYAT -->
 <div class="modal-overlay" id="editMyAbsenModal" style="display:none">
   <div class="modal" style="max-width:360px">
-    <div class="modal-header"><div class="modal-title">Edit Absensi</div><button class="modal-close" onclick="closeModal('editMyAbsenModal')">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Edit Keterangan</div><button class="modal-close" onclick="closeModal('editMyAbsenModal')">✕</button></div>
     <div class="modal-body">
       <input type="hidden" id="editMyAbsenId"/>
-      <div class="form-group"><label class="form-label">Status</label>
-        <select class="form-control" id="editMyAbsenStatus">
-          <option value="Di Kamar">✅ Di Kamar</option>
-          <option value="Di Bengkel">🔧 Di Bengkel</option>
-          <option value="Di Kebun">🌿 Di Kebun</option>
-          <option value="Di Rumah Sakit">🏥 Di Rumah Sakit</option>
-          <option value="Lainnya">📌 Lainnya</option>
-        </select>
+      <div class="form-group"><label class="form-label">Keterangan</label>
+        <input type="text" class="form-control" id="editMyAbsenKet" placeholder="Contoh: Di Bengkel, Di Kebun..."/>
+        <p style="font-size:11px;color:#94a3b8;margin-top:4px">Kosongkan jika tidak ada keterangan khusus.</p>
       </div>
-      <div class="form-group"><label class="form-label">Keterangan</label><input type="text" class="form-control" id="editMyAbsenKet" placeholder="Keterangan opsional"/></div>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('editMyAbsenModal')">Batal</button><button class="btn btn-primary" onclick="saveMyAbsen()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Simpan</button></div>
   </div>
