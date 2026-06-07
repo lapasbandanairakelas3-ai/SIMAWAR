@@ -144,7 +144,7 @@ async function doLogin() {
   if(!password){showAlert('warning','Perhatian','Password wajib diisi!');return;}
   btn.disabled=true; btnTxt.textContent='Memverifikasi...';
   try {
-    const {data:pg,error:pe}=await sb.from('pegawai').select('id,user_id,nama,username,password_plain,role').eq('username',username).maybeSingle();
+    const {data:pg,error:pe}=await sb.from('pegawai').select('id,user_id,nama,username,password_plain,is_admin').eq('username',username).maybeSingle();
     if(pe||!pg){showAlert('error','Login Gagal','Username tidak ditemukan!');btn.disabled=false;btnTxt.textContent='Masuk';return;}
     if(password!==pg.password_plain){showAlert('error','Login Gagal','Password salah!');btn.disabled=false;btnTxt.textContent='Masuk';return;}
     sessionStorage.setItem('sw_id',pg.id);
