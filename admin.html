@@ -78,6 +78,15 @@
         <div class="stat-card"><div class="stat-icon bg-purple-50" style="height:48px;animation:swpulse 1.5s infinite"></div><div style="height:28px;background:#f1f5f9;border-radius:8px;width:60px;margin-top:14px;animation:swpulse 1.5s infinite"></div><div style="height:12px;background:#f1f5f9;border-radius:6px;width:80px;margin-top:8px;animation:swpulse 1.5s infinite"></div></div>
       </div>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <!-- Status shift hari ini -->
+        <div class="card mb-4" style="padding:14px 16px">
+          <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:10px">Status Shift Hari Ini</div>
+          <div id="dashShiftStatus" style="display:flex;gap:8px;flex-wrap:wrap">
+            <div style="height:28px;width:100px;background:#f1f5f9;border-radius:20px;animation:swpulse 1.5s infinite"></div>
+            <div style="height:28px;width:100px;background:#f1f5f9;border-radius:20px;animation:swpulse 1.5s infinite"></div>
+            <div style="height:28px;width:100px;background:#f1f5f9;border-radius:20px;animation:swpulse 1.5s infinite"></div>
+          </div>
+        </div>
         <div class="card"><div class="card-header"><div><div class="card-title">WBP Belum Diabsen Hari Ini</div><div style="font-size:12px;color:#94a3b8;margin-top:2px" id="dashTodayDate"></div></div><button class="btn btn-ghost btn-sm" onclick="loadDashboard()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>Refresh</button></div><div id="dashBelumAbsen" style="padding:12px"><div style="height:40px;background:#f1f5f9;border-radius:8px;animation:swpulse 1.5s infinite"></div></div></div>
         <div class="card"><div class="card-header"><div class="card-title">Status Kamar</div><button class="btn btn-ghost btn-sm" onclick="loadDashboard()">Refresh</button></div><div class="card-body"><div class="kamar-grid" id="dashBlokGrid"><div style="height:80px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div><div style="height:80px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div></div></div></div>
       </div>
@@ -134,9 +143,15 @@
           <input type="date" class="form-control" style="width:auto" id="riwayatSampai" onchange="loadRiwayat()"/>
           <select class="form-control" style="width:auto;min-width:120px" id="riwayatBlokFilter" onchange="loadRiwayat()"><option value="">Semua Blok</option></select>
           <select class="form-control" style="width:auto;min-width:130px" id="riwayatPegawaiFilter" onchange="loadRiwayat()"><option value="">Semua Petugas</option></select>
+          <select class="form-control" style="width:auto" id="riwayatShiftFilter" onchange="loadRiwayat()">
+            <option value="">Semua Shift</option>
+            <option value="Pagi">🌅 Pagi</option>
+            <option value="Siang">☀️ Siang</option>
+            <option value="Sore">🌇 Sore</option>
+          </select>
           <button class="btn btn-ghost btn-sm" onclick="resetRiwayatFilter()">Reset</button>
         </div>
-        <div class="table-container"><table><thead><tr><th>No</th><th>Waktu</th><th>Petugas</th><th>Status</th><th>Blok</th><th>WBP</th><th>Keterangan</th><th>Aksi</th></tr></thead><tbody id="riwayatTableBody"></tbody></table></div>
+        <div class="table-container"><table><thead><tr><th>No</th><th>Waktu</th><th>Shift</th><th>Petugas</th><th>Status</th><th>Blok</th><th>WBP</th><th>Keterangan</th><th>Aksi</th></tr></thead><tbody id="riwayatTableBody"></tbody></table></div>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid #f1f5f9"><span style="font-size:12px;color:#94a3b8" id="riwayatCount">—</span><div style="display:flex;gap:6px" id="riwayatPagination"></div></div>
       </div>
     </div>

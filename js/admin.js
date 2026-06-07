@@ -120,39 +120,42 @@ async function loadDashboard(){
 }
 
 async function loadDashBelumAbsen(today){
-  const container=document.getElementById('dashBelumAbsen');
-  if(!container)return;
-  container.innerHTML='<div style="padding:16px;display:flex;flex-direction:column;gap:8px">'+
-    '<div style="height:32px;background:#f1f5f9;border-radius:8px;animation:swpulse 1.5s infinite"></div>'.repeat(3)+'</div>';
+  const container=document.getElementById('dashBelumAbsen');if(!container)return;
+  container.innerHTML='<div style="padding:12px;display:flex;flex-direction:column;gap:8px">'+'<div style="height:32px;background:#f1f5f9;border-radius:8px;animation:swpulse 1.5s infinite"></div>'.repeat(3)+'</div>';
 
-  // Ambil semua blok
-  const{data:bloks}=await sb.from('blok').select('id,nama');
-  if(!bloks?.length){container.innerHTML=`<div style="padding:24px;text-align:center;color:#94a3b8;font-size:13px">Belum ada kamar/blok</div>`;return;}
+  // Status shift hari ini
+  const shiftEl=document.getElementById('dashShiftStatus');
+  if(shiftEl){
+    const{data:shiftData}=await sb.from('absen_detail').select('shift').eq('tanggal',today);
+    const done=new Set((shiftData||[]).map(d=>d.shift));
+    shiftEl.innerHTML=['Pagi','Siang','Sore'].map(sh=>{const ok=done.has(sh);return`<span style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;background:${ok?SHIFT_BG[sh]:'#f1f5f9'};color:${ok?SHIFT_TC[sh]:'#94a3b8'};border:1.5px solid ${ok?SHIFT_COLOR[sh]:'#e2e8f0'}">${SHIFT_ICON[sh]} ${sh}: ${ok?'✅':'⏳'}</span>`;}).join('');
+  }
 
-  // Ambil WBP per blok dan absensi hari ini
-  const[wbpRes,absenRes]=await Promise.all([
+  const[blokRes,wbpRes,absenRes]=await Promise.all([
+    sb.from('blok').select('id,nama'),
     sb.from('wbp').select('id,nama,blok_id'),
-    sb.from('absen_detail').select('wbp_id').eq('tanggal',today)
+    sb.from('absen_detail').select('wbp_id,shift').eq('tanggal',today)
   ]);
-  const allWbp=wbpRes.data||[];
-  const absenSet=new Set((absenRes.data||[]).map(a=>a.wbp_id));
+  const bloks=blokRes.data||[],allWbp=wbpRes.data||[];
+  const absenMap={};(absenRes.data||[]).forEach(a=>{if(!absenMap[a.wbp_id])absenMap[a.wbp_id]=[];absenMap[a.wbp_id].push(a.shift);});
+  if(!bloks.length){container.innerHTML=`<div style="padding:24px;text-align:center;color:#94a3b8;font-size:13px">Belum ada kamar</div>`;return;}
 
-  let html='';
-  let adaBelum=false;
+  const currentShift=getShiftNow();
+  let html='',adaBelum=false;
   bloks.forEach(b=>{
     const wbpBlok=allWbp.filter(w=>w.blok_id===b.id);
-    const belum=wbpBlok.filter(w=>!absenSet.has(w.id));
-    if(belum.length>0){
-      adaBelum=true;
+    const belumShiftIni=wbpBlok.filter(w=>!(absenMap[w.id]||[]).includes(currentShift));
+    if(belumShiftIni.length>0){adaBelum=true;
       html+=`<div style="border-left:3px solid #ef4444;padding:10px 14px;background:#fff5f5;border-radius:0 10px 10px 0;margin-bottom:8px">
-        <div style="font-size:12px;font-weight:800;color:#1e293b;margin-bottom:4px">📍 ${b.nama} — <span style="color:#ef4444">${belum.length} WBP belum diabsen</span></div>
-        <div style="font-size:11px;color:#64748b">${belum.map(w=>`<span style="background:#fee2e2;color:#991b1b;padding:1px 6px;border-radius:6px;margin-right:4px;margin-bottom:4px;display:inline-block">${w.nama}</span>`).join('')}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="font-size:12px;font-weight:800;color:#1e293b">📍 ${b.nama} — <span style="color:#ef4444">${belumShiftIni.length} belum shift ${currentShift}</span></div>
+          <div style="display:flex;gap:4px">${['Pagi','Siang','Sore'].map(sh=>{const c=wbpBlok.filter(w=>(absenMap[w.id]||[]).includes(sh)).length;return`<span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:8px;background:${c>0?SHIFT_BG[sh]:'#f1f5f9'};color:${c>0?SHIFT_TC[sh]:'#94a3b8'}">${SHIFT_ICON[sh]}${c>0?` ${c}`:''}</span>`;}).join('')}</div>
+        </div>
+        <div style="font-size:11px;color:#64748b">${belumShiftIni.map(w=>`<span style="background:#fee2e2;color:#991b1b;padding:1px 6px;border-radius:6px;margin-right:4px;margin-bottom:4px;display:inline-block">${w.nama}</span>`).join('')}</div>
       </div>`;
     }
   });
-  if(!adaBelum){
-    html=`<div style="padding:24px;text-align:center"><div style="font-size:28px;margin-bottom:8px">🎉</div><div style="font-size:13px;font-weight:700;color:#10b981">Semua WBP sudah diabsen hari ini!</div></div>`;
-  }
+  if(!adaBelum)html=`<div style="padding:24px;text-align:center"><div style="font-size:28px;margin-bottom:8px">🎉</div><div style="font-size:13px;font-weight:700;color:#10b981">Semua WBP sudah diabsen shift ${currentShift}!</div></div>`;
   container.innerHTML=html;
 }
 
@@ -336,12 +339,12 @@ async function loadRiwayat(){
 function editAbsen(id,status,ket){document.getElementById('editAbsenId').value=id;document.getElementById('editAbsenStatus').value=status||'Di Kamar';document.getElementById('editAbsenKet').value=ket||'';openModal('editAbsenModal');}
 async function saveAbsen(){const id=document.getElementById('editAbsenId').value,status=document.getElementById('editAbsenStatus').value,ket=document.getElementById('editAbsenKet').value;const{error}=await sb.from('absen_detail').update({status,keterangan:ket||null}).eq('id',id);if(error){showAlert('error','Gagal',error.message);return;}showAlert('success','Diperbarui','Data absensi diperbarui.');closeModal('editAbsenModal');loadRiwayat();}
 async function deleteAbsen(id){showConfirm('Hapus Absensi','Yakin hapus data absensi ini?',async()=>{const{error}=await sb.from('absen_detail').delete().eq('id',id);if(error){showAlert('error','Gagal',error.message);return;}showAlert('success','Dihapus','Data absensi dihapus.');loadRiwayat();});}
-function resetRiwayatFilter(){const today=todayWIT();['riwayatSearch','riwayatBlokFilter','riwayatPegawaiFilter'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('riwayatDari').value=today;document.getElementById('riwayatSampai').value=today;riwayatPage=1;loadRiwayat();}
+function resetRiwayatFilter(){const today=todayWIT();['riwayatSearch','riwayatBlokFilter','riwayatPegawaiFilter','riwayatShiftFilter'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('riwayatDari').value=today;document.getElementById('riwayatSampai').value=today;riwayatPage=1;loadRiwayat();}
 async function exportRiwayat(){
   const data=window._riwayatData;if(!data?.length){showAlert('warning','Tidak Ada Data','Tidak ada data untuk diekspor.');return;}
   const dari=document.getElementById('riwayatDari')?.value||'',sampai=document.getElementById('riwayatSampai')?.value||'';
   try{const{jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'landscape'});doc.setFontSize(14);doc.setFont('helvetica','bold');doc.text('LAPORAN ABSENSI WBP',148,14,{align:'center'});doc.setFontSize(9);doc.setFont('helvetica','normal');doc.text(`Periode: ${dari} s.d. ${sampai}  |  Dicetak: ${new Date().toLocaleDateString('id-ID',{timeZone:'Asia/Jayapura'})}`,148,21,{align:'center'});doc.line(14,24,283,24);
-  doc.autoTable({startY:28,head:[['No','Waktu','Petugas','Status','Kamar','WBP','No.Reg','Keterangan']],body:data.map((r,i)=>[i+1,formatWIT(r.waktu),r.pegawai?.nama||'—',r.status||'—',r.blok?.nama||'—',r.wbp?.nama||'—',r.wbp?.no_registrasi||'—',r.keterangan||'—']),styles:{fontSize:7,cellPadding:2},headStyles:{fillColor:[30,64,175],textColor:255,fontStyle:'bold'},alternateRowStyles:{fillColor:[248,250,252]}});
+  doc.autoTable({startY:28,head:[['No','Waktu','Shift','Petugas','Status','Kamar','WBP','No.Reg','Keterangan']],body:data.map((r,i)=>[i+1,formatWIT(r.waktu),r.shift||'—',r.pegawai?.nama||'—',r.status||'—',r.blok?.nama||'—',r.wbp?.nama||'—',r.wbp?.no_registrasi||'—',r.keterangan||'—']),styles:{fontSize:7,cellPadding:2},headStyles:{fillColor:[30,64,175],textColor:255,fontStyle:'bold'},alternateRowStyles:{fillColor:[248,250,252]}});
   doc.save(`absensi_${dari}_${sampai}.pdf`);showAlert('success','Berhasil','PDF berhasil diunduh.');}catch(e){showAlert('error','Gagal','Gagal membuat PDF.');}
 }
 
