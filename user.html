@@ -164,19 +164,20 @@
           </button>
         </div>
         <!-- Filter preset -->
-        <div style="display:flex;gap:8px;padding:10px 16px 0;flex-wrap:wrap">
+        <div style="display:flex;gap:8px;padding:10px 16px 0;flex-wrap:wrap;align-items:center">
           <input type="hidden" id="myRiwayatPreset" value="today"/>
-          <button onclick="setPreset('today')" class="btn btn-sm" style="background:#eff6ff;color:#1d4ed8;border:1.5px solid #bfdbfe;font-size:12px">Hari Ini</button>
-          <button onclick="setPreset('month')" class="btn btn-sm" style="background:#f0fdf4;color:#166534;border:1.5px solid #bbf7d0;font-size:12px">Bulan Ini</button>
-          <button onclick="setPreset('custom')" class="btn btn-sm btn-ghost" style="font-size:12px">Pilih Tanggal</button>
+          <span style="font-size:11px;color:#94a3b8;font-weight:600">Periode:</span>
+          <button id="userPresetToday" onclick="setPreset('today')" style="padding:5px 12px;border-radius:20px;border:2px solid #1e40af;background:#1e40af;color:white;font-size:12px;font-weight:800;cursor:pointer">📅 Hari Ini</button>
+          <button id="userPresetMonth" onclick="setPreset('month')" style="padding:5px 12px;border-radius:20px;border:2px solid #e2e8f0;background:white;color:#64748b;font-size:12px;font-weight:600;cursor:pointer">📆 Bulan Ini</button>
+          <button id="userPresetCustom" onclick="setPreset('custom')" style="padding:5px 12px;border-radius:20px;border:2px solid #e2e8f0;background:white;color:#64748b;font-size:12px;font-weight:600;cursor:pointer">🗓️ Pilih Tanggal</button>
         </div>
         <div class="filter-bar" style="flex-wrap:wrap;gap:8px">
           <div class="search-input" style="min-width:140px;flex:1">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
             <input type="text" id="myRiwayatSearch" placeholder="Cari WBP / petugas..." oninput="loadMyRiwayat()"/>
           </div>
-          <input type="date" class="form-control" style="width:auto" id="myRiwayatDari" onchange="loadMyRiwayat()"/>
-          <input type="date" class="form-control" style="width:auto" id="myRiwayatSampai" onchange="loadMyRiwayat()"/>
+          <input type="date" class="form-control" style="width:auto;display:none" id="myRiwayatDari" onchange="loadMyRiwayat()"/>
+          <input type="date" class="form-control" style="width:auto;display:none" id="myRiwayatSampai" onchange="loadMyRiwayat()"/>
           <select class="form-control" style="width:auto;min-width:100px" id="myRiwayatBlok" onchange="loadMyRiwayat()"><option value="">Semua Kamar</option></select>
           <select class="form-control" style="width:auto" id="myRiwayatShift" onchange="loadMyRiwayat()">
             <option value="">Semua Shift</option>

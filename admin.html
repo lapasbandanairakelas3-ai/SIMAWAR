@@ -115,9 +115,9 @@
         <div class="card-header"><div class="card-title">Data Pegawai / Rupam</div><button class="btn btn-primary btn-sm" onclick="openPegawaiModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg> Tambah Rupam</button></div>
         <div class="filter-bar">
           <div class="search-input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg><input type="text" id="pegawaiSearch" placeholder="Cari nama/username..." oninput="debounce(loadPegawai)"/></div>
-          <select class="form-control" style="width:auto" id="pegawaiRoleFilter" onchange="loadPegawai()"><option value="">Semua Role</option><option value="admin">Admin</option><option value="user">Rupam</option></select>
+          
         </div>
-        <div class="table-container"><table><thead><tr><th>No</th><th>Nama Rupam</th><th>Username</th><th>Password</th><th>Aksi</th></tr></thead><tbody id="pegawaiTableBody"></tbody></table></div>
+        <div class="table-container"><table><thead><tr><th style="width:44px">No</th><th>Nama Rupam</th><th style="width:110px">Username</th><th>Password &amp; Aksi</th></tr></thead><tbody id="pegawaiTableBody"></tbody></table></div>
         <div style="padding:10px 16px;border-top:1px solid #f1f5f9"><span style="font-size:12px;color:#94a3b8" id="pegawaiCount">—</span></div>
       </div>
     </div>
@@ -138,15 +138,16 @@
         <div style="background:#fef9c3;border:1px solid #fde68a;border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#92400e">📊 <strong>Riwayat Absensi</strong> — Semua catatan absensi dari seluruh petugas. Filter berdasarkan tanggal, kamar, atau petugas. Klik ✏️ untuk koreksi data.</div>
         <div class="card-header"><div class="card-title">Riwayat Absensi (Semua Petugas)</div><button class="btn btn-success btn-sm" onclick="exportRiwayat()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg> Ekspor PDF</button></div>
         <input type="hidden" id="riwayatPreset" value="today"/>
-        <div style="display:flex;gap:8px;padding:10px 16px 0;flex-wrap:wrap">
-          <button onclick="setPresetAdmin('today')" class="btn btn-sm" style="background:#eff6ff;color:#1d4ed8;border:1.5px solid #bfdbfe;font-size:12px">Hari Ini</button>
-          <button onclick="setPresetAdmin('month')" class="btn btn-sm" style="background:#f0fdf4;color:#166534;border:1.5px solid #bbf7d0;font-size:12px">Bulan Ini</button>
-          <button onclick="setPresetAdmin('custom')" class="btn btn-sm btn-ghost" style="font-size:12px">Pilih Tanggal</button>
+        <div style="display:flex;gap:8px;padding:10px 16px 0;flex-wrap:wrap;align-items:center">
+          <span style="font-size:11px;color:#94a3b8;font-weight:600">Periode:</span>
+          <button id="presetBtnToday" onclick="setPresetAdmin('today')" class="btn btn-sm" style="font-size:12px;border:2px solid #3b82f6;background:#eff6ff;color:#1d4ed8;font-weight:700">📅 Hari Ini</button>
+          <button id="presetBtnMonth" onclick="setPresetAdmin('month')" class="btn btn-sm" style="font-size:12px;border:2px solid #e2e8f0;background:white;color:#64748b">📆 Bulan Ini</button>
+          <button id="presetBtnCustom" onclick="setPresetAdmin('custom')" class="btn btn-sm" style="font-size:12px;border:2px solid #e2e8f0;background:white;color:#64748b">🗓️ Pilih Tanggal</button>
         </div>
         <div class="filter-bar" style="flex-wrap:wrap;gap:8px">
           <div class="search-input" style="min-width:150px;flex:1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg><input type="text" id="riwayatSearch" placeholder="Cari WBP / petugas..." oninput="debounce(loadRiwayat)"/></div>
-          <input type="date" class="form-control" style="width:auto" id="riwayatDari" onchange="loadRiwayat()"/>
-          <input type="date" class="form-control" style="width:auto" id="riwayatSampai" onchange="loadRiwayat()"/>
+          <input type="date" class="form-control" style="width:auto;display:none" id="riwayatDari" onchange="loadRiwayat()"/>
+          <input type="date" class="form-control" style="width:auto;display:none" id="riwayatSampai" onchange="loadRiwayat()"/>
           <select class="form-control" style="width:auto;min-width:120px" id="riwayatBlokFilter" onchange="loadRiwayat()"><option value="">Semua Blok</option></select>
           <select class="form-control" style="width:auto;min-width:130px" id="riwayatPegawaiFilter" onchange="loadRiwayat()"><option value="">Semua Petugas</option></select>
           <select class="form-control" style="width:auto" id="riwayatShiftFilter" onchange="loadRiwayat()">

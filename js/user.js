@@ -193,7 +193,7 @@ function renderKartu(){
       <div style="padding:8px">
         <button onclick="setHadir('${w.id}','${w.nama.replace(/'/g,"\\'")}')"
           style="width:100%;padding:8px;border:none;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s;background:${hadir?'#10b981':'#d1fae5'};color:${hadir?'white':'#065f46'}">
-          ✓ Hadir${d.keterangan?` (${d.keterangan.split(' - ')[0]})':''}
+          ✓ Hadir${d.keterangan ? ' (' + d.keterangan.split(' - ')[0] + ')' : ''}
         </button>
       </div>
     </div>`;
@@ -329,8 +329,30 @@ async function saveMyAbsen(){
   if(error){showAlert('error','Gagal',error.message);return;}
   showAlert('success','Diperbarui','Keterangan diperbarui.');closeModal('editMyAbsenModal');loadMyRiwayat();
 }
-function setPreset(val){document.getElementById('myRiwayatPreset').value=val;loadMyRiwayat();}
-function resetMyRiwayat(){const today=todayWIT();['myRiwayatSearch','myRiwayatBlok','myRiwayatShift'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('myRiwayatDari').value=today;document.getElementById('myRiwayatSampai').value=today;document.getElementById('myRiwayatPreset').value='today';loadMyRiwayat();}
+function setPreset(val){
+  document.getElementById('myRiwayatPreset').value=val;
+  // Visual active state
+  const btns={today:'userPresetToday',month:'userPresetMonth',custom:'userPresetCustom'};
+  Object.entries(btns).forEach(([k,id])=>{
+    const btn=document.getElementById(id);if(!btn)return;
+    const active=k===val;
+    btn.style.background=active?'#1e40af':'white';
+    btn.style.color=active?'white':'#64748b';
+    btn.style.borderColor=active?'#1e40af':'#e2e8f0';
+    btn.style.fontWeight=active?'800':'600';
+  });
+  const datePickers=document.querySelectorAll('#myRiwayatDari,#myRiwayatSampai');
+  datePickers.forEach(el=>{if(el)el.style.display=val==='custom'?'':'none';});
+  loadMyRiwayat();
+}
+function resetMyRiwayat(){
+  const today=todayWIT();
+  ['myRiwayatSearch','myRiwayatBlok','myRiwayatShift'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('myRiwayatDari').value=today;
+  document.getElementById('myRiwayatSampai').value=today;
+  document.getElementById('myRiwayatPreset').value='today';
+  setPreset('today');
+}
 async function exportRiwayatUser(){
   const data=window._myRiwayatData;if(!data?.length){showAlert('warning','Tidak Ada Data','Tidak ada data.');return;}
   const dari=document.getElementById('myRiwayatDari')?.value||'',sampai=document.getElementById('myRiwayatSampai')?.value||'';

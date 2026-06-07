@@ -108,9 +108,13 @@ async function loadDashboard(){
 }
 
 async function loadDashKamar(today){
-  const container=document.getElementById('dashKamarGrid');
-  if(!container)return;
-  container.innerHTML='<div style="height:50px;background:#f1f5f9;border-radius:10px;animation:swpulse 1.5s infinite"></div>'.repeat(2);
+  // "WBP Belum Diabsen" section
+  const container=document.getElementById('dashBelumAbsen');
+  // "Status Kamar" section (blok grid)
+  const kamarGrid=document.getElementById('dashKamarContainer');
+  if(!container&&!kamarGrid)return;
+  if(container)container.innerHTML='<div style="height:40px;background:#f1f5f9;border-radius:10px;animation:swpulse 1.5s infinite"></div>'.repeat(2);
+  if(kamarGrid)kamarGrid.innerHTML='<div style="height:80px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div>'.repeat(2);
 
   const[blokRes,wbpRes,absenRes]=await Promise.all([
     sb.from('blok').select('id,nama,kapasitas'),
@@ -120,24 +124,52 @@ async function loadDashKamar(today){
   const bloks=blokRes.data||[],allWbp=wbpRes.data||[];
   const absenMap={};(absenRes.data||[]).forEach(a=>{if(!absenMap[a.wbp_id])absenMap[a.wbp_id]=[];absenMap[a.wbp_id].push(a.shift);});
   const currentShift=getShiftNow();
-  if(!bloks.length){container.innerHTML=`<div style="padding:24px;text-align:center;color:#94a3b8">Belum ada kamar</div>`;return;}
+  if(!bloks.length){
+    if(container)container.innerHTML=`<div style="padding:24px;text-align:center;color:#94a3b8">Belum ada kamar</div>`;
+    if(kamarGrid)kamarGrid.innerHTML=`<div style="padding:24px;text-align:center;color:#94a3b8">Belum ada kamar</div>`;
+    return;
+  }
 
-  container.innerHTML=bloks.map(b=>{
+  // Build data untuk kedua section
+  const blokData=bloks.map((b,idx)=>{
     const wbpBlok=allWbp.filter(w=>w.blok_id===b.id);
     const total=wbpBlok.length;
     const belumShift=wbpBlok.filter(w=>!(absenMap[w.id]||[]).includes(currentShift));
     const sudah=total-belumShift.length;
     const selesai=belumShift.length===0&&total>0;
-    return `<div style="border:1.5px solid ${selesai?'#86efac':'#e2e8f0'};border-radius:12px;padding:10px 14px;background:${selesai?'#f0fdf4':'white'};margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+    return {b,wbpBlok,total,belumShift,sudah,selesai};
+  });
+
+  // WBP Belum Diabsen section
+  if(container){
+    let html='';let adaBelum=false;
+    blokData.forEach(({b,belumShift,total,selesai})=>{
+      if(belumShift.length>0){adaBelum=true;
+        html+=`<div style="border-left:3px solid #ef4444;padding:8px 12px;background:#fff5f5;border-radius:0 10px 10px 0;margin-bottom:8px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <div style="font-size:12px;font-weight:800;color:#1e293b">📍 ${b.nama}</div>
+            <span style="font-size:11px;color:#ef4444;font-weight:700">${belumShift.length} belum shift ${currentShift}</span>
+          </div>
+          <div>${belumShift.map(w=>`<span style="background:#fee2e2;color:#991b1b;padding:1px 7px;border-radius:6px;font-size:11px;margin-right:4px;margin-bottom:3px;display:inline-block">${w.nama}</span>`).join('')}</div>
+        </div>`;
+      }
+    });
+    if(!adaBelum)html=`<div style="padding:20px;text-align:center"><div style="font-size:24px;margin-bottom:6px">🎉</div><div style="font-size:13px;font-weight:700;color:#10b981">Semua WBP sudah diabsen shift ${currentShift}!</div></div>`;
+    container.innerHTML=html;
+  }
+
+  // Status Kamar (blok grid)
+  if(kamarGrid){
+    kamarGrid.innerHTML=blokData.map(({b,wbpBlok,total,sudah,selesai})=>`
+      <div class="kamar-card" style="cursor:default;background:${selesai?'#f0fdf4':'white'};border-color:${selesai?'#86efac':'#e2e8f0'}">
+        <div style="font-size:22px;margin-bottom:6px">${selesai?'✅':'🏠'}</div>
         <div style="font-size:13px;font-weight:800;color:#1e293b">${b.nama}</div>
-        <div style="display:flex;gap:4px">${['Pagi','Siang','Sore'].map(sh=>{const c=wbpBlok.filter(w=>(absenMap[w.id]||[]).includes(sh)).length;return`<span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:8px;background:${c>0?SHIFT_BG[sh]:'#f1f5f9'};color:${c>0?SHIFT_TC[sh]:'#94a3b8'}">${SHIFT_ICON[sh]}${c>0?` ${c}`:''}</span>`;}).join('')}</div>
-      </div>
-      <div style="height:5px;background:#f1f5f9;border-radius:100px;overflow:hidden;margin-bottom:5px"><div style="height:100%;width:${total?Math.round(sudah/total*100):0}%;background:${selesai?'#10b981':'linear-gradient(90deg,#3b82f6,#6366f1)'};border-radius:100px;transition:width .3s"></div></div>
-      <div style="font-size:11px;color:#94a3b8">${sudah}/${total} WBP | Shift ${currentShift}: ${selesai?'✅ Selesai':`⏳ ${belumShift.length} belum`}</div>
-      ${belumShift.length>0?`<div style="font-size:10px;color:#ef4444;font-weight:600;margin-top:4px">Belum: ${belumShift.map(w=>w.nama).join(', ')}</div>`:''}
-    </div>`;
-  }).join('');
+        <div style="display:flex;gap:3px;justify-content:center;margin:5px 0">
+          ${['Pagi','Siang','Sore'].map(sh=>{const cnt=wbpBlok.filter(w=>(absenMap[w.id]||[]).includes(sh)).length;return`<span style="font-size:10px;font-weight:700;padding:1px 5px;border-radius:6px;background:${cnt>0?SHIFT_BG[sh]:'#f1f5f9'};color:${cnt>0?SHIFT_TC[sh]:'#94a3b8'}">${SHIFT_ICON[sh]}${cnt>0?' '+cnt:''}</span>`;}).join('')}
+        </div>
+        <div style="font-size:10px;color:#94a3b8">${sudah}/${total} WBP</div>
+      </div>`).join('');
+  }
 }
 
 // ── WBP CRUD ─────────────────────────────────────────────────
@@ -283,6 +315,9 @@ async function loadRiwayatFilters(){
 async function loadRiwayat(){
   const tbody=document.getElementById('riwayatTableBody');
   if(tbody)tbody.innerHTML=skel(16,9).repeat(4);
+  // Sync visual state tombol preset
+  const preset=document.getElementById('riwayatPreset')?.value||'today';
+  setPresetAdmin(preset);
   const dari=document.getElementById('riwayatDari')?.value||'';
   const sampai=document.getElementById('riwayatSampai')?.value||'';
   const blok=document.getElementById('riwayatBlokFilter')?.value||'';
@@ -335,8 +370,32 @@ async function saveAbsen(){
   showAlert('success','Diperbarui','Keterangan diperbarui.');closeModal('editAbsenModal');loadRiwayat();
 }
 async function deleteAbsen(id){showConfirm('Hapus','Yakin hapus data absensi ini?',async()=>{const{error}=await sb.from('absen_detail').delete().eq('id',id);if(error){showAlert('error','Gagal',error.message);return;}showAlert('success','Dihapus','Data dihapus.');loadRiwayat();});}
-function setPresetAdmin(val){document.getElementById('riwayatPreset').value=val;loadRiwayat();}
-function resetRiwayatFilter(){const today=todayWIT();['riwayatSearch','riwayatBlokFilter','riwayatPegawaiFilter','riwayatShiftFilter'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('riwayatDari').value=today;document.getElementById('riwayatSampai').value=today;document.getElementById('riwayatPreset').value='today';riwayatPage=1;loadRiwayat();}
+function setPresetAdmin(val){
+  document.getElementById('riwayatPreset').value=val;
+  // Update visual active state
+  const btns={today:'presetBtnToday',month:'presetBtnMonth',custom:'presetBtnCustom'};
+  Object.entries(btns).forEach(([k,id])=>{
+    const btn=document.getElementById(id);if(!btn)return;
+    const active=k===val;
+    btn.style.background=active?'#1e40af':'white';
+    btn.style.color=active?'white':'#64748b';
+    btn.style.borderColor=active?'#1e40af':'#e2e8f0';
+    btn.style.fontWeight=active?'800':'600';
+  });
+  // Tampilkan/sembunyikan date picker
+  const datePickers=document.querySelectorAll('#riwayatDari,#riwayatSampai');
+  datePickers.forEach(el=>{if(el)el.style.display=val==='custom'?'':'none';});
+  loadRiwayat();
+}
+function resetRiwayatFilter(){
+  const today=todayWIT();
+  ['riwayatSearch','riwayatBlokFilter','riwayatPegawaiFilter','riwayatShiftFilter'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('riwayatDari').value=today;
+  document.getElementById('riwayatSampai').value=today;
+  document.getElementById('riwayatPreset').value='today';
+  riwayatPage=1;
+  setPresetAdmin('today');
+}
 async function exportRiwayat(){
   const data=window._riwayatData;if(!data?.length){showAlert('warning','Tidak Ada Data','Tidak ada data.');return;}
   const dari=document.getElementById('riwayatDari')?.value||'',sampai=document.getElementById('riwayatSampai')?.value||'';
