@@ -13,29 +13,32 @@
   <style>
 @keyframes swpulse{0%,100%{opacity:1}50%{opacity:.5}}
 @keyframes sbar{to{width:100%}}
-.wbp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px}
+.wbp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
 @media(max-width:500px){.wbp-grid{grid-template-columns:repeat(2,1fr);gap:8px}}
-.wbp-card{background:white;border-radius:14px;overflow:hidden;border:2.5px solid #e2e8f0;transition:border-color .2s;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.wbp-card{background:white;border-radius:14px;overflow:hidden;border:2.5px solid #e2e8f0;transition:border-color .2s,background .2s;box-shadow:0 1px 6px rgba(0,0,0,.06)}
 .wbp-card.hadir{border-color:#10b981;background:#f0fdf4}
 .wbp-card.tidak{border-color:#f59e0b;background:#fffbeb}
-.kamar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:10px}
+.kamar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
 .kamar-card{background:white;border-radius:14px;padding:14px 10px 12px;text-align:center;border:2px solid #e2e8f0;transition:all .18s;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-.kamar-card.clickable{cursor:pointer}.kamar-card.clickable:hover{border-color:#3b82f6;background:#eff6ff;transform:translateY(-2px)}
+.kamar-card.clickable{cursor:pointer}
+.kamar-card.clickable:hover{border-color:#3b82f6;background:#eff6ff;transform:translateY(-2px)}
 .kamar-card.my-session{border-color:#3b82f6;background:#eff6ff}
-.kamar-card.locked{opacity:.55;cursor:pointer}.kamar-card.done{opacity:.6;cursor:pointer;background:#f0fdf4;border-color:#86efac}
+.kamar-card.locked{opacity:.55;cursor:pointer}
+.kamar-card.done{opacity:.6;cursor:pointer;background:#f0fdf4;border-color:#86efac}
 .ket-opsi-btn{background:#f8fafc;border:2px solid #e2e8f0;border-radius:14px;padding:12px 6px;font-size:11px;font-weight:700;color:#374151;cursor:pointer;transition:all .15s;text-align:center;line-height:1.6;width:100%}
 .ket-opsi-btn:hover,.ket-opsi-btn.active{background:#eff6ff;border-color:#3b82f6;color:#1d4ed8}
-.badge-yellow{background:#fef3c7;color:#92400e}
   </style>
 </head>
 <body>
 
 <!-- SPLASH -->
 <div id="splashScreen" style="position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#1e3a8a,#2563eb);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s">
-  <div id="splLogoWrap" style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;margin-bottom:16px;overflow:hidden;animation:swpulse 1.5s infinite"></div>
-  <div id="splNameWrap" style="height:22px;width:150px;background:rgba(255,255,255,.15);border-radius:8px;margin-bottom:6px;animation:swpulse 1.5s infinite"></div>
-  <div id="splDescWrap" style="height:14px;width:200px;background:rgba(255,255,255,.1);border-radius:6px;animation:swpulse 1.5s infinite"></div>
-  <div style="margin-top:28px;width:120px;height:3px;background:rgba(255,255,255,.15);border-radius:100px;overflow:hidden"><div style="height:100%;background:rgba(255,255,255,.8);animation:sbar .8s ease forwards;width:0%"></div></div>
+  <div id="splashLogoWrap" style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;margin-bottom:16px;overflow:hidden;animation:swpulse 1.5s infinite"></div>
+  <div id="splashNameWrap" style="height:22px;width:150px;background:rgba(255,255,255,.15);border-radius:8px;margin-bottom:6px;animation:swpulse 1.5s infinite"></div>
+  <div id="splashDescWrap" style="height:14px;width:200px;background:rgba(255,255,255,.1);border-radius:6px;animation:swpulse 1.5s infinite"></div>
+  <div style="margin-top:28px;width:120px;height:3px;background:rgba(255,255,255,.15);border-radius:100px;overflow:hidden">
+    <div style="height:100%;background:rgba(255,255,255,.8);animation:sbar .8s ease forwards;width:0%"></div>
+  </div>
 </div>
 
 <div id="appShell">
@@ -68,53 +71,64 @@
 
   <div class="content-area">
 
-    <!-- DASHBOARD -->
+    <!-- ========== DASHBOARD ========== -->
     <div id="page-dashboard" class="page-section active">
+      <!-- Stat cards -->
       <div class="stat-grid" style="margin-bottom:16px">
-        <div class="stat-card" onclick="goPage('absen')" style="cursor:pointer"><div class="stat-icon" style="background:#eff6ff;color:#3b82f6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div><div class="stat-value" id="dashUserStatWbp">—</div><div class="stat-label">Total WBP</div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:#fffbeb;color:#f59e0b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></div><div class="stat-value" id="dashUserStatBlok">—</div><div class="stat-label">Jumlah Kamar</div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:#fdf4ff;color:#a855f7"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div class="stat-value" id="dashUserStatAbsen">—</div><div class="stat-label">Absen Hari Ini</div></div>
-      </div>
-      <!-- Status shift hari ini -->
-      <div class="card mb-4" style="padding:14px 16px">
-        <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:10px">Status Shift Hari Ini</div>
-        <div id="dashShiftStatus" style="display:flex;gap:8px;flex-wrap:wrap">
-          <div style="height:28px;width:100px;background:#f1f5f9;border-radius:20px;animation:swpulse 1.5s infinite"></div>
-          <div style="height:28px;width:100px;background:#f1f5f9;border-radius:20px;animation:swpulse 1.5s infinite"></div>
-          <div style="height:28px;width:100px;background:#f1f5f9;border-radius:20px;animation:swpulse 1.5s infinite"></div>
+        <div class="stat-card" onclick="goPage('absen')" style="cursor:pointer">
+          <div class="stat-icon" style="background:#eff6ff;color:#3b82f6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+          <div class="stat-value" id="dashUserStatWbp">—</div><div class="stat-label">Total WBP</div>
+        </div>
+        <div class="stat-card" onclick="goPage('absen')" style="cursor:pointer">
+          <div class="stat-icon" style="background:#fffbeb;color:#f59e0b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></div>
+          <div class="stat-value" id="dashUserStatBlok">—</div><div class="stat-label">Jumlah Kamar</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#fdf4ff;color:#a855f7"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+          <div class="stat-value" id="dashUserStatAbsen">—</div><div class="stat-label">Absen Hari Ini</div>
         </div>
       </div>
+      <!-- Status kamar -->
       <div class="card">
-        <div class="card-header"><div><div class="card-title">Status per Kamar</div><div style="font-size:12px;color:#94a3b8;margin-top:2px" id="dashUserDate"></div></div><button class="btn btn-ghost btn-sm" onclick="loadUserDashboard()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>Refresh</button></div>
-        <div class="card-body" id="dashKamarStatus"><div style="height:50px;background:#f1f5f9;border-radius:10px;animation:swpulse 1.5s infinite"></div></div>
+        <div class="card-header">
+          <div>
+            <div class="card-title">Status Absensi per Kamar</div>
+            <div id="dashUserDate" style="font-size:12px;color:#94a3b8;margin-top:2px"></div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="loadUserDashboard()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
+            Refresh
+          </button>
+        </div>
+        <div class="card-body" id="dashKamarStatus">
+          <div style="height:50px;background:#f1f5f9;border-radius:10px;animation:swpulse 1.5s infinite"></div>
+          <div style="height:50px;background:#f1f5f9;border-radius:10px;margin-top:8px;animation:swpulse 1.5s infinite"></div>
+        </div>
       </div>
     </div>
 
-    <!-- ABSENSI -->
+    <!-- ========== ABSENSI ========== -->
     <div id="page-absen" class="page-section">
-      <div style="background:linear-gradient(135deg,#eff6ff,#f0f9ff);border:1px solid #bfdbfe;border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;gap:10px">
+      <!-- Panduan -->
+      <div style="background:linear-gradient(135deg,#eff6ff,#f0f9ff);border:1px solid #bfdbfe;border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start">
         <span style="font-size:18px;flex-shrink:0">📋</span>
-        <div style="font-size:12px;color:#1e40af;line-height:1.6"><strong>3x Absen per hari:</strong> Pagi (sebelum 12), Siang (12–17), Sore (17+). Pilih shift → kamar → tandai WBP → Simpan.</div>
+        <div style="font-size:12px;color:#1e40af;line-height:1.6">
+          <strong>Cara absensi:</strong> Pilih kamar → tandai setiap WBP (Di Kamar / Di Luar) → klik Simpan.<br>
+          Tombol Simpan aktif setelah <strong>semua WBP</strong> di kamar ditandai.
+        </div>
       </div>
       <!-- STEP 1 -->
       <div id="step1">
         <div class="card">
-          <div class="card-header"><div><div class="card-title">Pilih Shift &amp; Kamar</div></div><button class="btn btn-ghost btn-sm" onclick="loadKamarPicker()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>Refresh</button></div>
-          <div class="card-body">
-            <!-- Shift picker -->
-            <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:8px">Pilih Shift</div>
-            <div id="shiftPicker" style="display:flex;gap:8px;margin-bottom:16px">
-              <div style="flex:1;height:60px;background:#f1f5f9;border-radius:12px;animation:swpulse 1.5s infinite"></div>
-              <div style="flex:1;height:60px;background:#f1f5f9;border-radius:12px;animation:swpulse 1.5s infinite"></div>
-              <div style="flex:1;height:60px;background:#f1f5f9;border-radius:12px;animation:swpulse 1.5s infinite"></div>
-            </div>
-            <!-- Kamar grid -->
-            <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:8px" id="shiftLabel">Pilih Kamar</div>
-            <div class="kamar-grid" id="kamarPickerGrid">
-              <div style="height:90px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div>
-              <div style="height:90px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div>
-            </div>
+          <div class="card-header">
+            <div><div class="card-title">Pilih Kamar</div><div style="font-size:12px;color:#94a3b8;margin-top:2px">Tap kamar yang akan Anda periksa hari ini</div></div>
+            <button class="btn btn-ghost btn-sm" onclick="loadKamarPicker()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>Refresh</button>
           </div>
+          <div class="card-body"><div class="kamar-grid" id="kamarPickerGrid">
+            <div style="height:95px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div>
+            <div style="height:95px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div>
+            <div style="height:95px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div>
+          </div></div>
         </div>
       </div>
       <!-- STEP 2 -->
@@ -122,10 +136,7 @@
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px">
           <div style="display:flex;align-items:center;gap:10px">
             <button onclick="backToStep1()" class="btn btn-ghost btn-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>Kembali</button>
-            <div>
-              <div style="font-size:16px;font-weight:800;color:#1e293b" id="step2KamarTitle">—</div>
-              <div style="display:flex;align-items:center;gap:6px;margin-top:2px"><span id="step2ShiftBadge"></span><span style="font-size:11px;color:#94a3b8" id="step2Tanggal"></span></div>
-            </div>
+            <div><div style="font-size:17px;font-weight:800;color:#1e293b" id="step2KamarTitle">—</div><div style="font-size:11px;color:#94a3b8" id="step2Tanggal"></div></div>
           </div>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
             <span class="badge badge-green" id="cntHadir">— Di Kamar</span>
@@ -133,15 +144,24 @@
             <span class="badge badge-gray"  id="cntBelum">— Belum</span>
           </div>
         </div>
+        <!-- Progress bar — per kamar ini saja -->
         <div class="card mb-4" style="padding:12px 16px">
-          <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:11px;font-weight:600;color:#64748b">Progress</span><span style="font-size:11px;font-weight:800;color:#3b82f6" id="progressText">—</span></div>
-          <div style="height:8px;background:#f1f5f9;border-radius:100px;overflow:hidden"><div id="progressBar" style="height:100%;width:0%;background:linear-gradient(90deg,#3b82f6,#6366f1);border-radius:100px;transition:width .3s"></div></div>
-          <div style="font-size:11px;color:#94a3b8;margin-top:6px" id="progressHint">Tandai semua WBP untuk mengaktifkan tombol Simpan.</div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+            <span style="font-size:11px;font-weight:600;color:#64748b">Progress — Kamar Ini</span>
+            <span style="font-size:11px;font-weight:800;color:#3b82f6" id="progressText">—</span>
+          </div>
+          <div style="height:8px;background:#f1f5f9;border-radius:100px;overflow:hidden">
+            <div id="progressBar" style="height:100%;width:0%;background:linear-gradient(90deg,#3b82f6,#6366f1);border-radius:100px;transition:width .3s"></div>
+          </div>
+          <div style="font-size:11px;color:#94a3b8;margin-top:6px" id="progressHint">Tandai setiap WBP untuk mengaktifkan tombol Simpan.</div>
         </div>
+        <!-- WBP Grid -->
         <div class="wbp-grid" id="wbpAbsenGrid">
-          <div style="height:220px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div>
-          <div style="height:220px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div>
+          <div style="height:240px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div>
+          <div style="height:240px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div>
+          <div style="height:240px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div>
         </div>
+        <!-- Tombol Simpan — tersembunyi dulu -->
         <div id="simpanWrap" style="display:none;margin-top:20px;text-align:right">
           <button id="btnSubmit" onclick="submitAbsen()" class="btn btn-success" style="padding:12px 28px;font-size:14px" disabled>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Simpan Absensi
@@ -150,11 +170,11 @@
       </div>
     </div>
 
-    <!-- RIWAYAT -->
+    <!-- ========== RIWAYAT ========== -->
     <div id="page-riwayat" class="page-section">
       <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;gap:10px">
         <span style="font-size:18px;flex-shrink:0">📊</span>
-        <div style="font-size:12px;color:#166534;line-height:1.6">Seluruh data absensi semua petugas. Gunakan filter untuk mempersempit. Klik ✏️ untuk koreksi data.</div>
+        <div style="font-size:12px;color:#166534;line-height:1.6">Menampilkan <strong>seluruh data absensi</strong> dari semua petugas. Gunakan filter untuk mempersempit hasil.</div>
       </div>
       <div class="card">
         <div class="card-header">
@@ -163,13 +183,6 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>Ekspor PDF
           </button>
         </div>
-        <!-- Filter preset -->
-        <div style="display:flex;gap:8px;padding:10px 16px 0;flex-wrap:wrap">
-          <input type="hidden" id="myRiwayatPreset" value="today"/>
-          <button onclick="setPreset('today')" class="btn btn-sm" style="background:#eff6ff;color:#1d4ed8;border:1.5px solid #bfdbfe;font-size:12px">Hari Ini</button>
-          <button onclick="setPreset('month')" class="btn btn-sm" style="background:#f0fdf4;color:#166534;border:1.5px solid #bbf7d0;font-size:12px">Bulan Ini</button>
-          <button onclick="setPreset('custom')" class="btn btn-sm btn-ghost" style="font-size:12px">Pilih Tanggal</button>
-        </div>
         <div class="filter-bar" style="flex-wrap:wrap;gap:8px">
           <div class="search-input" style="min-width:140px;flex:1">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
@@ -177,101 +190,103 @@
           </div>
           <input type="date" class="form-control" style="width:auto" id="myRiwayatDari" onchange="loadMyRiwayat()"/>
           <input type="date" class="form-control" style="width:auto" id="myRiwayatSampai" onchange="loadMyRiwayat()"/>
-          <select class="form-control" style="width:auto;min-width:100px" id="myRiwayatBlok" onchange="loadMyRiwayat()"><option value="">Semua Kamar</option></select>
-          <select class="form-control" style="width:auto" id="myRiwayatShift" onchange="loadMyRiwayat()">
-            <option value="">Semua Shift</option>
-            <option value="Pagi">🌅 Pagi</option>
-            <option value="Siang">☀️ Siang</option>
-            <option value="Sore">🌇 Sore</option>
-          </select>
+          <select class="form-control" style="width:auto;min-width:110px" id="myRiwayatBlok" onchange="loadMyRiwayat()"><option value="">Semua Kamar</option></select>
           <button class="btn btn-ghost btn-sm" onclick="resetMyRiwayat()">Reset</button>
         </div>
         <div class="table-container">
-          <table><thead><tr><th>No</th><th>Waktu</th><th>Shift</th><th>Petugas</th><th>Kamar</th><th>WBP</th><th>Status</th><th>Aksi</th></tr></thead>
-          <tbody id="myRiwayatBody"><tr><td colspan="8" style="padding:40px;text-align:center;color:#94a3b8">Memuat...</td></tr></tbody></table>
+          <table><thead><tr><th>No</th><th>Waktu</th><th>Petugas</th><th>Kamar</th><th>WBP</th><th>Status</th><th>Keterangan</th></tr></thead>
+          <tbody id="myRiwayatBody"><tr><td colspan="7" style="padding:40px;text-align:center;color:#94a3b8">Memuat data...</td></tr></tbody></table>
         </div>
         <div style="padding:10px 16px;border-top:1px solid #f1f5f9"><span style="font-size:12px;color:#94a3b8" id="myRiwayatCount">—</span></div>
       </div>
     </div>
 
-    <!-- PROFIL -->
+    <!-- ========== PROFIL ========== -->
     <div id="page-profil" class="page-section">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <div class="card"><div class="card-body" style="text-align:center;padding:32px 20px">
           <div id="profilAvatar" style="width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,#3b82f6,#1e40af);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:white;margin:0 auto 14px">P</div>
           <div style="font-size:18px;font-weight:800;color:#1e293b" id="profilNama">—</div>
           <div class="mt-3"><span class="badge badge-blue">Petugas / Rupam</span></div>
-          <div style="margin-top:14px;padding-top:14px;border-top:1px solid #f1f5f9"><div style="display:flex;justify-content:space-between;padding:6px 0"><span style="font-size:12px;color:#94a3b8">Username</span><code style="font-size:12px;background:#f1f5f9;padding:2px 8px;border-radius:6px" id="profilUsername">—</code></div></div>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid #f1f5f9">
+            <div style="display:flex;justify-content:space-between;padding:6px 0"><span style="font-size:12px;color:#94a3b8">Username</span><code style="font-size:12px;background:#f1f5f9;padding:2px 8px;border-radius:6px" id="profilUsername">—</code></div>
+          </div>
         </div></div>
         <div class="card"><div class="card-header"><div class="card-title">Ganti Password</div></div>
           <div class="card-body">
-            <div style="background:#fef9c3;border:1px solid #fde68a;border-radius:10px;padding:10px 12px;font-size:12px;color:#92400e;margin-bottom:14px">⚠️ Setelah ganti password, gunakan password baru saat login berikutnya.</div>
+            <div style="background:#fef9c3;border:1px solid #fde68a;border-radius:10px;padding:10px 12px;font-size:12px;color:#92400e;margin-bottom:14px">⚠️ Setelah mengganti password, gunakan password baru saat login berikutnya.</div>
             <div class="form-group"><label class="form-label">Password Baru</label>
               <div style="position:relative"><input type="password" class="form-control" id="userPwdBaru" placeholder="Min. 4 karakter" autocomplete="new-password" style="padding-right:40px"/>
                 <button type="button" onclick="togglePwd('userPwdBaru')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;padding:4px"><svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
-              </div></div>
+              </div>
+            </div>
             <div class="form-group"><label class="form-label">Konfirmasi</label>
               <div style="position:relative"><input type="password" class="form-control" id="userPwdKonfirm" placeholder="Ulangi password baru" autocomplete="new-password" style="padding-right:40px"/>
                 <button type="button" onclick="togglePwd('userPwdKonfirm')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;padding:4px"><svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
-              </div></div>
+              </div>
+            </div>
             <button class="btn btn-primary" onclick="userSavePassword()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>Ganti Password</button>
           </div>
         </div>
       </div>
     </div>
 
-  </div>
+  </div><!-- /content-area -->
   <footer class="app-footer">
     <span>Dibuat dengan ❤️ Oleh</span><strong>WA MIRANTI</strong>
-    <a href="https://instagram.com/wa_miranti" target="_blank" class="social-link ig-link" title="@wa_miranti"><svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
-    <a href="https://tiktok.com/@wa_miranti" target="_blank" class="social-link tt-link" title="@wa_miranti"><svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V9.15a8.16 8.16 0 004.77 1.52V7.22a4.85 4.85 0 01-1-.53z"/></svg></a>
+    <a href="https://instagram.com/wa_miranti" target="_blank" class="social-link ig-link" title="Instagram @wa_miranti"><svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+    <a href="https://tiktok.com/@wa_miranti" target="_blank" class="social-link tt-link" title="TikTok @wa_miranti"><svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V9.15a8.16 8.16 0 004.77 1.52V7.22a4.85 4.85 0 01-1-.53z"/></svg></a>
   </footer>
 </div>
 </div>
 
-<!-- MODAL LOKASI WBP -->
+<!-- MODAL KETERANGAN (Di Luar Kamar) -->
 <div class="modal-overlay" id="ketModal" style="display:none">
-  <div class="modal" style="max-width:340px">
-    <div class="modal-header"><div><div class="modal-title">WBP Sedang Di Mana?</div><div style="font-size:12px;color:#94a3b8;margin-top:2px" id="ketWbpName">—</div></div><button class="modal-close" onclick="closeModal('ketModal')">✕</button></div>
+  <div class="modal" style="max-width:360px">
+    <div class="modal-header">
+      <div><div class="modal-title">WBP Sedang Di Mana?</div><div style="font-size:12px;color:#94a3b8;margin-top:2px" id="ketWbpName">—</div></div>
+      <button class="modal-close" onclick="closeModal('ketModal')">✕</button>
+    </div>
     <div class="modal-body">
       <input type="hidden" id="ketWbpId"/>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
-        <button type="button" class="ket-opsi-btn" data-val="Di Bengkel" onclick="pilihAlasan(this)"><div style="font-size:22px;margin-bottom:4px">🔧</div><div>Bengkel</div></button>
-        <button type="button" class="ket-opsi-btn" data-val="Di Kebun"   onclick="pilihAlasan(this)"><div style="font-size:22px;margin-bottom:4px">🌿</div><div>Kebun</div></button>
-        <button type="button" class="ket-opsi-btn" data-val="Di Rumah Sakit" onclick="pilihAlasan(this)"><div style="font-size:22px;margin-bottom:4px">🏥</div><div>RS</div></button>
+      <input type="hidden" id="editAbsenDetailId"/>
+      <p style="font-size:12px;color:#64748b;margin-bottom:12px">Pilih lokasi WBP saat ini:</p>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px">
+        <button type="button" class="ket-opsi-btn" data-val="Di Bengkel" onclick="pilihAlasan(this)"><div style="font-size:22px;margin-bottom:4px">🔧</div><div>Di Bengkel</div></button>
+        <button type="button" class="ket-opsi-btn" data-val="Di Kebun"  onclick="pilihAlasan(this)"><div style="font-size:22px;margin-bottom:4px">🌿</div><div>Di Kebun</div></button>
+        <button type="button" class="ket-opsi-btn" data-val="Di Rumah Sakit" onclick="pilihAlasan(this)"><div style="font-size:22px;margin-bottom:4px">🏥</div><div>Rumah Sakit</div></button>
+        <button type="button" class="ket-opsi-btn" data-val="Lainnya" onclick="pilihAlasan(this)"><div style="font-size:22px;margin-bottom:4px">📌</div><div>Lainnya</div></button>
       </div>
-      <div class="form-group"><label class="form-label">Keterangan Tambahan <span style="color:#94a3b8;font-weight:400">(opsional)</span></label><textarea class="form-control" id="ketDetail" rows="2" placeholder="Detail..."></textarea></div>
+      <div class="form-group"><label class="form-label">Keterangan Tambahan <span style="color:#94a3b8;font-weight:400">(opsional)</span></label>
+        <textarea class="form-control" id="ketDetail" rows="2" placeholder="Detail tambahan..."></textarea>
+      </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('ketModal')">Batal</button><button class="btn btn-warning" onclick="saveKeterangan()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Simpan</button></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('ketModal')">Batal</button>
+      <button class="btn btn-warning" onclick="saveKeterangan()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Simpan</button>
+    </div>
   </div>
 </div>
 
-<!-- MODAL EDIT RIWAYAT -->
-<div class="modal-overlay" id="editMyAbsenModal" style="display:none">
-  <div class="modal" style="max-width:360px">
-    <div class="modal-header"><div class="modal-title">Edit Absensi</div><button class="modal-close" onclick="closeModal('editMyAbsenModal')">✕</button></div>
-    <div class="modal-body">
-      <input type="hidden" id="editMyAbsenId"/>
-      <div class="form-group"><label class="form-label">Status</label>
-        <select class="form-control" id="editMyAbsenStatus">
-          <option value="Di Kamar">✅ Di Kamar</option>
-          <option value="Di Bengkel">🔧 Di Bengkel</option>
-          <option value="Di Kebun">🌿 Di Kebun</option>
-          <option value="Di Rumah Sakit">🏥 Di Rumah Sakit</option>
-          <option value="Lainnya">📌 Lainnya</option>
-        </select>
-      </div>
-      <div class="form-group"><label class="form-label">Keterangan</label><input type="text" class="form-control" id="editMyAbsenKet" placeholder="Keterangan opsional"/></div>
-    </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('editMyAbsenModal')">Batal</button><button class="btn btn-primary" onclick="saveMyAbsen()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>Simpan</button></div>
-  </div>
-</div>
-
-<script src="js/config.js"></script>
 <script>
-// Load splash dari DB setelah config.js (sb tersedia)
-loadSplashFromDB('splLogoWrap','splNameWrap','splDescWrap').catch(()=>{});
+async function loadSplashCfg(){
+  try{
+    const{data}=await window.sb?.from('site_config').select('site_name,logo_url').maybeSingle()||{data:null};
+    if(!data)throw new Error('no data');
+    const sl=document.getElementById('splashLogoWrap');sl.style.animation='none';
+    if(data.logo_url){const img=document.createElement('img');img.src=data.logo_url;img.style.cssText='width:100%;height:100%;object-fit:cover';sl.appendChild(img);}
+    else{sl.textContent='🏛️';sl.style.fontSize='30px';}
+    const sn=document.getElementById('splashNameWrap');sn.style.cssText='color:white;font-size:20px;font-weight:800;background:none;animation:none;height:auto;width:auto;border-radius:0;margin-bottom:5px';sn.textContent=data.site_name||'SIMAWAR';
+    const sd=document.getElementById('splashDescWrap');sd.style.cssText='color:rgba(255,255,255,.7);font-size:12px;background:none;animation:none;height:auto;width:auto;border-radius:0;text-align:center';sd.textContent='Sistem Informasi Monitoring Warga Binaan';
+  }catch(e){
+    const sl=document.getElementById('splashLogoWrap');sl.textContent='🏛️';sl.style.fontSize='30px';sl.style.animation='none';
+    const sn=document.getElementById('splashNameWrap');sn.style.cssText='color:white;font-size:20px;font-weight:800;background:none;animation:none;height:auto;width:auto;border-radius:0;margin-bottom:5px';sn.textContent='SIMAWAR';
+    const sd=document.getElementById('splashDescWrap');sd.style.cssText='color:rgba(255,255,255,.7);font-size:12px;background:none;animation:none;height:auto;width:auto;border-radius:0;text-align:center';sd.textContent='Sistem Informasi Monitoring Warga Binaan';
+  }
+}
 </script>
+<script src="js/config.js"></script>
+<script>loadSplashCfg().catch(()=>{});</script>
 <script src="js/user.js"></script>
 </body>
 </html>
