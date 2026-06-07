@@ -78,7 +78,16 @@
         <div class="stat-card"><div class="stat-icon bg-purple-50" style="height:48px;animation:swpulse 1.5s infinite"></div><div style="height:28px;background:#f1f5f9;border-radius:8px;width:60px;margin-top:14px;animation:swpulse 1.5s infinite"></div><div style="height:12px;background:#f1f5f9;border-radius:6px;width:80px;margin-top:8px;animation:swpulse 1.5s infinite"></div></div>
       </div>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div class="card"><div class="card-header"><div><div class="card-title">Absensi Hari Ini</div><div style="font-size:12px;color:#94a3b8;margin-top:2px" id="dashTodayDate"></div></div><span class="badge badge-blue" id="dashTodayCount">0 catatan</span></div><div id="dashTodayList" style="padding:16px"><div style="padding:32px;text-align:center;color:#94a3b8;font-size:13px">Belum ada absensi hari ini</div></div></div>
+        <!-- Status shift hari ini -->
+        <div class="card mb-4" style="padding:14px 16px">
+          <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:10px">Status Shift Hari Ini</div>
+          <div id="dashShiftStatus" style="display:flex;gap:8px;flex-wrap:wrap">
+            <div style="height:28px;width:100px;background:#f1f5f9;border-radius:20px;animation:swpulse 1.5s infinite"></div>
+            <div style="height:28px;width:100px;background:#f1f5f9;border-radius:20px;animation:swpulse 1.5s infinite"></div>
+            <div style="height:28px;width:100px;background:#f1f5f9;border-radius:20px;animation:swpulse 1.5s infinite"></div>
+          </div>
+        </div>
+        <div class="card"><div class="card-header"><div><div class="card-title">WBP Belum Diabsen Hari Ini</div><div style="font-size:12px;color:#94a3b8;margin-top:2px" id="dashTodayDate"></div></div><button class="btn btn-ghost btn-sm" onclick="loadDashboard()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>Refresh</button></div><div id="dashBelumAbsen" style="padding:12px"><div style="height:40px;background:#f1f5f9;border-radius:8px;animation:swpulse 1.5s infinite"></div></div></div>
         <div class="card"><div class="card-header"><div class="card-title">Status Kamar</div><button class="btn btn-ghost btn-sm" onclick="loadDashboard()">Refresh</button></div><div class="card-body"><div class="kamar-grid" id="dashBlokGrid"><div style="height:80px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div><div style="height:80px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div></div></div></div>
       </div>
     </div>
@@ -108,7 +117,7 @@
           <div class="search-input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg><input type="text" id="pegawaiSearch" placeholder="Cari nama/username..." oninput="debounce(loadPegawai)"/></div>
           <select class="form-control" style="width:auto" id="pegawaiRoleFilter" onchange="loadPegawai()"><option value="">Semua Role</option><option value="admin">Admin</option><option value="user">Rupam</option></select>
         </div>
-        <div class="table-container"><table><thead><tr><th>No</th><th>Nama</th><th>Username</th><th>Password</th><th>Role</th><th>Aksi</th></tr></thead><tbody id="pegawaiTableBody"></tbody></table></div>
+        <div class="table-container"><table><thead><tr><th>No</th><th>Nama Rupam</th><th>Username</th><th>Password</th><th>Aksi</th></tr></thead><tbody id="pegawaiTableBody"></tbody></table></div>
         <div style="padding:10px 16px;border-top:1px solid #f1f5f9"><span style="font-size:12px;color:#94a3b8" id="pegawaiCount">—</span></div>
       </div>
     </div>
@@ -134,9 +143,15 @@
           <input type="date" class="form-control" style="width:auto" id="riwayatSampai" onchange="loadRiwayat()"/>
           <select class="form-control" style="width:auto;min-width:120px" id="riwayatBlokFilter" onchange="loadRiwayat()"><option value="">Semua Blok</option></select>
           <select class="form-control" style="width:auto;min-width:130px" id="riwayatPegawaiFilter" onchange="loadRiwayat()"><option value="">Semua Petugas</option></select>
+          <select class="form-control" style="width:auto" id="riwayatShiftFilter" onchange="loadRiwayat()">
+            <option value="">Semua Shift</option>
+            <option value="Pagi">🌅 Pagi</option>
+            <option value="Siang">☀️ Siang</option>
+            <option value="Sore">🌇 Sore</option>
+          </select>
           <button class="btn btn-ghost btn-sm" onclick="resetRiwayatFilter()">Reset</button>
         </div>
-        <div class="table-container"><table><thead><tr><th>No</th><th>Waktu</th><th>Petugas</th><th>Blok</th><th>WBP</th><th>Status</th><th>Keterangan</th><th>Aksi</th></tr></thead><tbody id="riwayatTableBody"></tbody></table></div>
+        <div class="table-container"><table><thead><tr><th>No</th><th>Waktu</th><th>Shift</th><th>Petugas</th><th>Status</th><th>Blok</th><th>WBP</th><th>Keterangan</th><th>Aksi</th></tr></thead><tbody id="riwayatTableBody"></tbody></table></div>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid #f1f5f9"><span style="font-size:12px;color:#94a3b8" id="riwayatCount">—</span><div style="display:flex;gap:6px" id="riwayatPagination"></div></div>
       </div>
     </div>
@@ -204,7 +219,15 @@
           <div style="font-size:18px;font-weight:800" id="akunNamaDisplay">—</div>
           <div class="mt-3"><span class="badge badge-purple" id="akunRoleDisplay">Admin</span></div>
           <div style="margin-top:14px;padding-top:14px;border-top:1px solid #f1f5f9">
-            <div style="display:flex;justify-content:space-between;padding:6px 0"><span style="font-size:12px;color:#94a3b8">Username</span><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:5px" id="akunUsernameDisplay">—</code></div>
+            <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f8fafc"><span style="font-size:12px;color:#94a3b8">Username</span><code style="font-size:12px;background:#f1f5f9;padding:2px 8px;border-radius:6px" id="akunUsernameDisplay">—</code></div>
+            <div style="padding:8px 0">
+              <div style="font-size:11px;color:#94a3b8;margin-bottom:4px">Password Aktif</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <code id="akunPwdAktif" style="font-size:13px;background:#fef9c3;border:1px solid #fde68a;padding:4px 10px;border-radius:8px;color:#92400e;letter-spacing:2px">••••••••</code>
+                <button onclick="togglePwd('akunPwdAktifEl')" style="background:none;border:none;cursor:pointer;color:#94a3b8;padding:2px" title="Tampilkan password"><svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
+              </div>
+              <input type="text" id="akunPwdAktifEl" style="display:none" value=""/>
+            </div>
           </div>
         </div></div>
         <div class="card lg:col-span-2"><div class="card-header"><div class="card-title">Ubah Data Akun</div></div>
@@ -233,7 +256,7 @@
     </div>
 
   </div>
-  <footer class="app-footer"><span>Dibuat dengan ❤️ Oleh</span><strong>WA MIRANTI</strong><a href="https://www.instagram.com/mira07nti/" target="_blank" class="social-link ig-link" title="Instagram @wa_miranti"><svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a><a href="#" target="_blank" class="social-link tt-link" title="TikTok @wa_miranti"><svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V9.15a8.16 8.16 0 004.77 1.52V7.22a4.85 4.85 0 01-1-.53z"/></svg></a></footer>
+  <footer class="app-footer"><span>Dibuat dengan ❤️ Oleh</span><strong>WA MIRANTI</strong><a href="https://instagram.com/wa_miranti" target="_blank" class="social-link ig-link" title="Instagram @wa_miranti"><svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a><a href="https://tiktok.com/@wa_miranti" target="_blank" class="social-link tt-link" title="TikTok @wa_miranti"><svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V9.15a8.16 8.16 0 004.77 1.52V7.22a4.85 4.85 0 01-1-.53z"/></svg></a></footer>
 </div>
 </div>
 
@@ -268,7 +291,7 @@
       </div>
       <p style="font-size:11px;color:#f59e0b;margin-top:5px">Password tersimpan dan dapat dilihat admin di tabel.</p>
     </div>
-    <div class="form-group"><label class="form-label">Role</label><select class="form-control" id="pegawaiRole"><option value="user">Petugas / Rupam</option><option value="admin">Admin</option></select></div>
+
   </div>
   <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('pegawaiModal')">Batal</button><button class="btn btn-primary" onclick="savePegawai()" id="pegawaiSaveBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg> Simpan</button></div>
 </div></div>

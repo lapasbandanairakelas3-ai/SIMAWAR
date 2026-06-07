@@ -1,57 +1,32 @@
 -- ============================================================
--- FIX DATABASE SIMAWAR — Jalankan SATU PER SATU di SQL Editor
+-- FIX DATABASE v8 — Jalankan satu per satu di SQL Editor
 -- ============================================================
 
--- STEP 1: Cek struktur absen_session yang ada
-SELECT column_name, data_type 
-FROM information_schema.columns 
-WHERE table_name = 'absen_session' ORDER BY ordinal_position;
+-- STEP 1: Tambah kolom shift ke absen_detail
+ALTER TABLE absen_detail ADD COLUMN IF NOT EXISTS shift text DEFAULT 'Pagi';
+UPDATE absen_detail SET shift = 'Pagi' WHERE shift IS NULL;
+ALTER TABLE absen_detail DROP CONSTRAINT IF EXISTS absen_detail_shift_check;
+ALTER TABLE absen_detail ADD CONSTRAINT absen_detail_shift_check CHECK (shift IN ('Pagi','Siang','Sore'));
 
--- ============================================================
--- STEP 2: Tambah kolom selesai jika belum ada
--- ============================================================
-ALTER TABLE absen_session ADD COLUMN IF NOT EXISTS selesai boolean DEFAULT false;
+-- STEP 2: Tambah kolom shift ke absen_session
+ALTER TABLE absen_session ADD COLUMN IF NOT EXISTS shift text DEFAULT 'Pagi';
+UPDATE absen_session SET shift = 'Pagi' WHERE shift IS NULL;
 
--- Jika ada kolom status lama, migrasikan ke selesai
-UPDATE absen_session SET selesai = (status = 'selesai') WHERE selesai IS NULL;
-
--- Hapus kolom status lama jika ada
-ALTER TABLE absen_session DROP COLUMN IF EXISTS status;
-
--- ============================================================
--- STEP 3: Hapus duplikat di absen_detail
--- Simpan hanya 1 record per WBP per hari (yang paling baru)
--- ============================================================
-DELETE FROM absen_detail a
-USING absen_detail b
-WHERE a.wbp_id = b.wbp_id 
-  AND a.tanggal = b.tanggal 
-  AND a.created_at < b.created_at;
-
--- ============================================================
--- STEP 4: Hapus index lama lalu buat baru
--- ============================================================
+-- STEP 3: Rebuild index — unique per WBP per shift per hari
 DROP INDEX IF EXISTS idx_absen_wbp_hari;
+DROP INDEX IF EXISTS idx_absen_wbp_hari_shift;
+CREATE UNIQUE INDEX idx_absen_wbp_hari_shift ON absen_detail(wbp_id, tanggal, shift);
+
+-- STEP 4: Rebuild index sesi
 DROP INDEX IF EXISTS idx_sesi_aktif;
+DROP INDEX IF EXISTS idx_sesi_aktif_shift;
+CREATE UNIQUE INDEX idx_sesi_aktif_shift ON absen_session(blok_id, tanggal, shift) WHERE selesai = false;
 
-CREATE UNIQUE INDEX idx_absen_wbp_hari ON absen_detail(wbp_id, tanggal);
-CREATE UNIQUE INDEX idx_sesi_aktif ON absen_session(blok_id, tanggal) WHERE selesai = false;
+-- STEP 5: Fix kolom is_admin jika belum ada
+ALTER TABLE pegawai ADD COLUMN IF NOT EXISTS is_admin boolean DEFAULT false;
+UPDATE pegawai SET is_admin = (role = 'admin') WHERE role IS NOT NULL AND is_admin IS NOT TRUE;
 
--- ============================================================
--- STEP 5: Tutup semua sesi lama yang mungkin masih terbuka
--- ============================================================
-UPDATE absen_session SET selesai = true
-WHERE tanggal < CURRENT_DATE;
-
--- ============================================================
 -- STEP 6: Verifikasi
--- ============================================================
-SELECT 'absen_session' as tabel, count(*) FROM absen_session
-UNION ALL
-SELECT 'absen_detail', count(*) FROM absen_detail;
-
--- Cek masih ada duplikat?
-SELECT wbp_id, tanggal, count(*) as jumlah
-FROM absen_detail
-GROUP BY wbp_id, tanggal
-HAVING count(*) > 1;
+SELECT 'absen_detail kolom' as cek, column_name FROM information_schema.columns WHERE table_name='absen_detail' AND column_name='shift';
+SELECT 'absen_session kolom' as cek, column_name FROM information_schema.columns WHERE table_name='absen_session' AND column_name='shift';
+SELECT 'total absen' as cek, count(*) FROM absen_detail;
