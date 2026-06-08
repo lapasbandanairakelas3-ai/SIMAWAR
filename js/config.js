@@ -8,7 +8,9 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // ── SHIFT ─────────────────────────────────────────────────────
 // PAGI: 00–07:59, SIANG: 08–13:59, MALAM: 14–23:59 (WIT)
 function getShiftNow() {
-  const h = parseInt(new Date().toLocaleString('id-ID', { timeZone:'Asia/Jayapura', hour:'2-digit', hour12:false }));
+  // WIT = Asia/Jayapura
+  const timeStr = new Date().toLocaleString('id-ID', { timeZone:'Asia/Jayapura', hour:'2-digit', minute:'2-digit', hour12:false });
+  const h = parseInt(timeStr.split('.')[0] || timeStr.split(':')[0]);
   if (h < 8)  return 'Pagi';
   if (h < 14) return 'Siang';
   return 'Malam';
@@ -18,7 +20,6 @@ const SHIFT_ICON  = { Pagi:'🌅', Siang:'☀️', Malam:'🌙' };
 const SHIFT_COLOR = { Pagi:'#f59e0b', Siang:'#3b82f6', Malam:'#6366f1' };
 const SHIFT_BG    = { Pagi:'#fef3c7', Siang:'#dbeafe', Malam:'#ede9fe' };
 const SHIFT_TC    = { Pagi:'#92400e', Siang:'#1e40af', Malam:'#4338ca' };
-// Label jam batas
 const SHIFT_LABEL = { Pagi:'PAGI SEBELUM JAM 08.00', Siang:'SIANG SEBELUM JAM 14.00', Malam:'MALAM SEBELUM JAM 20.00' };
 
 function shiftBadge(shift) {

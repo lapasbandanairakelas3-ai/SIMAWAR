@@ -101,7 +101,7 @@ async function loadDashboard(){
   if(shiftEl){
     const{data:sd}=await sb.from('absen_detail').select('shift').eq('tanggal',today);
     const done=new Set((sd||[]).map(d=>d.shift));
-    shiftEl.innerHTML=['Pagi','Siang','Sore'].map(sh=>{
+    shiftEl.innerHTML=['Pagi','Siang','Malam'].map(sh=>{
       const ok=done.has(sh);
       return `<span style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;background:${ok?SHIFT_BG[sh]:'#f1f5f9'};color:${ok?SHIFT_TC[sh]:'#94a3b8'};border:1.5px solid ${ok?SHIFT_COLOR[sh]:'#e2e8f0'}">${SHIFT_ICON[sh]} ${sh}: ${ok?'✅':'⏳'}</span>`;
     }).join('');
@@ -345,33 +345,36 @@ async function loadRiwayat(){
 // Edit hanya keterangan
 function pilihAlasanEdit(btn){document.querySelectorAll('#editAbsenOpsiGrid .ket-opsi-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
 
-function renderKetOpsisBtnsAdmin(containerId, existingKet=''){
+function renderKetOpsisBtnsAdmin(containerId, existingStatus='', existingKet=''){
   const cont=document.getElementById(containerId);if(!cont)return;
-  const statusList=getStatusList().filter(s=>s!=='Ada');
-  cont.innerHTML=statusList.map(s=>`<button type="button" class="ket-opsi-btn" data-val="${s}" onclick="pilihAlasanEdit(this)" style="font-size:11px;font-weight:700">${s}</button>`).join('');
-  if(existingKet){
-    const parts=existingKet.split(' - ');
-    const btn=cont.querySelector(`.ket-opsi-btn[data-val="${parts[0]}"]`);
-    if(btn){btn.classList.add('active');const extra=document.getElementById('editAbsenKetExtra');if(extra)extra.value=parts.slice(1).join(' - ');}
-    else{const extra=document.getElementById('editAbsenKetExtra');if(extra)extra.value=existingKet;}
+  const statusList=getStatusList();
+  if(!statusList.length){
+    cont.innerHTML=['Ada','Di Bengkel','Di Kebun','Di Rumah Sakit'].map(s=>`<button type="button" class="ket-opsi-btn" data-val="${s}" onclick="pilihAlasanEdit(this)">${s}</button>`).join('');
+  } else {
+    cont.innerHTML=statusList.map(s=>`<button type="button" class="ket-opsi-btn" data-val="${s}" onclick="pilihAlasanEdit(this)">${s}</button>`).join('');
   }
+  // Pre-select status
+  if(existingStatus){
+    const btn=cont.querySelector(`.ket-opsi-btn[data-val="${existingStatus}"]`);
+    if(btn)btn.classList.add('active');
+  }
+  const extra=document.getElementById('editAbsenKetExtra');if(extra&&existingKet)extra.value=existingKet;
 }
 
 function editAbsen(id,status,ket){
   document.getElementById('editAbsenId').value=id;
-  renderKetOpsisBtnsAdmin('editAbsenOpsiGrid', ket);
+  const extra=document.getElementById('editAbsenKetExtra');if(extra)extra.value='';
+  renderKetOpsisBtnsAdmin('editAbsenOpsiGrid', status||'Ada', ket||'');
   openModal('editAbsenModal');
 }
 async function saveAbsen(){
   const id=document.getElementById('editAbsenId').value;
   const aktif=document.querySelector('#editAbsenOpsiGrid .ket-opsi-btn.active');
   const extra=document.getElementById('editAbsenKetExtra')?.value.trim()||'';
-  let ket='';
-  if(aktif){ket=extra?`${aktif.dataset.val} - ${extra}`:aktif.dataset.val;}
-  else if(extra){ket=extra;}
-  const{error}=await sb.from('absen_detail').update({keterangan:ket||null}).eq('id',id);
+  if(!aktif){showAlert('warning','Pilih Status','Pilih status terlebih dahulu.');return;}
+  const{error}=await sb.from('absen_detail').update({status:aktif.dataset.val,keterangan:extra||null}).eq('id',id);
   if(error){showAlert('error','Gagal',error.message);return;}
-  showAlert('success','Diperbarui','Keterangan diperbarui.');closeModal('editAbsenModal');loadRiwayat();
+  showAlert('success','Diperbarui','Data diperbarui.');closeModal('editAbsenModal');loadRiwayat();
 }
 async function deleteAbsen(id){showConfirm('Hapus','Yakin hapus data absensi ini?',async()=>{const{error}=await sb.from('absen_detail').delete().eq('id',id);if(error){showAlert('error','Gagal',error.message);return;}showAlert('success','Dihapus','Data dihapus.');loadRiwayat();});}
 function setPresetAdmin(val, reload=true){
@@ -412,8 +415,12 @@ async function exportRiwayat(){
 async function loadStatus(){
   const tbody=document.getElementById('statusTableBody');
   if(tbody)tbody.innerHTML='<tr><td colspan="5" style="padding:40px;text-align:center;color:#94a3b8">Memuat...</td></tr>';
-  await loadStatusList(); // refresh cache
-  const{data,count}=await sb.from('status_absen').select('*',{count:'exact'}).order('urutan');
+  await loadStatusList().catch(()=>{});
+  const{data,count,error}=await sb.from('status_absen').select('*',{count:'exact'}).order('urutan');
+  if(error){
+    if(tbody)tbody.innerHTML=`<tr><td colspan="5"><div style="padding:24px;text-align:center;background:#fef2f2;margin:12px;border-radius:10px"><div style="font-size:13px;font-weight:700;color:#dc2626;margin-bottom:6px">⚠️ Tabel status_absen belum dibuat</div><div style="font-size:12px;color:#64748b">Jalankan SQL di file <code>fix_v9_complete.sql</code> di Supabase SQL Editor, lalu refresh halaman ini.</div></div></td></tr>`;
+    return;
+  }
   document.getElementById('statusCount').textContent=`${count||0} data`;
   if(!data?.length){if(tbody)tbody.innerHTML=`<tr><td colspan="5">${emptyState('Belum Ada Status','Tambahkan pilihan status absen')}</td></tr>`;return;}
   if(tbody)tbody.innerHTML=data.map((s,i)=>`<tr class="fade-in">
@@ -437,7 +444,14 @@ async function saveStatus(){
   const btn=document.getElementById('statusSaveBtn');btn.disabled=true;btn.textContent='Menyimpan...';
   try{
     const res=id?await sb.from('status_absen').update({nama,urutan}).eq('id',id):await sb.from('status_absen').insert({nama,urutan,aktif:true});
-    if(res.error){showAlert('error','Gagal',res.error.message);return;}
+    if(res.error){
+      if(res.error.code==='42P01'||res.error.message?.includes('does not exist')){
+        showAlert('error','Tabel Belum Ada','Jalankan SQL di fix_v9_complete.sql di Supabase terlebih dahulu.',6000);
+      } else {
+        showAlert('error','Gagal',res.error.message);
+      }
+      return;
+    }
     showAlert('success','Berhasil',id?'Status diperbarui.':'Status ditambahkan.');closeModal('statusModal');loadStatus();await loadStatusList();
   }finally{btn.disabled=false;btn.textContent='Simpan';}
 }

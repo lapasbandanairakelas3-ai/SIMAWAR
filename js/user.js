@@ -17,7 +17,8 @@ async function init(){
   document.getElementById('myRiwayatSampai').value=today;
   document.getElementById('myRiwayatPreset').value='today';
   setSimpanBtn(false);
-  await loadStatusList().catch(()=>{}); // Load status dari DB
+  // Load status dari DB (fallback ke default jika tabel belum ada)
+  await loadStatusList().catch(()=>{ console.log('status_absen table not found, using defaults'); });
   ['userPwdBaru','userPwdKonfirm'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   loadSiteConfigUser().catch(()=>{});
   // Restore halaman terakhir (agar tidak kembali ke awal saat refresh)
@@ -72,7 +73,7 @@ async function loadUserDashboard(){
   if(shiftEl){
     const{data:sd}=await sb.from('absen_detail').select('shift').eq('tanggal',today);
     const done=new Set((sd||[]).map(d=>d.shift));
-    shiftEl.innerHTML=['Pagi','Siang','Sore'].map(sh=>{const ok=done.has(sh);return`<span style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;background:${ok?SHIFT_BG[sh]:'#f1f5f9'};color:${ok?SHIFT_TC[sh]:'#94a3b8'};border:1.5px solid ${ok?SHIFT_COLOR[sh]:'#e2e8f0'}">${SHIFT_ICON[sh]} ${sh}: ${ok?'✅':'⏳'}</span>`;}).join('');
+    shiftEl.innerHTML=['Pagi','Siang','Malam'].map(sh=>{const ok=done.has(sh);return`<span style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;background:${ok?SHIFT_BG[sh]:'#f1f5f9'};color:${ok?SHIFT_TC[sh]:'#94a3b8'};border:1.5px solid ${ok?SHIFT_COLOR[sh]:'#e2e8f0'}">${SHIFT_ICON[sh]} ${sh}: ${ok?'✅':'⏳'}</span>`;}).join('');
   }
   // Status kamar
   const container=document.getElementById('dashKamarStatus');
@@ -96,7 +97,7 @@ async function loadUserDashboard(){
     return`<div style="border:1.5px solid ${selesai?'#86efac':'#e2e8f0'};border-radius:12px;padding:10px 14px;background:${selesai?'#f0fdf4':'white'};margin-bottom:8px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
         <div style="font-size:13px;font-weight:800;color:#1e293b">${b.nama}</div>
-        <div style="display:flex;gap:4px">${['Pagi','Siang','Sore'].map(sh=>{const c=wbpBlok.filter(w=>(absenMap[w.id]||[]).includes(sh)).length;return`<span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:8px;background:${c>0?SHIFT_BG[sh]:'#f1f5f9'};color:${c>0?SHIFT_TC[sh]:'#94a3b8'}">${SHIFT_ICON[sh]}${c>0?` ${c}`:''}</span>`;}).join('')}</div>
+        <div style="display:flex;gap:4px">${['Pagi','Siang','Malam'].map(sh=>{const c=wbpBlok.filter(w=>(absenMap[w.id]||[]).includes(sh)).length;return`<span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:8px;background:${c>0?SHIFT_BG[sh]:'#f1f5f9'};color:${c>0?SHIFT_TC[sh]:'#94a3b8'}">${SHIFT_ICON[sh]}${c>0?` ${c}`:''}</span>`;}).join('')}</div>
       </div>
       <div style="height:5px;background:#f1f5f9;border-radius:100px;overflow:hidden;margin-bottom:5px"><div style="height:100%;width:${total?Math.round(sudah/total*100):0}%;background:${selesai?'#10b981':'linear-gradient(90deg,#3b82f6,#6366f1)'};border-radius:100px;transition:width .3s"></div></div>
       <div style="font-size:11px;color:#94a3b8">${sudah}/${total} WBP | Shift ${currentShift}: ${selesai?'✅ Selesai':`⏳ ${belumShift.length} belum`}</div>
@@ -110,23 +111,30 @@ async function loadKamarPicker(){
   const shiftNow=getShiftNow();
   const picker=document.getElementById('shiftPicker');
   if(picker){
-    picker.innerHTML=['Pagi','Siang','Sore'].map(sh=>`
+    picker.innerHTML=['Pagi','Siang','Malam'].map(sh=>`
       <button onclick="pilihShift('${sh}')" id="shiftBtn_${sh}"
-        style="flex:1;padding:10px 8px;border-radius:12px;border:2px solid ${sh===shiftNow?SHIFT_COLOR[sh]:'#e2e8f0'};
+        style="flex:1;padding:14px 8px;border-radius:12px;border:2px solid ${sh===shiftNow?SHIFT_COLOR[sh]:'#e2e8f0'};
         background:${sh===shiftNow?SHIFT_BG[sh]:'white'};color:${sh===shiftNow?SHIFT_TC[sh]:'#64748b'};
-        font-size:12px;font-weight:800;cursor:pointer;transition:all .18s">
-        ${SHIFT_ICON[sh]}<br><span style="font-size:13px">${sh}</span>
+        font-size:13px;font-weight:800;cursor:pointer;transition:all .18s">
+        <div style="font-size:22px;margin-bottom:4px">${SHIFT_ICON[sh]}</div>
+        <div>${sh}</div>
+        <div style="font-size:9px;font-weight:600;margin-top:3px;opacity:.8">${sh==='Pagi'?'s.d. 08.00':sh==='Siang'?'s.d. 14.00':'s.d. 20.00'}</div>
       </button>`).join('');
   }
+  // Set shift sesuai jam sekarang, langsung load kamar
   selectedShift=shiftNow;
   const lbl=document.getElementById('shiftLabel');if(lbl)lbl.textContent=`Kamar — Shift ${shiftNow}`;
-  // Langsung load grid kamar tanpa menunggu klik
   await loadKamarGrid(shiftNow);
 }
 function pilihShift(sh){
   selectedShift=sh;
   document.getElementById('shiftLabel').textContent=`Kamar — Shift ${sh}`;
-  ['Pagi','Siang','Sore'].forEach(s=>{const btn=document.getElementById('shiftBtn_'+s);if(!btn)return;btn.style.borderColor=s===sh?SHIFT_COLOR[sh]:'#e2e8f0';btn.style.background=s===sh?SHIFT_BG[sh]:'white';btn.style.color=s===sh?SHIFT_TC[sh]:'#64748b';});
+  ['Pagi','Siang','Malam'].forEach(s=>{
+    const btn=document.getElementById('shiftBtn_'+s);if(!btn)return;
+    btn.style.borderColor=s===sh?SHIFT_COLOR[sh]:'#e2e8f0';
+    btn.style.background=s===sh?SHIFT_BG[sh]:'white';
+    btn.style.color=s===sh?SHIFT_TC[sh]:'#64748b';
+  });
   loadKamarGrid(sh);
 }
 
@@ -160,7 +168,8 @@ async function pilihKamar(blokId,blokNama){
   document.getElementById('step2ShiftBadge').innerHTML=shiftBadge(selectedShift);
   document.getElementById('step2Tanggal').textContent=new Date().toLocaleString('id-ID',{timeZone:'Asia/Jayapura',dateStyle:'full',timeStyle:'short'});
   setSimpanBtn(false);
-  await loadStatusList().catch(()=>{}); // Load status dari DB
+  // Load status dari DB (fallback ke default jika tabel belum ada)
+  await loadStatusList().catch(()=>{ console.log('status_absen table not found, using defaults'); });
   await loadWbpUntukAbsen(blokId);
 }
 
@@ -233,29 +242,37 @@ function pilihAlasan(btn){document.querySelectorAll('.ket-opsi-btn').forEach(b=>
 function saveKeterangan(){
   const wbpId=document.getElementById('ketWbpId').value;
   const aktif=document.querySelector('#ketOpsiGrid .ket-opsi-btn.active');
+  if(!aktif){showAlert('warning','Pilih Status','Pilih status WBP terlebih dahulu.');return;}
   const detail=document.getElementById('ketDetail').value.trim();
-  let ket='';
-  if(aktif){ket=detail?`${aktif.dataset.val} - ${detail}`:aktif.dataset.val;}
-  else if(detail){ket=detail;}
-  absenData[wbpId]={...(absenData[wbpId]||{}),status:'Ada',keterangan:ket};
+  const statusDipilih=aktif.dataset.val;
+  // Keterangan: isi detail jika bukan status "Ada", atau jika ada detail tambahan
+  const ket=detail?`${detail}`:statusDipilih!=='Ada'?'':'';
+  absenData[wbpId]={...(absenData[wbpId]||{}),status:statusDipilih,keterangan:ket||null};
   closeModal('ketModal');updateProgress();renderKartu();cekSimpanBolehAktif();
 }
 function tutupKetModal(){
-  // Tutup tanpa ubah apapun
+  // Jika WBP sudah punya status → boleh tutup (ubah/batalkan)
+  // Jika belum ada status → jangan tutup (paksa pilih dulu)
+  const wbpId=document.getElementById('ketWbpId').value;
+  if(!absenData[wbpId]?.status){
+    showAlert('info','Pilih Status','Pilih status WBP terlebih dahulu sebelum menutup.');
+    return;
+  }
   closeModal('ketModal');
 }
 
 function updateProgress(){
   const total=wbpList.length;
   const wbpIdSet=new Set(wbpList.map(w=>w.id));
-  const hadirCount=Object.entries(absenData).filter(([id,d])=>wbpIdSet.has(id)&&d.status).length;
-  const done=hadirCount;const pct=total?Math.round(done/total*100):0;
+  const sudahCount=Object.entries(absenData).filter(([id,d])=>wbpIdSet.has(id)&&d.status).length;
+  const pct=total?Math.round(sudahCount/total*100):0;
   const pb=document.getElementById('progressBar');if(pb)pb.style.width=pct+'%';
-  const pt=document.getElementById('progressText');if(pt)pt.textContent=`${done} / ${total}`;
-  const elH=document.getElementById('cntHadir');if(elH)elH.textContent=`${hadirCount} Hadir`;
-  const elB=document.getElementById('cntBelum');if(elB)elB.textContent=`${total-done} Belum`;
+  const pt=document.getElementById('progressText');if(pt)pt.textContent=`${sudahCount} / ${total}`;
+  const elH=document.getElementById('cntHadir');if(elH)elH.textContent=`${sudahCount} Sudah`;
+  const elT=document.getElementById('cntTidak');if(elT)elT.style.display='none';
+  const elB=document.getElementById('cntBelum');if(elB)elB.textContent=`${total-sudahCount} Belum`;
   const ph=document.getElementById('progressHint');
-  if(ph)ph.textContent=done===total&&total>0?'✅ Semua WBP sudah ditandai. Klik Simpan.':'Tap tombol Hadir pada setiap WBP untuk mengaktifkan tombol Simpan.';
+  if(ph)ph.textContent=sudahCount===total&&total>0?'✅ Semua WBP sudah diabsen. Klik Simpan.':'Tap tombol "Absen" pada setiap WBP untuk mengaktifkan tombol Simpan.';
 }
 function cekSimpanBolehAktif(){
   const semuaDitandai=wbpList.every(w=>absenData[w.id]?.status);
@@ -334,22 +351,20 @@ async function loadMyRiwayat(){
     <td style="padding:9px 12px"><button class="btn btn-warning btn-sm btn-icon" onclick="editMyAbsen('${row.id}','${(row.keterangan||'').replace(/'/g,"\\'")}')" title="Edit Keterangan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/></svg></button></td>
   </tr>`).join('');
 }
-function editMyAbsen(id,ket){
+function editMyAbsen(id,status,ket){
   document.getElementById('editMyAbsenId').value=id;
-  document.getElementById('editMyAbsenKetExtra').value='';
-  renderKetOpsiBtns('editMyAbsenOpsiGrid', ket);
+  document.getElementById('editMyAbsenKetExtra').value=ket||'';
+  renderStatusPicker('editMyAbsenOpsiGrid', status?{status,keterangan:ket}:null);
   openModal('editMyAbsenModal');
 }
 async function saveMyAbsen(){
   const id=document.getElementById('editMyAbsenId').value;
   const aktif=document.querySelector('#editMyAbsenOpsiGrid .ket-opsi-btn.active');
   const extra=document.getElementById('editMyAbsenKetExtra')?.value.trim()||'';
-  let ket='';
-  if(aktif){ket=extra?`${aktif.dataset.val} - ${extra}`:aktif.dataset.val;}
-  else if(extra){ket=extra;}
-  const{error}=await sb.from('absen_detail').update({keterangan:ket||null}).eq('id',id);
+  if(!aktif){showAlert('warning','Pilih Status','Pilih status terlebih dahulu.');return;}
+  const{error}=await sb.from('absen_detail').update({status:aktif.dataset.val,keterangan:extra||null}).eq('id',id);
   if(error){showAlert('error','Gagal',error.message);return;}
-  showAlert('success','Diperbarui','Keterangan diperbarui.');closeModal('editMyAbsenModal');loadMyRiwayat();
+  showAlert('success','Diperbarui','Data diperbarui.');closeModal('editMyAbsenModal');loadMyRiwayat();
 }
 async function deleteMyAbsen(id){
   showConfirm('Hapus Data','Yakin hapus data absensi ini?',async()=>{
