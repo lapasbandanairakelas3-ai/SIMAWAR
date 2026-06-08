@@ -580,3 +580,10 @@ body {
 .app-footer {
   margin-top: auto;
 }
+
+
+/* HAMBURGER TOGGLE - hide on desktop, show on mobile */
+.menu-toggle { display: none; }
+@media (max-width: 768px) {
+  .menu-toggle { display: inline-flex !important; }
+}

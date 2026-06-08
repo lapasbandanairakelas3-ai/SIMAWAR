@@ -31,8 +31,10 @@ function shiftBadge(shift) {
 // Diambil dari DB, default fallback
 let _statusList = ['Ada','Di Bengkel','Di Kebun','Di Rumah Sakit'];
 async function loadStatusList() {
-  const { data } = await sb.from('status_absen').select('nama').eq('aktif',true).order('urutan');
-  if (data?.length) _statusList = data.map(d => d.nama);
+  try {
+    const { data, error } = await sb.from('status_absen').select('nama').eq('aktif',true).order('urutan');
+    if (!error && data?.length) _statusList = data.map(d => d.nama);
+  } catch(e) { /* keep default fallback */ }
   return _statusList;
 }
 function getStatusList() { return _statusList; }

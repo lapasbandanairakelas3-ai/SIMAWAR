@@ -165,9 +165,14 @@ async function downloadLaporanPDF() {
       head: [['No','Nama WBP','Status','Keterangan']],
       body: rows,
       margin: {left: ml, right: mr},
-      styles: {fontSize:8, cellPadding:2.5},
-      headStyles: {fillColor:[219,234,254], textColor:[30,58,138], fontStyle:'bold', fontSize:8},
-      columnStyles: {0:{cellWidth:12,halign:'center'},2:{cellWidth:30,halign:'center',fontStyle:'bold'},3:{cellWidth:55}},
+      styles: {fontSize:8, cellPadding:3, valign:'middle'},
+      headStyles: {fillColor:[219,234,254], textColor:[30,58,138], fontStyle:'bold', fontSize:8, halign:'center', valign:'middle'},
+      columnStyles: {
+        0: {cellWidth:12, halign:'center'},
+        1: {halign:'left'},
+        2: {cellWidth:35, halign:'center', fontStyle:'bold'},
+        3: {cellWidth:60, halign:'center'}
+      },
       alternateRowStyles: {fillColor:[248,250,252]},
       tableLineColor:[200,210,230], tableLineWidth:0.3,
       didDrawPage: (data) => { y = data.cursor.y; }

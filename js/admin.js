@@ -101,7 +101,7 @@ async function loadDashboard(){
   if(shiftEl){
     const{data:sd}=await sb.from('absen_detail').select('shift').eq('tanggal',today);
     const done=new Set((sd||[]).map(d=>d.shift));
-    shiftEl.innerHTML=['Pagi','Siang','Malam'].map(sh=>{
+    shiftEl.innerHTML=SHIFT_LIST.map(sh=>{
       const ok=done.has(sh);
       return `<span style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;background:${ok?SHIFT_BG[sh]:'#f1f5f9'};color:${ok?SHIFT_TC[sh]:'#94a3b8'};border:1.5px solid ${ok?SHIFT_COLOR[sh]:'#e2e8f0'}">${SHIFT_ICON[sh]} ${sh}: ${ok?'✅':'⏳'}</span>`;
     }).join('');

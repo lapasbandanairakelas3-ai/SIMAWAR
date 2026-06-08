@@ -175,16 +175,24 @@ async function pilihKamar(blokId,blokNama){
 
 async function loadWbpUntukAbsen(blokId){
   const grid=document.getElementById('wbpAbsenGrid');
-  grid.innerHTML='<div style="height:220px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div>'.repeat(3);
+  grid.innerHTML='<div style="height:260px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div>'.repeat(3);
   const sw=document.getElementById('simpanWrap');if(sw)sw.style.display='none';
-  const{data:wbps}=await sb.from('wbp').select('id,nama,no_registrasi,kasus,masa_pidana,tgl_bebas').eq('blok_id',blokId).order('nama');
-  wbpList=wbps||[];
-  if(!wbpList.length){grid.innerHTML=`<div style="grid-column:1/-1">${emptyState('Tidak Ada WBP','Belum ada WBP di kamar ini')}</div>`;setSimpanBtn(false);return;}
-  // Cek sudah diabsen di shift ini hari ini
+  // Pastikan status list ready
+  await loadStatusList().catch(()=>{});
   const today=todayWIT();
-  const{data:sudahData}=await sb.from('absen_detail').select('id,wbp_id,status,keterangan').eq('tanggal',today).eq('shift',selectedShift).in('wbp_id',wbpList.map(w=>w.id));
+  // Load WBP + data sudah absen PARAREL
+  const [wbpRes,sudahRes]=await Promise.all([
+    sb.from('wbp').select('id,nama,no_registrasi,kasus,masa_pidana,tgl_bebas').eq('blok_id',blokId).order('nama'),
+    sb.from('absen_detail').select('id,wbp_id,status,keterangan').eq('tanggal',today).eq('shift',selectedShift)
+  ]);
+  wbpList=wbpRes.data||[];
+  if(!wbpList.length){grid.innerHTML=`<div style="grid-column:1/-1">${emptyState('Tidak Ada WBP','Belum ada WBP di kamar ini')}</div>`;setSimpanBtn(false);return;}
+  // Build absenData dari sudahData
   absenData={};
-  (sudahData||[]).forEach(a=>{absenData[a.wbp_id]={id:a.id,status:a.status,keterangan:a.keterangan||'',sudahAbsen:true};});
+  const wbpIds=new Set(wbpList.map(w=>w.id));
+  (sudahRes.data||[]).filter(a=>wbpIds.has(a.wbp_id)).forEach(a=>{
+    absenData[a.wbp_id]={id:a.id,status:a.status,keterangan:a.keterangan||'',sudahAbsen:true};
+  });
   renderKartu();updateProgress();cekSimpanBolehAktif();
 }
 
@@ -195,48 +203,47 @@ function renderKartu(){
     const hadir=!!d.status;
     let expStr='',expColor='#64748b',expWarn=false;
     if(w.tgl_bebas){const tgl=new Date(w.tgl_bebas+'T00:00:00'),sisa=Math.ceil((tgl-new Date())/(1000*60*60*24));const bln=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];expStr=`${String(tgl.getDate()).padStart(2,'0')} ${bln[tgl.getMonth()]} ${tgl.getFullYear()}`;expWarn=sisa<=90;expColor=sisa<=30?'#dc2626':sisa<=90?'#f59e0b':'#64748b';}
-    return`<div class="wbp-card ${hadir?'hadir':''}" id="wcard-${w.id}">
+    const wname=w.nama.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+    return`<div class="wbp-card ${hadir?'hadir':''}" id="wcard-${w.id}"
+      onclick="setHadir('${w.id}','${wname}')"
+      style="cursor:pointer;border:2.5px solid ${hadir?'#10b981':'#e2e8f0'};border-radius:14px;overflow:hidden;background:white;transition:all .2s;position:relative;box-shadow:${hadir?'0 4px 12px rgba(16,185,129,.18)':'0 1px 3px rgba(0,0,0,.05)'}">
       <div style="position:relative">
-        ${hadir?`<div style="position:absolute;top:8px;right:8px;z-index:2;background:#10b981;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" style="width:13px;height:13px"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg></div>`:''}
-        <div style="width:100%;aspect-ratio:1/1;background:linear-gradient(135deg,#dbeafe,#e0e7ff);display:flex;align-items:center;justify-content:center"><span style="font-size:40px;font-weight:900;color:rgba(59,130,246,.18)">${w.nama?.[0]||'?'}</span></div>
-        <div style="background:linear-gradient(135deg,#1e3a8a,#1e40af);color:white;font-size:11px;font-weight:800;text-align:center;padding:5px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${w.nama}</div>
+        ${hadir?`<div style="position:absolute;top:8px;right:8px;z-index:2;background:#10b981;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(16,185,129,.4)"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg></div>`:`<div style="position:absolute;top:8px;right:8px;z-index:2;background:#1e40af;color:white;border-radius:14px;padding:4px 12px;font-size:10px;font-weight:800;letter-spacing:.4px;box-shadow:0 2px 6px rgba(30,64,175,.3)">📋 ABSEN</div>`}
+        <div style="width:100%;aspect-ratio:1/1;background:linear-gradient(135deg,#dbeafe,#e0e7ff);display:flex;align-items:center;justify-content:center"><span style="font-size:48px;font-weight:900;color:rgba(59,130,246,.22)">${w.nama?.[0]||'?'}</span></div>
+        <div style="background:linear-gradient(135deg,#1e3a8a,#1e40af);color:white;font-size:12px;font-weight:800;text-align:center;padding:6px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${w.nama}</div>
       </div>
       <div style="padding:8px 10px 0">
         <div style="font-size:10px;color:#94a3b8">${w.no_registrasi||'—'}</div>
-        ${w.kasus?`<div style="font-size:10px;color:#64748b;margin-top:3px"><span style="color:#94a3b8">Perkara: </span>${w.kasus}</div>`:''}
         ${w.masa_pidana?`<div style="font-size:10px;font-weight:700;color:#1e293b;margin-top:2px"><span style="color:#94a3b8;font-weight:400">Putusan: </span>${w.masa_pidana}</div>`:''}
       </div>
       ${w.tgl_bebas?`<div style="margin:6px 8px 0;padding:5px 8px;border-radius:8px;background:${expWarn?'#fef2f2':'#f8fafc'};border:1px solid ${expWarn?'#fecaca':'#e2e8f0'};text-align:center"><div style="font-size:9px;font-weight:700;color:${expColor};text-transform:uppercase">Bebas</div><div style="font-size:12px;font-weight:900;color:${expColor}">${expStr}</div></div>`:''}
-      <!-- Keterangan di bawah (jika hadir dan ada keterangan) -->
-      ${hadir&&d.keterangan?`<div style="margin:5px 8px 0;padding:5px 8px;background:#fef3c7;border-radius:8px;font-size:10px;font-weight:600;color:#92400e">📌 ${d.keterangan}</div>`:''}
-      <!-- Satu tombol Hadir, klik buka pilihan keterangan -->
-      <div style="padding:8px">
-        <button onclick="setHadir('${w.id}','${w.nama.replace(/'/g,"\\'")}')"
-          style="width:100%;padding:8px;border:none;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s;background:${hadir?'#10b981':'#d1fae5'};color:${hadir?'white':'#065f46'}">
-          ✓ Ada${d.keterangan ? ' (' + d.keterangan.split(' - ')[0] + ')' : ''}
-        </button>
-      </div>
+      ${hadir?`<div style="margin:6px 8px 8px;padding:7px 10px;background:#d1fae5;border-radius:10px;font-size:11px;font-weight:700;color:#065f46;text-align:center">✓ ${d.status||'Ada'}${d.keterangan?' • '+d.keterangan:''}</div>`:'<div style="height:8px"></div>'}
     </div>`;
   }).join('');
 }
 
 function setHadir(wbpId, wbpNama){
-  // Tandai hadir dulu (jika belum)
-  if(!absenData[wbpId])absenData[wbpId]={};
-  absenData[wbpId].status='Ada';
-  // Buka modal keterangan langsung (1 klik)
+  // Buka modal pilih status (WBP belum dianggap absen sampai pilih status)
   document.getElementById('ketWbpId').value=wbpId;
   document.getElementById('ketWbpName').textContent=wbpNama;
   document.getElementById('ketDetail').value='';
-  document.querySelectorAll('.ket-opsi-btn').forEach(b=>b.classList.remove('active'));
-  const existing=absenData[wbpId]?.keterangan;
-  if(existing){
-    const btn=document.querySelector(`.ket-opsi-btn[data-val="${existing.split(' - ')[0]}"]`);
-    if(btn)btn.classList.add('active');
-    document.getElementById('ketDetail').value=existing.includes(' - ')?existing.split(' - ').slice(1).join(' - '):'';
-  }
-  updateProgress();renderKartu();cekSimpanBolehAktif();
+  // Render tombol status dari DB
+  renderStatusPicker('ketOpsiGrid', absenData[wbpId]);
   openModal('ketModal');
+}
+
+function renderStatusPicker(containerId, existingData){
+  const cont=document.getElementById(containerId);if(!cont)return;
+  const statusList=getStatusList();
+  const list=statusList?.length?statusList:['Ada','Di Bengkel','Di Kebun','Di Rumah Sakit'];
+  cont.innerHTML=list.map(s=>`<button type="button" class="ket-opsi-btn" data-val="${s}" onclick="pilihAlasan(this)">${s}</button>`).join('');
+  if(existingData?.status){
+    const btn=cont.querySelector(`.ket-opsi-btn[data-val="${existingData.status}"]`);
+    if(btn)btn.classList.add('active');
+    if(existingData.keterangan){
+      const ket=document.getElementById('ketDetail');if(ket)ket.value=existingData.keterangan;
+    }
+  }
 }
 function pilihAlasan(btn){document.querySelectorAll('.ket-opsi-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
 function saveKeterangan(){
@@ -245,9 +252,7 @@ function saveKeterangan(){
   if(!aktif){showAlert('warning','Pilih Status','Pilih status WBP terlebih dahulu.');return;}
   const detail=document.getElementById('ketDetail').value.trim();
   const statusDipilih=aktif.dataset.val;
-  // Keterangan: isi detail jika bukan status "Ada", atau jika ada detail tambahan
-  const ket=detail?`${detail}`:statusDipilih!=='Ada'?'':'';
-  absenData[wbpId]={...(absenData[wbpId]||{}),status:statusDipilih,keterangan:ket||null};
+  absenData[wbpId]={...(absenData[wbpId]||{}),status:statusDipilih,keterangan:detail||null};
   closeModal('ketModal');updateProgress();renderKartu();cekSimpanBolehAktif();
 }
 function tutupKetModal(){

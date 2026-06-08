@@ -58,7 +58,7 @@
 <div class="main-wrapper">
   <header class="top-header">
     <div style="display:flex;align-items:center;gap:10px">
-      <button onclick="toggleSidebar()" style="background:none;border:none;cursor:pointer;padding:6px"><svg style="width:20px;height:20px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <button class="menu-toggle" onclick="toggleSidebar()" style="background:none;border:none;cursor:pointer;padding:6px"><svg style="width:20px;height:20px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
       <div><div class="header-title" id="headerTitle">Dashboard</div><div class="header-subtitle" id="headerDate"></div></div>
     </div>
     <div class="header-user" onclick="goPage('profil')" style="cursor:pointer">
@@ -287,7 +287,7 @@
     </div>
     <div class="modal-body">
       <input type="hidden" id="ketWbpId"/>
-      <p style="font-size:12px;color:#374151;margin-bottom:12px;font-weight:600">Pilih status WBP saat ini:</p>
+      <p style="font-size:13px;color:#1e293b;margin-bottom:12px;font-weight:700">Status Absen</p>
       <div id="ketOpsiGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px">
         <!-- Diisi dinamis dari DB -->
       </div>
