@@ -95,3 +95,31 @@ ALTER TABLE absen_detail DROP CONSTRAINT IF EXISTS absen_detail_status_check;
 UPDATE absen_detail SET status = 'Hadir' WHERE status IN ('Di Kamar','Lainnya','Di Bengkel','Di Kebun','Di Rumah Sakit');
 -- Tambah constraint baru
 ALTER TABLE absen_detail ADD CONSTRAINT absen_detail_status_check CHECK (status = 'Hadir');
+
+-- ── STEP 11: Tabel status_absen (admin bisa kelola opsi status) ──
+CREATE TABLE IF NOT EXISTS status_absen (
+  id         uuid default gen_random_uuid() primary key,
+  nama       text not null unique,
+  urutan     int default 0,
+  aktif      boolean default true,
+  created_at timestamptz default now()
+);
+
+-- Insert default status
+INSERT INTO status_absen (nama, urutan) VALUES
+  ('Ada',           1),
+  ('Di Bengkel',    2),
+  ('Di Kebun',      3),
+  ('Di Rumah Sakit',4)
+ON CONFLICT (nama) DO NOTHING;
+
+-- RLS
+ALTER TABLE status_absen ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "p_sa" ON status_absen;
+CREATE POLICY "p_sa" ON status_absen FOR ALL USING (true) WITH CHECK (true);
+
+-- Update constraint absen_detail - hapus dulu, biarkan bebas (status diambil dari tabel)
+ALTER TABLE absen_detail DROP CONSTRAINT IF EXISTS absen_detail_status_check;
+
+-- Update data lama: Hadir -> Ada
+UPDATE absen_detail SET status = 'Ada' WHERE status = 'Hadir';

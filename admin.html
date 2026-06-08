@@ -44,6 +44,7 @@
       <div class="nav-item" id="nav-riwayat" onclick="goPage('riwayat')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6M7 7h10M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg></div>Riwayat Absensi</div>
     </div>
     <div class="nav-section"><div class="nav-section-title">Pengaturan</div>
+      <div class="nav-item" id="nav-status" onclick="goPage('status')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z"/></svg></div>Status Absen</div>
       <div class="nav-item" id="nav-siteconfig" onclick="goPage('siteconfig')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>Konfigurasi</div>
       <div class="nav-item" id="nav-akun" onclick="goPage('akun')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>Akun Saya</div>
     </div>
@@ -89,7 +90,7 @@
           </div>
         </div>
         <div class="card"><div class="card-header"><div><div class="card-title">WBP Belum Diabsen Hari Ini</div><div style="font-size:12px;color:#94a3b8;margin-top:2px" id="dashTodayDate"></div></div><button class="btn btn-ghost btn-sm" onclick="loadDashboard()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>Refresh</button></div><div id="dashBelumAbsen" style="padding:12px"><div style="height:40px;background:#f1f5f9;border-radius:8px;animation:swpulse 1.5s infinite"></div></div></div>
-        <div class="card"><div class="card-header"><div class="card-title">Status Kamar</div><button class="btn btn-ghost btn-sm" onclick="loadDashboard()">Refresh</button></div><div class="card-body"><div class="kamar-grid" id="dashBlokGrid"><div style="height:80px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div><div style="height:80px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div></div></div></div>
+        </div>
       </div>
     </div>
 
@@ -118,7 +119,7 @@
           <div class="search-input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg><input type="text" id="pegawaiSearch" placeholder="Cari nama/username..." oninput="debounce(loadPegawai)"/></div>
           
         </div>
-        <div class="table-container"><table><thead><tr><th style="width:44px">No</th><th>Nama Rupam</th><th style="width:110px">Username</th><th>Password &amp; Aksi</th></tr></thead><tbody id="pegawaiTableBody"></tbody></table></div>
+        <div class="table-container"><table><thead><tr><th style="width:44px">No</th><th>Nama Rupam</th><th style="width:110px">Username</th><th style="width:160px">Password</th><th style="width:100px">Aksi</th></tr></thead><tbody id="pegawaiTableBody"></tbody></table></div>
         <div style="padding:10px 16px;border-top:1px solid #f1f5f9"><span style="font-size:12px;color:#94a3b8" id="pegawaiCount">—</span></div>
       </div>
     </div>
@@ -155,7 +156,7 @@
             <option value="">Semua Shift</option>
             <option value="Pagi">🌅 Pagi</option>
             <option value="Siang">☀️ Siang</option>
-            <option value="Sore">🌇 Sore</option>
+            <option value="Malam">🌙 Malam</option>
           </select>
           <button class="btn btn-ghost btn-sm" onclick="resetRiwayatFilter()">Reset</button>
         </div>
@@ -165,6 +166,24 @@
     </div>
 
     <!-- KONFIGURASI -->
+    <!-- STATUS ABSEN -->
+    <div id="page-status" class="page-section">
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#166534">
+        ⚙️ <strong>Kelola Status Absen</strong> — Tambah/hapus pilihan status yang muncul saat Rupam melakukan absensi. Contoh: Ada, Di Bengkel, Di Kebun, Di Rumah Sakit.
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Daftar Status</div>
+          <button class="btn btn-primary btn-sm" onclick="openStatusModal()">+ Tambah Status</button>
+        </div>
+        <div class="table-container">
+          <table><thead><tr><th style="width:44px">No</th><th>Nama Status</th><th style="width:80px">Urutan</th><th style="width:80px">Aktif</th><th style="width:100px">Aksi</th></tr></thead>
+          <tbody id="statusTableBody"><tr><td colspan="5" style="padding:40px;text-align:center;color:#94a3b8">Memuat...</td></tr></tbody></table>
+        </div>
+        <div style="padding:10px 16px;border-top:1px solid #f1f5f9"><span style="font-size:12px;color:#94a3b8" id="statusCount">—</span></div>
+      </div>
+    </div>
+
     <div id="page-siteconfig" class="page-section">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <div class="lg:col-span-2 space-y-5">
@@ -320,12 +339,17 @@
 </div></div>
 
 <!-- MODAL EDIT ABSEN (ADMIN) -->
-<div class="modal-overlay" id="editAbsenModal" style="display:none"><div class="modal" style="max-width:380px">
-  <div class="modal-header"><div class="modal-title">Edit Absensi</div><button class="modal-close" onclick="closeModal('editAbsenModal')">✕</button></div>
+<div class="modal-overlay" id="editAbsenModal" style="display:none"><div class="modal" style="max-width:400px">
+  <div class="modal-header"><div class="modal-title">Edit Keterangan</div><button class="modal-close" onclick="closeModal('editAbsenModal')">✕</button></div>
   <div class="modal-body">
     <input type="hidden" id="editAbsenId"/>
-    <div class="form-group"><label class="form-label">Status</label><select class="form-control" id="editAbsenStatus"><option value="Hadir">Hadir</option><option value="Tidak Hadir">Tidak Hadir</option></select></div>
-    <div class="form-group"><label class="form-label">Keterangan</label><input type="text" class="form-control" id="editAbsenKet" placeholder="Keterangan (jika tidak hadir)"/></div>
+    <div class="form-group"><label class="form-label">Keterangan <span style="color:#94a3b8;font-weight:400">(pilih jika ada)</span></label>
+      <div id="editAbsenOpsiGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px">
+        <!-- Diisi dinamis dari DB -->
+      </div>
+      <input type="text" class="form-control" id="editAbsenKetExtra" placeholder="Keterangan tambahan (opsional)"/>
+      <p style="font-size:11px;color:#94a3b8;margin-top:5px">Biarkan kosong jika tidak ada keterangan.</p>
+    </div>
   </div>
   <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('editAbsenModal')">Batal</button><button class="btn btn-primary" onclick="saveAbsen()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg> Simpan</button></div>
 </div></div>
@@ -353,6 +377,21 @@ async function loadSplashCfg(){
     <div class="modal-header"><div class="modal-title">Detail WBP</div><button class="modal-close" onclick="closeModal('showWbpModal')">✕</button></div>
     <div class="modal-body" id="showWbpContent"></div>
     <div class="modal-footer"><button class="btn btn-primary" onclick="closeModal('showWbpModal')">Tutup</button></div>
+  </div></div>
+
+  <!-- MODAL STATUS ABSEN -->
+  <div class="modal-overlay" id="statusModal" style="display:none"><div class="modal" style="max-width:380px">
+    <div class="modal-header"><div class="modal-title" id="statusModalTitle">Tambah Status</div><button class="modal-close" onclick="closeModal('statusModal')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="statusId"/>
+      <div class="form-group"><label class="form-label">Nama Status</label>
+        <input type="text" class="form-control" id="statusNama" placeholder="Contoh: Di Kebun"/>
+      </div>
+      <div class="form-group"><label class="form-label">Urutan Tampil</label>
+        <input type="number" class="form-control" id="statusUrutan" value="0" min="0"/>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('statusModal')">Batal</button><button class="btn btn-primary" id="statusSaveBtn" onclick="saveStatus()">Simpan</button></div>
   </div></div>
 <script src="js/config.js"></script>
 <script>loadSplashCfg().catch(()=>{});</script>

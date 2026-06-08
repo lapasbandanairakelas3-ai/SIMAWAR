@@ -20,15 +20,16 @@ async function init(){
   const last=sessionStorage.getItem('sw_admin_page')||'dashboard';
   goPage(last,false);
   loadSiteConfig().catch(()=>{});
+  loadStatusList().catch(()=>{}); // Load status cache
 }
 
 function goPage(page,save=true){
   document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active'));
   document.getElementById('page-'+page)?.classList.add('active');
-  ['dashboard','wbp','pegawai','blok','riwayat','siteconfig','akun'].forEach(id=>{
+  ['dashboard','wbp','pegawai','blok','riwayat','status','siteconfig','akun'].forEach(id=>{
     document.getElementById('nav-'+id)?.classList.toggle('active',id===page);
   });
-  const T={dashboard:'Dashboard',wbp:'Data WBP',pegawai:'Data Rupam',blok:'Blok/Kamar',riwayat:'Riwayat Absensi',siteconfig:'Konfigurasi',akun:'Akun Saya'};
+  const T={dashboard:'Dashboard',wbp:'Data WBP',pegawai:'Data Rupam',blok:'Blok/Kamar',riwayat:'Riwayat Absensi',status:'Status Absen',siteconfig:'Konfigurasi',akun:'Akun Saya'};
   document.getElementById('headerTitle').textContent=T[page]||page;
   if(save)sessionStorage.setItem('sw_admin_page',page);
   closeSidebar();
@@ -37,6 +38,7 @@ function goPage(page,save=true){
   if(page==='pegawai')loadPegawai();
   if(page==='blok')loadBlok();
   if(page==='riwayat'){loadRiwayatFilters();loadRiwayat();}
+  if(page==='status')loadStatus();
   if(page==='akun')loadAkun();
   if(page==='siteconfig')loadSiteConfigForm();
 }
@@ -110,11 +112,8 @@ async function loadDashboard(){
 async function loadDashKamar(today){
   // "WBP Belum Diabsen" section
   const container=document.getElementById('dashBelumAbsen');
-  // "Status Kamar" section (blok grid)
-  const kamarGrid=document.getElementById('dashKamarContainer');
-  if(!container&&!kamarGrid)return;
-  if(container)container.innerHTML='<div style="height:40px;background:#f1f5f9;border-radius:10px;animation:swpulse 1.5s infinite"></div>'.repeat(2);
-  if(kamarGrid)kamarGrid.innerHTML='<div style="height:80px;background:#f1f5f9;border-radius:14px;animation:swpulse 1.5s infinite"></div>'.repeat(2);
+  if(!container)return;
+  container.innerHTML='<div style="height:40px;background:#f1f5f9;border-radius:10px;animation:swpulse 1.5s infinite"></div>'.repeat(2);
 
   const[blokRes,wbpRes,absenRes]=await Promise.all([
     sb.from('blok').select('id,nama,kapasitas'),
@@ -158,18 +157,6 @@ async function loadDashKamar(today){
     container.innerHTML=html;
   }
 
-  // Status Kamar (blok grid)
-  if(kamarGrid){
-    kamarGrid.innerHTML=blokData.map(({b,wbpBlok,total,sudah,selesai})=>`
-      <div class="kamar-card" style="cursor:default;background:${selesai?'#f0fdf4':'white'};border-color:${selesai?'#86efac':'#e2e8f0'}">
-        <div style="font-size:22px;margin-bottom:6px">${selesai?'✅':'🏠'}</div>
-        <div style="font-size:13px;font-weight:800;color:#1e293b">${b.nama}</div>
-        <div style="display:flex;gap:3px;justify-content:center;margin:5px 0">
-          ${['Pagi','Siang','Sore'].map(sh=>{const cnt=wbpBlok.filter(w=>(absenMap[w.id]||[]).includes(sh)).length;return`<span style="font-size:10px;font-weight:700;padding:1px 5px;border-radius:6px;background:${cnt>0?SHIFT_BG[sh]:'#f1f5f9'};color:${cnt>0?SHIFT_TC[sh]:'#94a3b8'}">${SHIFT_ICON[sh]}${cnt>0?' '+cnt:''}</span>`;}).join('')}
-        </div>
-        <div style="font-size:10px;color:#94a3b8">${sudah}/${total} WBP</div>
-      </div>`).join('');
-  }
 }
 
 // ── WBP CRUD ─────────────────────────────────────────────────
@@ -356,26 +343,28 @@ async function loadRiwayat(){
   document.getElementById('riwayatPagination').innerHTML=tot>1?Array.from({length:Math.min(tot,10)},(_,i)=>`<button onclick="riwayatPage=${i+1};loadRiwayat()" class="btn btn-sm ${i+1===riwayatPage?'btn-primary':'btn-ghost'}" style="min-width:32px">${i+1}</button>`).join(''):'';
 }
 // Edit hanya keterangan
-function pilihAlasanEdit(btn){document.querySelectorAll('#editAbsenModal .ket-opsi-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+function pilihAlasanEdit(btn){document.querySelectorAll('#editAbsenOpsiGrid .ket-opsi-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+
+function renderKetOpsisBtnsAdmin(containerId, existingKet=''){
+  const cont=document.getElementById(containerId);if(!cont)return;
+  const statusList=getStatusList().filter(s=>s!=='Ada');
+  cont.innerHTML=statusList.map(s=>`<button type="button" class="ket-opsi-btn" data-val="${s}" onclick="pilihAlasanEdit(this)" style="font-size:11px;font-weight:700">${s}</button>`).join('');
+  if(existingKet){
+    const parts=existingKet.split(' - ');
+    const btn=cont.querySelector(`.ket-opsi-btn[data-val="${parts[0]}"]`);
+    if(btn){btn.classList.add('active');const extra=document.getElementById('editAbsenKetExtra');if(extra)extra.value=parts.slice(1).join(' - ');}
+    else{const extra=document.getElementById('editAbsenKetExtra');if(extra)extra.value=existingKet;}
+  }
+}
 
 function editAbsen(id,status,ket){
   document.getElementById('editAbsenId').value=id;
-  document.getElementById('editAbsenStatusShow').textContent=status||'Hadir';
-  // Reset pilihan
-  document.querySelectorAll('#editAbsenModal .ket-opsi-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('editAbsenKetExtra').value='';
-  // Pre-select keterangan yang sudah ada
-  if(ket){
-    const parts=ket.split(' - ');
-    const btn=document.querySelector(`#editAbsenModal .ket-opsi-btn[data-val="${parts[0]}"]`);
-    if(btn){btn.classList.add('active');document.getElementById('editAbsenKetExtra').value=parts.slice(1).join(' - ');}
-    else{document.getElementById('editAbsenKetExtra').value=ket;}
-  }
+  renderKetOpsisBtnsAdmin('editAbsenOpsiGrid', ket);
   openModal('editAbsenModal');
 }
 async function saveAbsen(){
   const id=document.getElementById('editAbsenId').value;
-  const aktif=document.querySelector('#editAbsenModal .ket-opsi-btn.active');
+  const aktif=document.querySelector('#editAbsenOpsiGrid .ket-opsi-btn.active');
   const extra=document.getElementById('editAbsenKetExtra')?.value.trim()||'';
   let ket='';
   if(aktif){ket=extra?`${aktif.dataset.val} - ${extra}`:aktif.dataset.val;}
@@ -417,6 +406,47 @@ async function exportRiwayat(){
   try{const{jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'landscape'});doc.setFontSize(14);doc.setFont('helvetica','bold');doc.text('LAPORAN ABSENSI WBP',148,14,{align:'center'});doc.setFontSize(9);doc.setFont('helvetica','normal');doc.text(`Periode: ${dari} s.d. ${sampai}`,148,21,{align:'center'});doc.line(14,24,283,24);
   doc.autoTable({startY:28,head:[['No','Waktu','Shift','Petugas','Kamar','WBP','No.Reg','Status','Keterangan']],body:data.map((r,i)=>[i+1,formatWIT(r.waktu),r.shift||'—',r.pegawai?.nama||'—',r.blok?.nama||'—',r.wbp?.nama||'—',r.wbp?.no_registrasi||'—',r.status||'—',r.keterangan||'—']),styles:{fontSize:7,cellPadding:2},headStyles:{fillColor:[30,64,175],textColor:255,fontStyle:'bold'},alternateRowStyles:{fillColor:[248,250,252]}});
   doc.save(`absensi_${dari}_${sampai}.pdf`);showAlert('success','Berhasil','PDF diunduh.');}catch(e){showAlert('error','Gagal','Gagal buat PDF.');}
+}
+
+// ── STATUS ABSEN ─────────────────────────────────────────────
+async function loadStatus(){
+  const tbody=document.getElementById('statusTableBody');
+  if(tbody)tbody.innerHTML='<tr><td colspan="5" style="padding:40px;text-align:center;color:#94a3b8">Memuat...</td></tr>';
+  await loadStatusList(); // refresh cache
+  const{data,count}=await sb.from('status_absen').select('*',{count:'exact'}).order('urutan');
+  document.getElementById('statusCount').textContent=`${count||0} data`;
+  if(!data?.length){if(tbody)tbody.innerHTML=`<tr><td colspan="5">${emptyState('Belum Ada Status','Tambahkan pilihan status absen')}</td></tr>`;return;}
+  if(tbody)tbody.innerHTML=data.map((s,i)=>`<tr class="fade-in">
+    <td style="font-size:12px;color:#94a3b8;text-align:center">${i+1}</td>
+    <td style="font-size:13px;font-weight:700">${s.nama}</td>
+    <td style="font-size:12px;text-align:center;color:#64748b">${s.urutan}</td>
+    <td style="text-align:center"><span style="background:${s.aktif?'#d1fae5':'#fee2e2'};color:${s.aktif?'#065f46':'#991b1b'};padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700">${s.aktif?'Aktif':'Nonaktif'}</span></td>
+    <td><div style="display:flex;gap:6px">
+      <button class="btn btn-warning btn-sm btn-icon" onclick="editStatus('${s.id}','${s.nama.replace(/'/g,"\'")}',${s.urutan},${s.aktif})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/></svg></button>
+      <button class="btn btn-danger btn-sm btn-icon" onclick="deleteStatus('${s.id}','${s.nama.replace(/'/g,"\'")}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+    </div></td>
+  </tr>`).join('');
+}
+function openStatusModal(){['statusId','statusNama'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('statusUrutan').value='0';document.getElementById('statusModalTitle').textContent='Tambah Status';openModal('statusModal');}
+function editStatus(id,nama,urutan,aktif){document.getElementById('statusId').value=id;document.getElementById('statusNama').value=nama;document.getElementById('statusUrutan').value=urutan;document.getElementById('statusModalTitle').textContent='Edit Status';openModal('statusModal');}
+async function saveStatus(){
+  const id=document.getElementById('statusId').value;
+  const nama=document.getElementById('statusNama').value.trim();
+  const urutan=parseInt(document.getElementById('statusUrutan').value)||0;
+  if(!nama){showAlert('warning','Perhatian','Nama status wajib diisi.');return;}
+  const btn=document.getElementById('statusSaveBtn');btn.disabled=true;btn.textContent='Menyimpan...';
+  try{
+    const res=id?await sb.from('status_absen').update({nama,urutan}).eq('id',id):await sb.from('status_absen').insert({nama,urutan,aktif:true});
+    if(res.error){showAlert('error','Gagal',res.error.message);return;}
+    showAlert('success','Berhasil',id?'Status diperbarui.':'Status ditambahkan.');closeModal('statusModal');loadStatus();await loadStatusList();
+  }finally{btn.disabled=false;btn.textContent='Simpan';}
+}
+async function deleteStatus(id,nama){
+  showConfirm('Hapus Status',`Hapus status <b>${nama}</b>? Data absensi yang sudah menggunakan status ini tidak berubah.`,async()=>{
+    const{error}=await sb.from('status_absen').delete().eq('id',id);
+    if(error){showAlert('error','Gagal',error.message);return;}
+    showAlert('success','Dihapus',`${nama} dihapus.`);loadStatus();await loadStatusList();
+  });
 }
 
 // ── AKUN ─────────────────────────────────────────────────────

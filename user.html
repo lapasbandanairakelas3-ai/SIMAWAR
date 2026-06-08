@@ -49,6 +49,7 @@
     <div class="nav-item active" id="nav-dashboard" onclick="goPage('dashboard')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>Dashboard</div>
     <div class="nav-item" id="nav-absen" onclick="goPage('absen')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>Absensi WBP</div>
     <div class="nav-item" id="nav-riwayat" onclick="goPage('riwayat')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6M7 7h10M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg></div>Riwayat</div>
+    <div class="nav-item" id="nav-laporan" onclick="goPage('laporan')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg></div>Laporan</div>
     <div class="nav-item" id="nav-profil" onclick="goPage('profil')"><div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>Profil</div>
   </div></nav>
   <div class="sidebar-footer"><div class="nav-item" onclick="doLogout()" style="background:rgba(239,68,68,.12);color:#fca5a5;cursor:pointer"><div class="nav-icon" style="background:rgba(239,68,68,.15)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></div>Keluar</div></div>
@@ -183,7 +184,7 @@
             <option value="">Semua Shift</option>
             <option value="Pagi">🌅 Pagi</option>
             <option value="Siang">☀️ Siang</option>
-            <option value="Sore">🌇 Sore</option>
+            <option value="Malam">🌙 Malam</option>
           </select>
           <button class="btn btn-ghost btn-sm" onclick="resetMyRiwayat()">Reset</button>
         </div>
@@ -192,6 +193,50 @@
           <tbody id="myRiwayatBody"><tr><td colspan="8" style="padding:40px;text-align:center;color:#94a3b8">Memuat...</td></tr></tbody></table>
         </div>
         <div style="padding:10px 16px;border-top:1px solid #f1f5f9"><span style="font-size:12px;color:#94a3b8" id="myRiwayatCount">—</span></div>
+      </div>
+    </div>
+
+    <!-- LAPORAN -->
+    <div id="page-laporan" class="page-section">
+      <div style="background:#fef9c3;border:1px solid #fde68a;border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;gap:10px">
+        <span style="font-size:18px;flex-shrink:0">📄</span>
+        <div style="font-size:12px;color:#92400e;line-height:1.6">Pilih tanggal dan shift, lalu klik <strong>Preview</strong> untuk melihat laporan. Klik <strong>Download PDF</strong> untuk mengunduh.</div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Laporan Absensi WBP</div></div>
+        <div class="card-body">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+            <div class="form-group" style="margin-bottom:0;flex:1;min-width:140px">
+              <label class="form-label">Tanggal</label>
+              <input type="date" class="form-control" id="laporanTanggal"/>
+            </div>
+            <div class="form-group" style="margin-bottom:0;min-width:140px">
+              <label class="form-label">Shift</label>
+              <select class="form-control" id="laporanShift">
+                <option value="Pagi">🌅 Pagi (s.d. 08.00)</option>
+                <option value="Siang">☀️ Siang (s.d. 14.00)</option>
+                <option value="Malam">🌙 Malam (s.d. 20.00)</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="previewLaporan()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              Preview
+            </button>
+            <button class="btn btn-success" onclick="downloadLaporanPDF()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+              Download PDF
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Preview area -->
+      <div class="card" style="margin-top:14px">
+        <div id="laporanPreview" style="padding:16px;min-height:200px">
+          <div style="text-align:center;padding:48px;color:#94a3b8">
+            <div style="font-size:32px;margin-bottom:8px">📄</div>
+            <div style="font-size:14px;font-weight:700">Pilih tanggal dan shift, lalu klik Preview</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -242,11 +287,9 @@
     </div>
     <div class="modal-body">
       <input type="hidden" id="ketWbpId"/>
-      <p style="font-size:12px;color:#64748b;margin-bottom:10px">WBP sudah ditandai <strong>Hadir</strong>. Tambahkan keterangan jika WBP sedang di luar kamar:</p>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
-        <button type="button" class="ket-opsi-btn" data-val="Di Bengkel" onclick="pilihAlasan(this)"><div style="font-size:22px;margin-bottom:4px">🔧</div><div>Bengkel</div></button>
-        <button type="button" class="ket-opsi-btn" data-val="Di Kebun"   onclick="pilihAlasan(this)"><div style="font-size:22px;margin-bottom:4px">🌿</div><div>Kebun</div></button>
-        <button type="button" class="ket-opsi-btn" data-val="Di Rumah Sakit" onclick="pilihAlasan(this)"><div style="font-size:22px;margin-bottom:4px">🏥</div><div>Rumah Sakit</div></button>
+      <p style="font-size:12px;color:#64748b;margin-bottom:10px">WBP sudah ditandai <strong>Ada</strong>. Tambahkan keterangan jika WBP sedang di luar kamar:</p>
+      <div id="ketOpsiGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
+        <!-- Diisi dinamis dari DB -->
       </div>
       <div class="form-group">
         <label class="form-label">Keterangan Tambahan <span style="color:#94a3b8;font-weight:400">(opsional)</span></label>
@@ -269,10 +312,8 @@
     <div class="modal-body">
       <input type="hidden" id="editMyAbsenId"/>
       <div class="form-group"><label class="form-label">Keterangan <span style="color:#94a3b8;font-weight:400">(pilih jika ada)</span></label>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px">
-          <button type="button" class="ket-opsi-btn" data-val="Di Bengkel" onclick="pilihAlasanMyEdit(this)"><div style="font-size:20px;margin-bottom:3px">🔧</div><div>Bengkel</div></button>
-          <button type="button" class="ket-opsi-btn" data-val="Di Kebun"   onclick="pilihAlasanMyEdit(this)"><div style="font-size:20px;margin-bottom:3px">🌿</div><div>Kebun</div></button>
-          <button type="button" class="ket-opsi-btn" data-val="Di Rumah Sakit" onclick="pilihAlasanMyEdit(this)"><div style="font-size:20px;margin-bottom:3px">🏥</div><div>Rumah Sakit</div></button>
+        <div id="editMyAbsenOpsiGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px">
+          <!-- Diisi dinamis dari DB -->
         </div>
         <input type="text" class="form-control" id="editMyAbsenKetExtra" placeholder="Keterangan tambahan (opsional)"/>
         <p style="font-size:11px;color:#94a3b8;margin-top:5px">Biarkan kosong jika tidak ada keterangan.</p>
@@ -287,6 +328,7 @@
 // Load splash dari DB setelah config.js (sb tersedia)
 loadSplashFromDB('splLogoWrap','splNameWrap','splDescWrap').catch(()=>{});
 </script>
+<script src="js/laporan.js"></script>
 <script src="js/user.js"></script>
 </body>
 </html>
