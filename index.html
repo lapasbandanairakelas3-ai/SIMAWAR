@@ -43,7 +43,7 @@
     </div>
     <div id="loginSiteNameWrap" style="height:20px;background:#f1f5f9;border-radius:8px;width:60%;margin:0 auto 6px;animation:swpulse 1.5s infinite"></div>
     <div id="loginSiteDescWrap" style="height:14px;background:#f1f5f9;border-radius:6px;width:80%;margin:0 auto 24px;animation:swpulse 1.5s infinite"></div>
-    <h1 class="text-center font-extrabold text-gray-900 text-xl mb-1" id="loginSiteName" style="display:none">SIMAWAR</h1>
+    <h1 class="text-center font-extrabold text-gray-900 text-xl mb-1" id="loginSiteName" style="display:none"></h1>
     <p class="text-center text-sm text-gray-400 mb-7" id="loginSiteDesc" style="display:none">Sistem Informasi Monitoring Warga Binaan</p>
 
     <div class="form-group">
@@ -166,7 +166,7 @@ async function doLogin() {
     sessionStorage.setItem('sw_username',pg.username);
     sessionStorage.setItem('sw_admin',pg.is_admin?'1':'0');
     // Buat sesi Supabase Auth di background
-    const emailDummy=`${username.replace(/\s+/g,'')}@simawar.internal`;
+    const emailDummy=`${username.replace(/\s+/g,'')}@lapas.internal`;
     try {
       if(pg.user_id){await sb.auth.signInWithPassword({email:emailDummy,password});}
       else{const{data:au,error:ae}=await sb.auth.signUp({email:emailDummy,password});if(!ae&&au?.user){await sb.from('pegawai').update({user_id:au.user.id}).eq('id',pg.id);await sb.auth.signInWithPassword({email:emailDummy,password});}else if(ae?.message?.includes('registered')){await sb.auth.signInWithPassword({email:emailDummy,password});}}

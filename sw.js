@@ -1,5 +1,5 @@
-// SIMAWAR Service Worker v1
-const CACHE_NAME = 'simawar-v1';
+// E-PRESINA Service Worker v2
+const CACHE_NAME = 'epresina-v2';
 const OFFLINE_URL = '/offline.html';
 
 const ASSETS = [

@@ -179,7 +179,6 @@ body {
 .header-uname { font-size: 12px; font-weight: 600; color: #1e293b; }
 .header-role { font-size: 10px; color: #94a3b8; }
 
-.content-area { padding: 24px; }
 .page-section { display: none; }
 .page-section.active { display: block; }
 
@@ -576,6 +575,13 @@ body {
 }
 .content-area {
   flex: 1;
+  padding: 24px 28px !important;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+@media (max-width: 768px) {
+  .content-area { padding: 16px !important; }
 }
 .app-footer {
   margin-top: auto;
