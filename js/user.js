@@ -27,18 +27,19 @@ async function init(){
 }
 
 async function loadSiteConfigUser(){
-  const{data}=await sb.from('site_config').select('site_name,logo_url,favicon_url').maybeSingle();
-  if(!data)return;
-  if(data.site_name){document.title=`Petugas — ${data.site_name}`;document.getElementById('sidebarName').textContent=data.site_name;}
-  if(data.logo_url){document.getElementById('sidebarLogoEmoji').style.display='none';const sl=document.getElementById('sidebarLogo');if(!sl.querySelector('img')){const img=document.createElement('img');img.src=data.logo_url;img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:8px';sl.appendChild(img);}}
-  if(data.favicon_url)document.getElementById('faviconEl').href=data.favicon_url;
+  await applySiteIdentity({
+    pageTitle: 'Petugas',
+    sidebarLogo: 'sidebarLogo',
+    sidebarName: 'sidebarName'
+  });
+  if (typeof window.updateManifestFromDB === 'function') window.updateManifestFromDB();
 }
 
 function goPage(page){
   document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active'));
   document.getElementById('page-'+page)?.classList.add('active');
-  ['dashboard','absen','riwayat','laporan','profil'].forEach(id=>document.getElementById('nav-'+id)?.classList.toggle('active',id===page));
-  const T={dashboard:'Dashboard',absen:'Absensi WBP',riwayat:'Riwayat',laporan:'Laporan',profil:'Profil'};
+  ['dashboard','absen','riwayat','laporan','aplikasi','profil'].forEach(id=>document.getElementById('nav-'+id)?.classList.toggle('active',id===page));
+  const T={dashboard:'Dashboard',absen:'Absensi WBP',riwayat:'Riwayat',laporan:'Laporan',aplikasi:'Aplikasi',profil:'Profil'};
   document.getElementById('headerTitle').textContent=T[page]||page;
   // Simpan halaman aktif agar refresh tidak kembali ke menu awal
   sessionStorage.setItem('sw_user_page', page);
@@ -47,6 +48,7 @@ function goPage(page){
   if(page==='absen'){loadKamarPicker();} // load otomatis saat buka absen
   if(page==='riwayat'){loadMyRiwayatFilter();loadMyRiwayat();}
   if(page==='laporan')loadLaporan();
+  if(page==='aplikasi')loadAplikasiUser();
   if(page==='profil')loadProfil();
 }
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('mobileOverlay').classList.toggle('show');}
@@ -408,6 +410,72 @@ async function exportRiwayatUser(){
   try{const{jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'landscape'});doc.setFontSize(14);doc.setFont('helvetica','bold');doc.text('LAPORAN ABSENSI WBP',148,14,{align:'center'});doc.setFontSize(9);doc.setFont('helvetica','normal');doc.text(`Periode: ${dari} s.d. ${sampai}`,148,21,{align:'center'});doc.line(14,24,283,24);
   doc.autoTable({startY:28,head:[['No','Waktu','Shift','Petugas','Kamar','WBP','No.Reg','Status','Keterangan']],body:data.map((r,i)=>[i+1,formatWIT(r.waktu),r.shift||'—',r.pegawai?.nama||'—',r.blok?.nama||'—',r.wbp?.nama||'—',r.wbp?.no_registrasi||'—',r.status||'—',r.keterangan||'—']),styles:{fontSize:7,cellPadding:2},headStyles:{fillColor:[30,64,175],textColor:255,fontStyle:'bold'},alternateRowStyles:{fillColor:[248,250,252]}});
   doc.save(`absensi_${dari}_${sampai}.pdf`);showAlert('success','Berhasil','PDF diunduh.');}catch(e){showAlert('error','Gagal','Gagal buat PDF.');}
+}
+
+// ── APLIKASI / PWA ───────────────────────────────────────────
+async function loadAplikasiUser(){
+  // Update nama aplikasi dari DB
+  try {
+    const data = await loadSiteIdentity();
+    const name = data.site_name || 'E-PRESINA';
+    const el1 = document.getElementById('userAppName'); if(el1) el1.textContent = name;
+    const el2 = document.getElementById('userAppNameDesc'); if(el2) el2.textContent = name;
+  } catch(e){}
+  updateUserPwaStatus();
+  window.addEventListener('pwa-installable', updateUserPwaStatus);
+  window.addEventListener('pwa-installed', updateUserPwaStatus);
+}
+function updateUserPwaStatus(){
+  const box = document.getElementById('userPwaStatusBox');
+  const btn = document.getElementById('userBtnInstallPwa');
+  if(!box||!btn)return;
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if(isStandalone){
+    box.innerHTML = '<div style="background:#d1fae5;border:1px solid #86efac;color:#065f46;padding:10px 12px;border-radius:10px;font-size:12px;font-weight:700">✅ Aplikasi sudah terinstall dan sedang berjalan.</div>';
+    btn.disabled = true; btn.textContent = 'Sudah Terinstall'; btn.style.opacity = '0.5';
+  } else if(window._pwaCanInstall){
+    box.innerHTML = '<div style="background:#fef3c7;border:1px solid #fde68a;color:#92400e;padding:10px 12px;border-radius:10px;font-size:12px;font-weight:700">📲 Aplikasi siap untuk diinstall. Klik tombol di bawah.</div>';
+    btn.disabled = false; btn.style.opacity = '1';
+  } else {
+    box.innerHTML = '<div style="background:#fee2e2;border:1px solid #fecaca;color:#991b1b;padding:10px 12px;border-radius:10px;font-size:12px;font-weight:600">⚠️ Browser belum siap. Buka di Chrome/Edge/Safari, atau ikuti panduan manual.</div>';
+    btn.disabled = true; btn.style.opacity = '0.5';
+  }
+}
+async function installPwaUser(){
+  if(!window._pwaInstall){showAlert('warning','Tidak Tersedia','Browser tidak mendukung install otomatis.');return;}
+  const ok = await window._pwaInstall();
+  if(ok){showAlert('success','Berhasil','Aplikasi sedang diinstall.');setTimeout(updateUserPwaStatus,1500);}
+  else showAlert('info','Dibatalkan','Install dibatalkan.');
+}
+async function showAndroidGuideUser(){
+  const data = await loadSiteIdentity(); const name = data.site_name || 'E-PRESINA';
+  const html = `<div style="font-size:12px;line-height:1.7;color:#374151;text-align:left">
+    <div style="font-size:14px;font-weight:800;color:#1e3a8a;margin-bottom:8px">📱 Install di Android (Chrome)</div>
+    <ol style="padding-left:20px">
+      <li>Buka website ${name} di <strong>Chrome</strong>.</li>
+      <li>Tap ikon <strong>⋮ (titik 3)</strong> di pojok kanan atas browser.</li>
+      <li>Pilih <strong>"Install app"</strong> atau <strong>"Add to Home screen"</strong>.</li>
+      <li>Tap <strong>"Install"</strong> pada popup yang muncul.</li>
+      <li>Ikon ${name} akan muncul di home screen.</li>
+    </ol>
+    <div style="background:#f0fdf4;padding:8px 10px;border-radius:8px;margin-top:10px;font-size:11px;color:#166534">💡 Atau klik tombol "Install ke Perangkat Ini" di atas jika muncul.</div>
+  </div>`;
+  showConfirm('Panduan Android',html,()=>{},'info');
+}
+async function showIosGuideUser(){
+  const data = await loadSiteIdentity(); const name = data.site_name || 'E-PRESINA';
+  const html = `<div style="font-size:12px;line-height:1.7;color:#374151;text-align:left">
+    <div style="font-size:14px;font-weight:800;color:#1e3a8a;margin-bottom:8px">🍎 Install di iPhone/iPad (Safari)</div>
+    <ol style="padding-left:20px">
+      <li>Buka website ${name} di <strong>Safari</strong>.</li>
+      <li>Tap ikon <strong>Share (kotak dengan panah ke atas)</strong> di bawah layar.</li>
+      <li>Scroll, pilih <strong>"Add to Home Screen"</strong>.</li>
+      <li>Tap <strong>"Add"</strong> di pojok kanan atas.</li>
+      <li>Ikon ${name} akan muncul di home screen.</li>
+    </ol>
+    <div style="background:#fff7ed;padding:8px 10px;border-radius:8px;margin-top:10px;font-size:11px;color:#9a3412">⚠️ Hanya bisa di Safari, bukan Chrome iOS.</div>
+  </div>`;
+  showConfirm('Panduan iOS',html,()=>{},'info');
 }
 
 // ── PROFIL ───────────────────────────────────────────────────

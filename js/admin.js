@@ -77,7 +77,7 @@ async function saveSiteConfig(){
   const res=siteConfigId?await sb.from('site_config').update(payload).eq('id',siteConfigId):await sb.from('site_config').insert(payload);
   if(res.error)throw res.error;showAlert('success','Berhasil!','Konfigurasi disimpan');logoFile=null;favFile=null;loadSiteConfig();}catch(e){showAlert('error','Gagal',e.message);}
 }
-function resetSiteConfig(){showConfirm('Reset','Reset konfigurasi?',async()=>{await sb.from('site_config').update({site_name:'SIMAWAR',site_desc:'Sistem Informasi Monitoring Warga Binaan',logo_url:null,favicon_url:null}).eq('id',siteConfigId);showAlert('success','Reset!','Konfigurasi direset');loadSiteConfig();loadSiteConfigForm();},'danger');}
+function resetSiteConfig(){showConfirm('Reset','Reset konfigurasi?',async()=>{await sb.from('site_config').update({site_name:'E-PRESINA',site_desc:'Sistem Informasi Monitoring Warga Binaan',logo_url:null,favicon_url:null}).eq('id',siteConfigId);showAlert('success','Reset!','Konfigurasi direset');loadSiteConfig();loadSiteConfigForm();},'danger');}
 
 // ── DASHBOARD ─────────────────────────────────────────────────
 async function loadDashboard(){
@@ -477,7 +477,14 @@ async function deleteStatus(id,nama){
 }
 
 // ── APLIKASI / PWA ───────────────────────────────────────────
-function loadAplikasi(){
+async function loadAplikasi(){
+  // Update nama aplikasi dari DB
+  try {
+    const data = await loadSiteIdentity();
+    const name = data.site_name || 'E-PRESINA';
+    const inst = document.getElementById('appNameInstall'); if(inst) inst.textContent = name;
+    const desc = document.getElementById('appNameDesc'); if(desc) desc.textContent = name;
+  } catch(e){}
   updatePwaStatus();
   // Listen for installable event
   window.addEventListener('pwa-installable', updatePwaStatus);
@@ -508,29 +515,31 @@ async function installPwa(){
   if(ok){showAlert('success','Berhasil','Aplikasi sedang diinstall.');setTimeout(updatePwaStatus,1500);}
   else showAlert('info','Dibatalkan','Install dibatalkan.');
 }
-function showAndroidGuide(){
+async function showAndroidGuide(){
+  const data = await loadSiteIdentity(); const name = data.site_name || 'E-PRESINA';
   const html=`<div style="font-size:12px;line-height:1.7;color:#374151;text-align:left">
     <div style="font-size:14px;font-weight:800;color:#1e3a8a;margin-bottom:8px">📱 Install di Android (Chrome)</div>
     <ol style="padding-left:20px">
-      <li>Buka website SIMAWAR di <strong>Chrome</strong>.</li>
+      <li>Buka website ${name} di <strong>Chrome</strong>.</li>
       <li>Tap ikon <strong>⋮ (titik 3)</strong> di pojok kanan atas browser.</li>
       <li>Pilih <strong>"Install app"</strong> atau <strong>"Add to Home screen"</strong>.</li>
       <li>Tap <strong>"Install"</strong> pada popup yang muncul.</li>
-      <li>Ikon SIMAWAR akan muncul di home screen.</li>
+      <li>Ikon ${name} akan muncul di home screen.</li>
     </ol>
     <div style="background:#f0fdf4;padding:8px 10px;border-radius:8px;margin-top:10px;font-size:11px;color:#166534">💡 Atau klik tombol "Install ke Perangkat Ini" di atas jika muncul.</div>
   </div>`;
   showConfirm('Panduan Android',html,()=>{},'info');
 }
-function showIosGuide(){
+async function showIosGuide(){
+  const data = await loadSiteIdentity(); const name = data.site_name || 'E-PRESINA';
   const html=`<div style="font-size:12px;line-height:1.7;color:#374151;text-align:left">
     <div style="font-size:14px;font-weight:800;color:#1e3a8a;margin-bottom:8px">🍎 Install di iPhone/iPad (Safari)</div>
     <ol style="padding-left:20px">
-      <li>Buka website SIMAWAR di <strong>Safari</strong>.</li>
+      <li>Buka website ${name} di <strong>Safari</strong>.</li>
       <li>Tap ikon <strong>Share (kotak dengan panah ke atas)</strong> di bawah layar.</li>
       <li>Scroll, pilih <strong>"Add to Home Screen"</strong>.</li>
       <li>Tap <strong>"Add"</strong> di pojok kanan atas.</li>
-      <li>Ikon SIMAWAR akan muncul di home screen.</li>
+      <li>Ikon ${name} akan muncul di home screen.</li>
     </ol>
     <div style="background:#fff7ed;padding:8px 10px;border-radius:8px;margin-top:10px;font-size:11px;color:#9a3412">⚠️ Hanya bisa di Safari, bukan Chrome iOS.</div>
   </div>`;

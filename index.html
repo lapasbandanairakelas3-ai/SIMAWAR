@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Masuk — SIMAWAR</title>
+  <title>Masuk — E-PRESINA</title>
   <link rel="icon" id="faviconEl" href="data:,"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -16,7 +16,7 @@
   <meta name="theme-color" content="#1e3a8a"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="apple-mobile-web-app-title" content="SIMAWAR"/>
+  <meta name="apple-mobile-web-app-title" content="E-PRESINA"/>
   <link rel="apple-touch-icon" href="/icons/icon-192.png"/>
 </head>
 <body>
@@ -88,7 +88,8 @@ function togglePwd(id, btn) {
 
 async function loadCfg() {
   try {
-    const { data } = await sb.from('site_config').select('*').maybeSingle();
+    // Pakai loadSiteIdentity yang ter-cache
+    const data = await loadSiteIdentity();
     if (!data) { showLoginFallback(); return; }
 
     // Update splash: ganti skeleton dengan konten asli
@@ -105,7 +106,7 @@ async function loadCfg() {
     }
     const sn = document.getElementById('splashNameWrap');
     sn.style.cssText = 'color:white;font-size:20px;font-weight:800;background:none;animation:none;height:auto;width:auto;border-radius:0;margin-bottom:6px';
-    sn.textContent = data.site_name || 'SIMAWAR';
+    sn.textContent = data.site_name || 'E-PRESINA';
     const sd = document.getElementById('splashDescWrap');
     sd.style.cssText = 'color:rgba(255,255,255,0.7);font-size:12px;background:none;animation:none;height:auto;width:auto;border-radius:0;text-align:center';
     sd.textContent = data.site_desc?.split('\n')[0] || 'Sistem Informasi Monitoring Warga Binaan';
@@ -122,17 +123,23 @@ async function loadCfg() {
     document.getElementById('loginSiteNameWrap').style.display='none';
     document.getElementById('loginSiteDescWrap').style.display='none';
     const sname = document.getElementById('loginSiteName');
-    sname.textContent = data.site_name || 'SIMAWAR'; sname.style.display='block';
+    sname.textContent = data.site_name || 'E-PRESINA'; sname.style.display='block';
     const sdesc = document.getElementById('loginSiteDesc');
     sdesc.textContent = data.site_desc || 'Sistem Informasi Monitoring Warga Binaan'; sdesc.style.display='block';
-    document.title = `Masuk — ${data.site_name||'SIMAWAR'}`;
+    document.title = `Masuk — ${data.site_name||'E-PRESINA'}`;
     if (data.favicon_url) document.getElementById('faviconEl').href = data.favicon_url;
+    if (data.logo_url) {
+      const apple = document.querySelector('link[rel="apple-touch-icon"]');
+      if (apple) apple.href = data.logo_url;
+    }
+    // Update PWA manifest dengan logo dari DB
+    if (typeof window.updateManifestFromDB === 'function') window.updateManifestFromDB();
   } catch(e) { showLoginFallback(); }
 }
 
 function showLoginFallback() {
   document.getElementById('splashLogoWrap').textContent='🏛️'; document.getElementById('splashLogoWrap').style.fontSize='32px'; document.getElementById('splashLogoWrap').style.animation='none';
-  document.getElementById('splashNameWrap').style.cssText='color:white;font-size:20px;font-weight:800;background:none;animation:none;height:auto;width:auto;border-radius:0'; document.getElementById('splashNameWrap').textContent='SIMAWAR';
+  document.getElementById('splashNameWrap').style.cssText='color:white;font-size:20px;font-weight:800;background:none;animation:none;height:auto;width:auto;border-radius:0'; document.getElementById('splashNameWrap').textContent='E-PRESINA';
   document.getElementById('splashDescWrap').style.cssText='color:rgba(255,255,255,0.7);font-size:12px;background:none;animation:none;height:auto;width:auto;border-radius:0;text-align:center'; document.getElementById('splashDescWrap').textContent='Sistem Informasi Monitoring Warga Binaan';
   document.getElementById('loginSiteNameWrap').style.display='none'; document.getElementById('loginSiteDescWrap').style.display='none';
   document.getElementById('loginLogoPlaceholder').style.display='block'; document.getElementById('loginLogo').style.animation='none'; document.getElementById('loginLogo').style.background='linear-gradient(135deg,#3b82f6,#1e40af)';

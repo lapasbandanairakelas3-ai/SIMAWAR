@@ -65,7 +65,7 @@ async function previewLaporan() {
       <!-- Header -->
       <div style="text-align:center;margin-bottom:20px;border-bottom:2px solid #1e3a8a;padding-bottom:14px">
         <div style="font-size:18px;font-weight:900;color:#1e3a8a;text-transform:uppercase;letter-spacing:1px">Laporan Absensi WBP</div>
-        <div style="font-size:13px;color:#475569;margin-top:4px">${cfg.instansi||cfg.site_name||'SIMAWAR'}</div>
+        <div style="font-size:13px;color:#475569;margin-top:4px">${cfg.instansi||cfg.site_name|| 'E-PRESINA'}</div>
         <div style="font-size:12px;color:#64748b;margin-top:6px"><strong>Periode / Waktu:</strong> ${tglFmt} / ${jamPertama}</div>
         <div style="font-size:12px;color:#64748b;margin-top:2px"><strong>Petugas:</strong> ${petugasStr}</div>
       </div>`;
@@ -140,7 +140,7 @@ async function downloadLaporanPDF() {
   doc.setFontSize(14); doc.setFont('helvetica','bold');
   doc.text('LAPORAN ABSENSI WBP', PW/2, y, {align:'center'}); y+=7;
   doc.setFontSize(9); doc.setFont('helvetica','normal');
-  doc.text(d.cfg.instansi||d.cfg.site_name||'SIMAWAR', PW/2, y, {align:'center'}); y+=6;
+  doc.text(d.cfg.instansi||d.cfg.site_name|| 'E-PRESINA', PW/2, y, {align:'center'}); y+=6;
   doc.setFontSize(8);
   doc.text(`Periode / Waktu : ${d.tglFmt} / ${d.jamPertama}`, ml, y); y+=5;
   doc.text(`Petugas        : ${d.petugasStr}`, ml, y); y+=6;

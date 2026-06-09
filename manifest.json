@@ -1,6 +1,6 @@
 {
-  "name": "SIMAWAR - Lapas Kelas III Bandanaira",
-  "short_name": "SIMAWAR",
+  "name": "E-PRESINA Lapas Bandanaira",
+  "short_name": "E-PRESINA",
   "description": "Sistem Informasi Monitoring Warga Binaan - Lapas Kelas III Bandanaira",
   "start_url": "/user",
   "display": "standalone",
@@ -64,14 +64,27 @@
       "name": "Absensi WBP",
       "short_name": "Absensi",
       "url": "/user",
-      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "Admin Panel",
       "short_name": "Admin",
       "url": "/admin",
-      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ],
-  "categories": ["productivity", "government"]
+  "categories": [
+    "productivity",
+    "government"
+  ]
 }

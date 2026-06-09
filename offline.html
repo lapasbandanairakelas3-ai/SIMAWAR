@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tidak Ada Koneksi — SIMAWAR</title>
+  <title>Tidak Ada Koneksi — E-PRESINA</title>
   <link rel="manifest" href="/manifest.json"/>
   <meta name="theme-color" content="#1e3a8a"/>
   <style>
@@ -61,6 +61,24 @@
     window.addEventListener('online', () => {
       setTimeout(() => location.reload(), 800);
     });
+  </script>
+  <script>
+    // Baca site identity dari localStorage cache (kalau ada)
+    try {
+      const cached = localStorage.getItem('sw_site_identity');
+      if (cached) {
+        const data = JSON.parse(cached);
+        const name = data.site_name || 'E-PRESINA';
+        // Update title saja
+        document.title = document.title.replace('SIMAWAR', name).replace('E-PRESINA', name);
+        // Update logo / icon kalau ada
+        if (data.favicon_url) {
+          let fav = document.querySelector('link[rel="icon"]');
+          if (!fav) { fav = document.createElement('link'); fav.rel='icon'; document.head.appendChild(fav); }
+          fav.href = data.favicon_url;
+        }
+      }
+    } catch(e){}
   </script>
 </body>
 </html>

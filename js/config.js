@@ -103,17 +103,102 @@ function emptyState(title, sub='') {
   return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px;text-align:center"><div style="width:56px;height:56px;border-radius:16px;background:#eff6ff;display:flex;align-items:center;justify-content:center;margin-bottom:12px"><svg viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="1.5" style="width:28px;height:28px"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg></div><div style="font-size:14px;font-weight:700;color:#374151">${title}</div>${sub?`<div style="font-size:12px;color:#94a3b8;margin-top:4px;max-width:200px">${sub}</div>`:''}</div>`;
 }
 
-// Load splash dari site_config
+// ── SITE IDENTITY (terpusat) ───────────────────────────────
+// Hanya panggil 1x per page, hasilnya di-cache di window._siteIdentity
+let _siteIdentityPromise = null;
+async function loadSiteIdentity(force=false) {
+  if (window._siteIdentity && !force) return window._siteIdentity;
+  if (_siteIdentityPromise && !force) return _siteIdentityPromise;
+  _siteIdentityPromise = (async () => {
+    let identity = {
+      site_name: 'E-PRESINA',
+      site_desc: 'Sistem Informasi Monitoring Warga Binaan',
+      logo_url: '',
+      favicon_url: '',
+      instansi: 'Lapas Kelas III Bandanaira',
+      alamat: ''
+    };
+    try {
+      const { data, error } = await sb.from('site_config').select('*').maybeSingle();
+      if (!error && data) identity = { ...identity, ...data };
+    } catch (e) { /* fallback to defaults */ }
+    window._siteIdentity = identity;
+    // Cache di localStorage 1 jam (untuk PWA offline)
+    try {
+      localStorage.setItem('sw_site_identity', JSON.stringify({ ...identity, _ts: Date.now() }));
+    } catch (e) {}
+    return identity;
+  })();
+  return _siteIdentityPromise;
+}
+
+// Try load dari localStorage segera (sync) sebelum DB - untuk first paint
+(function preloadIdentity() {
+  try {
+    const cached = localStorage.getItem('sw_site_identity');
+    if (cached) {
+      const data = JSON.parse(cached);
+      // Pakai cache kalau umurnya < 1 jam
+      if (data._ts && Date.now() - data._ts < 3600000) {
+        window._siteIdentity = data;
+      }
+    }
+  } catch (e) {}
+})();
+
+// Apply identity ke title + favicon + sidebar
+// pageTitle: prefix untuk title (cth: "Admin", "Petugas", "Masuk")
+async function applySiteIdentity(opts = {}) {
+  const { pageTitle = '', logoWrapId, nameWrapId, descWrapId, sidebarLogo, sidebarName } = opts;
+  const data = await loadSiteIdentity();
+  // Document title
+  document.title = pageTitle ? `${pageTitle} — ${data.site_name}` : data.site_name;
+  // Favicon
+  if (data.favicon_url) {
+    let fav = document.getElementById('faviconEl') || document.querySelector('link[rel="icon"]');
+    if (fav) fav.href = data.favicon_url;
+  }
+  // Apple touch icon (PWA install)
+  if (data.logo_url) {
+    let apple = document.querySelector('link[rel="apple-touch-icon"]');
+    if (apple) apple.href = data.logo_url;
+  }
+  // Sidebar brand
+  if (sidebarLogo) {
+    const sl = document.getElementById(sidebarLogo);
+    if (sl) {
+      if (data.logo_url) {
+        const emoji = document.getElementById('sidebarLogoEmoji');
+        if (emoji) emoji.style.display = 'none';
+        if (!sl.querySelector('img')) {
+          const img = document.createElement('img');
+          img.src = data.logo_url;
+          img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:8px';
+          sl.appendChild(img);
+        } else {
+          sl.querySelector('img').src = data.logo_url;
+        }
+      }
+    }
+  }
+  if (sidebarName) {
+    const sn = document.getElementById(sidebarName);
+    if (sn) sn.textContent = data.site_name;
+  }
+  return data;
+}
+
+// Load splash dari site_config (DEPRECATED - prefer applySiteIdentity)
 async function loadSplashFromDB(logoWrapId, nameWrapId, descWrapId) {
   try {
-    const { data } = await sb.from('site_config').select('site_name,logo_url,site_desc').maybeSingle();
+    const data = await loadSiteIdentity();
     if (!data) throw new Error('no data');
     const sl=document.getElementById(logoWrapId); if(sl){sl.style.animation='none';if(data.logo_url){const img=document.createElement('img');img.src=data.logo_url;img.style.cssText='width:100%;height:100%;object-fit:cover';sl.appendChild(img);}else{sl.textContent='🏛️';sl.style.fontSize='30px';}}
-    const sn=document.getElementById(nameWrapId); if(sn){sn.style.cssText='color:white;font-size:20px;font-weight:800;background:none;animation:none;height:auto;width:auto;border-radius:0;margin-bottom:5px';sn.textContent=data.site_name||'SIMAWAR';}
+    const sn=document.getElementById(nameWrapId); if(sn){sn.style.cssText='color:white;font-size:20px;font-weight:800;background:none;animation:none;height:auto;width:auto;border-radius:0;margin-bottom:5px';sn.textContent=data.site_name|| 'E-PRESINA';}
     const sd=document.getElementById(descWrapId); if(sd){sd.style.cssText='color:rgba(255,255,255,.7);font-size:12px;background:none;animation:none;height:auto;width:auto;border-radius:0;text-align:center';sd.textContent=(data.site_desc||'').split('\n')[0]||'Sistem Informasi Monitoring Warga Binaan';}
   } catch(e) {
     const sl=document.getElementById(logoWrapId);if(sl){sl.textContent='🏛️';sl.style.fontSize='30px';sl.style.animation='none';}
-    const sn=document.getElementById(nameWrapId);if(sn){sn.style.cssText='color:white;font-size:20px;font-weight:800;background:none;animation:none;height:auto;width:auto;border-radius:0;margin-bottom:5px';sn.textContent='SIMAWAR';}
+    const sn=document.getElementById(nameWrapId);if(sn){sn.style.cssText='color:white;font-size:20px;font-weight:800;background:none;animation:none;height:auto;width:auto;border-radius:0;margin-bottom:5px';sn.textContent='E-PRESINA';}
     const sd=document.getElementById(descWrapId);if(sd){sd.style.cssText='color:rgba(255,255,255,.7);font-size:12px;background:none;animation:none;height:auto;width:auto;border-radius:0;text-align:center';sd.textContent='Sistem Informasi Monitoring Warga Binaan';}
   }
 }

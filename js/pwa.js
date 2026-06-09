@@ -60,4 +60,53 @@
     window._pwaCanInstall = false;
     window.dispatchEvent(new CustomEvent('pwa-installed'));
   });
+
+  // 4. Dynamic manifest - update setelah site_identity load
+  window.updateManifestFromDB = async function() {
+    if (typeof loadSiteIdentity !== 'function') return;
+    try {
+      const data = await loadSiteIdentity();
+      const manifest = {
+        name: (data.site_name || 'E-PRESINA') + ' — ' + (data.instansi || 'Lapas Bandanaira'),
+        short_name: data.site_name || 'E-PRESINA',
+        description: data.site_desc || 'Sistem Informasi Monitoring Warga Binaan',
+        start_url: '/user',
+        display: 'standalone',
+        background_color: '#1e3a8a',
+        theme_color: '#1e3a8a',
+        orientation: 'portrait-primary',
+        scope: '/',
+        lang: 'id',
+        icons: data.logo_url ? [
+          { src: data.logo_url, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+          { src: data.logo_url, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+        ] : [
+          { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+          { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+        ]
+      };
+      const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+      const url = URL.createObjectURL(blob);
+      let link = document.querySelector('link[rel="manifest"]');
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'manifest';
+        document.head.appendChild(link);
+      }
+      // Revoke old blob URL
+      if (link.href.startsWith('blob:')) URL.revokeObjectURL(link.href);
+      link.href = url;
+      // Update apple-touch-icon juga
+      if (data.logo_url) {
+        let apple = document.querySelector('link[rel="apple-touch-icon"]');
+        if (!apple) {
+          apple = document.createElement('link');
+          apple.rel = 'apple-touch-icon';
+          document.head.appendChild(apple);
+        }
+        apple.href = data.logo_url;
+      }
+    } catch (e) { console.log('[PWA] Manifest update failed:', e); }
+  };
+
 })();
