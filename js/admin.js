@@ -8,7 +8,7 @@ async function init(){
   setTimeout(()=>{const s=document.getElementById('splashScreen');if(s){s.style.opacity='0';setTimeout(()=>s.remove(),500);}},800);
   const swId=sessionStorage.getItem('sw_id'), swAdmin=sessionStorage.getItem('sw_admin');
   if(!swId||swAdmin!=='1'){location.href='index.html';return;}
-  const{data:p}=await sb.from('pegawai').select('id,nama,username,password_plain,is_admin').eq('id',swId).maybeSingle();
+  const{data:p}=await sb.from('pegawai').select('id,nama,username,password_plain,is_admin,email').eq('id',swId).maybeSingle();
   if(!p||!p.is_admin){sessionStorage.clear();location.href='index.html';return;}
   currentAdmin=p;
   document.getElementById('headerUname').textContent=p.nama;
@@ -26,10 +26,10 @@ async function init(){
 function goPage(page,save=true){
   document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active'));
   document.getElementById('page-'+page)?.classList.add('active');
-  ['dashboard','wbp','pegawai','blok','riwayat','status','siteconfig','akun'].forEach(id=>{
+  ['dashboard','wbp','pegawai','blok','riwayat','status','siteconfig','aplikasi','akun'].forEach(id=>{
     document.getElementById('nav-'+id)?.classList.toggle('active',id===page);
   });
-  const T={dashboard:'Dashboard',wbp:'Data WBP',pegawai:'Data Rupam',blok:'Blok/Kamar',riwayat:'Riwayat Absensi',status:'Status Absen',siteconfig:'Konfigurasi',akun:'Akun Saya'};
+  const T={dashboard:'Dashboard',wbp:'Data WBP',pegawai:'Data Rupam',blok:'Blok/Kamar',riwayat:'Riwayat Absensi',status:'Status Absen',siteconfig:'Konfigurasi',aplikasi:'Aplikasi',akun:'Akun Saya'};
   document.getElementById('headerTitle').textContent=T[page]||page;
   if(save)sessionStorage.setItem('sw_admin_page',page);
   closeSidebar();
@@ -39,6 +39,7 @@ function goPage(page,save=true){
   if(page==='blok')loadBlok();
   if(page==='riwayat'){loadRiwayatFilters();loadRiwayat();}
   if(page==='status')loadStatus();
+  if(page==='aplikasi')loadAplikasi();
   if(page==='akun')loadAkun();
   if(page==='siteconfig')loadSiteConfigForm();
 }
@@ -233,7 +234,19 @@ async function saveWbp(){
     showAlert('success','Berhasil',id?'WBP diperbarui.':'WBP ditambahkan.');closeModal('wbpModal');loadWbp();
   }finally{btn.disabled=false;btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg> Simpan';}
 }
-async function deleteWbp(id,nama){showConfirm('Hapus WBP',`Hapus <b>${nama}</b>?`,async()=>{const{error}=await sb.from('wbp').delete().eq('id',id);if(error){showAlert('error','Gagal',error.message);return;}showAlert('success','Dihapus',`${nama} dihapus.`);loadWbp();});}
+async function deleteWbp(id,nama){
+  // Cek dulu jumlah data absensi terkait
+  const{count}=await sb.from('absen_detail').select('id',{count:'exact',head:true}).eq('wbp_id',id);
+  const msg=count>0
+    ?`Hapus <b>${nama}</b>?<br/><br/><span style="color:#dc2626;font-size:12px">⚠️ <b>${count} data absensi</b> terkait juga akan terhapus permanen.</span>`
+    :`Hapus <b>${nama}</b>?`;
+  showConfirm('Hapus WBP',msg,async()=>{
+    const{error}=await sb.from('wbp').delete().eq('id',id);
+    if(error){showAlert('error','Gagal','Gagal hapus: '+error.message+'. Pastikan SQL fix_v9_pwa.sql sudah dijalankan.',6000);return;}
+    showAlert('success','Dihapus',count>0?`${nama} dan ${count} data absensi dihapus.`:`${nama} dihapus.`);
+    loadWbp();
+  });
+}
 
 // ── PEGAWAI ───────────────────────────────────────────────────
 async function loadPegawai(){
@@ -463,6 +476,67 @@ async function deleteStatus(id,nama){
   });
 }
 
+// ── APLIKASI / PWA ───────────────────────────────────────────
+function loadAplikasi(){
+  updatePwaStatus();
+  // Listen for installable event
+  window.addEventListener('pwa-installable', updatePwaStatus);
+  window.addEventListener('pwa-installed', updatePwaStatus);
+}
+function updatePwaStatus(){
+  const box=document.getElementById('pwaStatusBox');
+  const btn=document.getElementById('btnInstallPwa');
+  if(!box||!btn)return;
+  // Check if running as standalone (already installed)
+  const isStandalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone;
+  if(isStandalone){
+    box.innerHTML='<div style="background:#d1fae5;border:1px solid #86efac;color:#065f46;padding:10px 12px;border-radius:10px;font-size:12px;font-weight:700">✅ Aplikasi sudah terinstall dan sedang berjalan.</div>';
+    btn.disabled=true;btn.textContent='Sudah Terinstall';btn.style.opacity='0.5';
+  } else if(window._pwaCanInstall){
+    box.innerHTML='<div style="background:#fef3c7;border:1px solid #fde68a;color:#92400e;padding:10px 12px;border-radius:10px;font-size:12px;font-weight:700">📲 Aplikasi siap untuk diinstall. Klik tombol di bawah.</div>';
+    btn.disabled=false;btn.style.opacity='1';
+  } else {
+    box.innerHTML='<div style="background:#fee2e2;border:1px solid #fecaca;color:#991b1b;padding:10px 12px;border-radius:10px;font-size:12px;font-weight:600">⚠️ Browser belum siap. Buka halaman ini di Chrome/Edge/Safari, atau lihat panduan manual di bawah.</div>';
+    btn.disabled=true;btn.style.opacity='0.5';
+  }
+}
+async function installPwa(){
+  if(!window._pwaInstall){
+    showAlert('warning','Tidak Tersedia','Browser tidak mendukung install otomatis. Gunakan panduan manual.');return;
+  }
+  const ok=await window._pwaInstall();
+  if(ok){showAlert('success','Berhasil','Aplikasi sedang diinstall.');setTimeout(updatePwaStatus,1500);}
+  else showAlert('info','Dibatalkan','Install dibatalkan.');
+}
+function showAndroidGuide(){
+  const html=`<div style="font-size:12px;line-height:1.7;color:#374151;text-align:left">
+    <div style="font-size:14px;font-weight:800;color:#1e3a8a;margin-bottom:8px">📱 Install di Android (Chrome)</div>
+    <ol style="padding-left:20px">
+      <li>Buka website SIMAWAR di <strong>Chrome</strong>.</li>
+      <li>Tap ikon <strong>⋮ (titik 3)</strong> di pojok kanan atas browser.</li>
+      <li>Pilih <strong>"Install app"</strong> atau <strong>"Add to Home screen"</strong>.</li>
+      <li>Tap <strong>"Install"</strong> pada popup yang muncul.</li>
+      <li>Ikon SIMAWAR akan muncul di home screen.</li>
+    </ol>
+    <div style="background:#f0fdf4;padding:8px 10px;border-radius:8px;margin-top:10px;font-size:11px;color:#166534">💡 Atau klik tombol "Install ke Perangkat Ini" di atas jika muncul.</div>
+  </div>`;
+  showConfirm('Panduan Android',html,()=>{},'info');
+}
+function showIosGuide(){
+  const html=`<div style="font-size:12px;line-height:1.7;color:#374151;text-align:left">
+    <div style="font-size:14px;font-weight:800;color:#1e3a8a;margin-bottom:8px">🍎 Install di iPhone/iPad (Safari)</div>
+    <ol style="padding-left:20px">
+      <li>Buka website SIMAWAR di <strong>Safari</strong>.</li>
+      <li>Tap ikon <strong>Share (kotak dengan panah ke atas)</strong> di bawah layar.</li>
+      <li>Scroll, pilih <strong>"Add to Home Screen"</strong>.</li>
+      <li>Tap <strong>"Add"</strong> di pojok kanan atas.</li>
+      <li>Ikon SIMAWAR akan muncul di home screen.</li>
+    </ol>
+    <div style="background:#fff7ed;padding:8px 10px;border-radius:8px;margin-top:10px;font-size:11px;color:#9a3412">⚠️ Hanya bisa di Safari, bukan Chrome iOS.</div>
+  </div>`;
+  showConfirm('Panduan iOS',html,()=>{},'info');
+}
+
 // ── AKUN ─────────────────────────────────────────────────────
 async function loadAkun(){
   if(!currentAdmin)return;
@@ -471,12 +545,29 @@ async function loadAkun(){
   document.getElementById('akunUsernameDisplay').textContent=currentAdmin.username||'—';
   const fn=document.getElementById('akunNama');if(fn)fn.value=currentAdmin.nama||'';
   const fu=document.getElementById('akunUsername');if(fu)fu.value=currentAdmin.username||'';
+  const fe=document.getElementById('akunEmail');if(fe)fe.value=currentAdmin.email||'';
+  const eD=document.getElementById('akunEmailDisplay');if(eD)eD.textContent=currentAdmin.email||'(belum diisi)';
   const pwdShow=document.getElementById('akunPwdAktif');const pwdHidden=document.getElementById('akunPwdAktifEl');
   if(pwdShow){pwdShow.textContent='••••••••';pwdShow.style.letterSpacing='2px';}
   if(pwdHidden)pwdHidden.value=currentAdmin.password_plain||'';
   ['akunPwdBaru','akunPwdKonfirm'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
 }
 function togglePwdAktif(){const pwdCode=document.getElementById('akunPwdAktif'),pwdInput=document.getElementById('akunPwdAktifEl');if(!pwdCode||!pwdInput)return;if(pwdCode.textContent==='••••••••'){pwdCode.textContent=pwdInput.value||'(kosong)';pwdCode.style.letterSpacing='normal';pwdCode.style.background='#fef08a';}else{pwdCode.textContent='••••••••';pwdCode.style.letterSpacing='2px';pwdCode.style.background='#fef9c3';}}
-async function saveAkun(){const nama=document.getElementById('akunNama')?.value.trim();if(!nama){showAlert('warning','Perhatian','Nama tidak boleh kosong.');return;}const{error}=await sb.from('pegawai').update({nama}).eq('id',currentAdmin.id);if(error){showAlert('error','Gagal',error.message);return;}currentAdmin.nama=nama;sessionStorage.setItem('sw_nama',nama);document.getElementById('headerUname').textContent=nama;document.getElementById('headerAvatar').textContent=nama[0].toUpperCase();document.getElementById('akunAvatarBig').textContent=nama[0].toUpperCase();document.getElementById('akunNamaDisplay').textContent=nama;showAlert('success','Berhasil','Nama diperbarui.');}
+async function saveAkun(){
+  const nama=document.getElementById('akunNama')?.value.trim();
+  const email=document.getElementById('akunEmail')?.value.trim();
+  if(!nama){showAlert('warning','Perhatian','Nama tidak boleh kosong.');return;}
+  if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showAlert('warning','Email Tidak Valid','Format email salah.');return;}
+  const{error}=await sb.from('pegawai').update({nama,email:email||null}).eq('id',currentAdmin.id);
+  if(error){showAlert('error','Gagal',error.message);return;}
+  currentAdmin.nama=nama;currentAdmin.email=email||null;
+  sessionStorage.setItem('sw_nama',nama);
+  document.getElementById('headerUname').textContent=nama;
+  document.getElementById('headerAvatar').textContent=nama[0].toUpperCase();
+  document.getElementById('akunAvatarBig').textContent=nama[0].toUpperCase();
+  document.getElementById('akunNamaDisplay').textContent=nama;
+  const eD=document.getElementById('akunEmailDisplay');if(eD)eD.textContent=email||'(belum diisi)';
+  showAlert('success','Berhasil','Profil diperbarui.');
+}
 async function savePassword(){const pwd=document.getElementById('akunPwdBaru')?.value,konfirm=document.getElementById('akunPwdKonfirm')?.value;if(!pwd||pwd.length<4){showAlert('warning','Terlalu Pendek','Minimal 4 karakter.');return;}if(pwd!==konfirm){showAlert('error','Tidak Cocok','Konfirmasi tidak sesuai.');return;}showConfirm('Ganti Password','Yakin?',async()=>{const{error}=await sb.from('pegawai').update({password_plain:pwd}).eq('id',currentAdmin.id);if(error){showAlert('error','Gagal',error.message);return;}currentAdmin.password_plain=pwd;const pwdHidden=document.getElementById('akunPwdAktifEl');if(pwdHidden)pwdHidden.value=pwd;document.getElementById('akunPwdBaru').value='';document.getElementById('akunPwdKonfirm').value='';showAlert('success','Berhasil','Password diganti.');});}
 init();

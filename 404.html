@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>404 — Halaman Tidak Ditemukan | SIMAWAR</title>
+  <link rel="manifest" href="/manifest.json"/>
+  <meta name="theme-color" content="#1e3a8a"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#1e3a8a 0%,#1e40af 50%,#312e81 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;color:white;-webkit-font-smoothing:antialiased;overflow:hidden}
+    .container{max-width:520px;width:100%;text-align:center;position:relative;z-index:2}
+    .number{font-size:120px;font-weight:900;line-height:1;letter-spacing:-4px;background:linear-gradient(135deg,#fff,#cbd5e1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;text-shadow:0 8px 32px rgba(255,255,255,.1)}
+    @media(min-width:640px){.number{font-size:180px;letter-spacing:-8px}}
+    .icon{font-size:64px;margin-bottom:14px}
+    h1{font-size:24px;font-weight:800;margin-bottom:10px;letter-spacing:-.3px}
+    p{font-size:14px;opacity:.85;line-height:1.6;margin-bottom:28px;max-width:380px;margin-left:auto;margin-right:auto}
+    .actions{display:flex;flex-direction:column;gap:10px;max-width:280px;margin:0 auto}
+    .btn{padding:14px 24px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+    .btn-primary{background:white;color:#1e3a8a}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.25)}
+    .btn-secondary{background:rgba(255,255,255,.12);color:white;border:1px solid rgba(255,255,255,.2)}
+    .btn-secondary:hover{background:rgba(255,255,255,.18)}
+    .bg-shapes{position:absolute;inset:0;overflow:hidden;z-index:1}
+    .bg-shapes::before,.bg-shapes::after{content:'';position:absolute;border-radius:50%;filter:blur(80px);opacity:.3}
+    .bg-shapes::before{width:400px;height:400px;background:#3b82f6;top:-100px;left:-100px;animation:float 10s ease-in-out infinite}
+    .bg-shapes::after{width:300px;height:300px;background:#8b5cf6;bottom:-50px;right:-80px;animation:float 13s ease-in-out infinite reverse}
+    @keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(40px,-40px)}}
+  </style>
+</head>
+<body>
+  <div class="bg-shapes"></div>
+  <div class="container">
+    <div class="icon">🔍</div>
+    <div class="number">404</div>
+    <h1>Halaman Tidak Ditemukan</h1>
+    <p>Halaman yang Anda cari tidak ada atau telah dipindahkan. Periksa kembali URL atau kembali ke beranda.</p>
+    <div class="actions">
+      <a href="/" class="btn btn-primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+        Kembali ke Beranda
+      </a>
+      <button class="btn btn-secondary" onclick="history.back()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+        Halaman Sebelumnya
+      </button>
+    </div>
+  </div>
+</body>
+</html>

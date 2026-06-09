@@ -1,0 +1,12 @@
+# Cloudflare Pages redirects
+# 404 fallback - SPA-like behavior
+/sw.js              /sw.js              200
+/manifest.json      /manifest.json      200
+/icons/*            /icons/:splat       200
+
+# Route to existing pages
+/login              /index.html         200
+/dashboard          /admin.html         200
+
+# 404 fallback untuk semua URL tidak dikenal
+/*                  /404.html           404

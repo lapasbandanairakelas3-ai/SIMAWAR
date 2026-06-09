@@ -12,6 +12,12 @@
     @keyframes swpulse{0%,100%{opacity:1}50%{opacity:.5}}
     @keyframes sbar{to{width:100%}}
   </style>
+  <link rel="manifest" href="/manifest.json"/>
+  <meta name="theme-color" content="#1e3a8a"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="SIMAWAR"/>
+  <link rel="apple-touch-icon" href="/icons/icon-192.png"/>
 </head>
 <body>
 
@@ -61,7 +67,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
       <span id="btnLoginText">Masuk</span>
     </button>
-    <p style="text-align:center;font-size:11px;color:#94a3b8;margin-top:14px">Hubungi admin jika lupa password</p>
+    <p style="text-align:center;font-size:12px;color:#64748b;margin-top:14px"><a href="#" onclick="openLupaPwd();return false;" style="color:#1d4ed8;font-weight:600;text-decoration:none">Lupa Password?</a></p>
   </div>
 
   <div class="app-footer" style="position:fixed;bottom:0;left:0;right:0;background:transparent;border:none;padding:14px">
@@ -72,6 +78,7 @@
   </div>
 </div>
 
+<script src="js/pwa.js"></script>
 <script src="js/config.js"></script>
 <script>
 function togglePwd(id, btn) {
@@ -180,7 +187,71 @@ async function init() {
     if(swId){ location.href=swAdmin==='1'?'admin.html':'user.html'; return; }
   } catch(e){}
 }
+
+// ── LUPA PASSWORD (admin only) ────────────────────────────────
+function openLupaPwd(){
+  document.getElementById('lupaPwdModal').style.display='flex';
+  document.getElementById('lupaEmail').value='';
+  document.getElementById('lupaResult').innerHTML='';
+}
+function closeLupaPwd(){ document.getElementById('lupaPwdModal').style.display='none'; }
+async function submitLupaPwd(){
+  const email=(document.getElementById('lupaEmail').value||'').trim().toLowerCase();
+  const result=document.getElementById('lupaResult');
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    result.innerHTML='<div style="background:#fef2f2;color:#dc2626;padding:10px 12px;border-radius:10px;font-size:12px;font-weight:600;margin-top:10px">Format email tidak valid.</div>';
+    return;
+  }
+  const btn=document.getElementById('btnLupaSubmit');
+  btn.disabled=true; btn.textContent='Memeriksa...';
+  try{
+    // Cari admin dengan email tersebut
+    const {data,error}=await sb.from('pegawai').select('id,nama,username,password_plain').eq('email',email).eq('is_admin',true).maybeSingle();
+    if(error||!data){
+      result.innerHTML='<div style="background:#fef2f2;color:#dc2626;padding:10px 12px;border-radius:10px;font-size:12px;font-weight:600;margin-top:10px">❌ Email tidak terdaftar sebagai admin.</div>';
+      return;
+    }
+    // Tampilkan kredensial (untuk lapas, ini lebih praktis daripada SMTP)
+    result.innerHTML=`<div style="background:#f0fdf4;border:1px solid #86efac;padding:14px;border-radius:12px;margin-top:12px">
+      <div style="font-size:13px;font-weight:700;color:#065f46;margin-bottom:8px">✅ Akun Ditemukan</div>
+      <div style="font-size:12px;color:#166534;line-height:1.7">
+        <div><strong>Nama:</strong> ${data.nama}</div>
+        <div><strong>Username:</strong> <code style="background:#d1fae5;padding:2px 6px;border-radius:4px">${data.username}</code></div>
+        <div style="margin-top:6px"><strong>Password:</strong> <code style="background:#fef9c3;padding:2px 6px;border-radius:4px;color:#92400e">${data.password_plain||'—'}</code></div>
+      </div>
+      <div style="font-size:11px;color:#94a3b8;margin-top:10px;padding-top:10px;border-top:1px solid #bbf7d0">⚠️ Catat password ini lalu segera ganti setelah login.</div>
+    </div>`;
+  } finally {
+    btn.disabled=false; btn.textContent='Cari Akun';
+  }
+}
+
 init();
 </script>
+
+<!-- MODAL LUPA PASSWORD -->
+<div id="lupaPwdModal" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.5);backdrop-filter:blur(4px)" onclick="if(event.target===this)closeLupaPwd()">
+  <div style="background:white;border-radius:20px;max-width:400px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.2)">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:20px 20px 12px">
+      <div>
+        <div style="font-size:16px;font-weight:800;color:#1e293b">Lupa Password</div>
+        <div style="font-size:12px;color:#94a3b8;margin-top:2px">Khusus akun Admin</div>
+      </div>
+      <button onclick="closeLupaPwd()" style="background:#f1f5f9;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;color:#64748b;font-size:18px">✕</button>
+    </div>
+    <div style="padding:0 20px 20px">
+      <p style="font-size:13px;color:#64748b;margin-bottom:14px;line-height:1.6">Masukkan email yang terdaftar pada akun admin Anda. Sistem akan menampilkan kredensial Anda jika ditemukan.</p>
+      <div style="margin-bottom:14px">
+        <label style="font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;display:block">Email Admin</label>
+        <input type="email" id="lupaEmail" placeholder="admin@email.com" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;outline:none" autocomplete="email"/>
+      </div>
+      <div id="lupaResult"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+        <button onclick="closeLupaPwd()" style="padding:9px 18px;border:none;background:#f1f5f9;color:#64748b;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer">Batal</button>
+        <button id="btnLupaSubmit" onclick="submitLupaPwd()" style="padding:9px 18px;border:none;background:linear-gradient(135deg,#3b82f6,#1e40af);color:white;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">Cari Akun</button>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
